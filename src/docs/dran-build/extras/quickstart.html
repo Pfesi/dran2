@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quickstart Guide &mdash; dran v1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=e160b93e"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="The command line interface (CLI)" href="cli.html" />
+    <link rel="prev" title="Caveats" href="caveats.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            dran
+          </a>
+              <div class="version">
+                v1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="caveats.html">Caveats</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Quickstart Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#starting-the-program-without-commands">Starting the program without commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#starting-the-program-with-command-line-options">Starting the program with command line options</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">The command line interface (CLI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gui.html">The graphical user interface (GUI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gui.html#the-landing-page">The landing page</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gui.html#edit-driftscan">Edit driftscan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gui.html#edit-time-series">Edit Time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gui.html#view-plots">View plots</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tuts/tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="commands.html">Commands</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guidelines:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../docs/modules.html">src</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">dran</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Quickstart Guide</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/extras/quickstart.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="quickstart-guide">
+<h1>Quickstart Guide<a class="headerlink" href="#quickstart-guide" title="Link to this heading"></a></h1>
+<p>After the successful <a class="reference external" href="installation.rst">installation</a> of the package libraries you can now start reducing the data. DRAN provides you with a variety of options to process drift scan data which are
+discussed below.</p>
+<section id="starting-the-program-without-commands">
+<h2>Starting the program without commands<a class="headerlink" href="#starting-the-program-without-commands" title="Link to this heading"></a></h2>
+<p>As a beginner, it is advised to start running your analysis by basically just entering the program name without any options. This is useful as it starts the program and shows you step by step options you can select to reduce and analyse your data.</p>
+<p>To start the program type</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dran</span>
+</pre></div>
+</div>
+<p>This command starts the program and displays a set of options a user
+can select to begin processing drift scan data.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#########################################################</span>
+<span class="c1">#                                                                                            #</span>
+<span class="c1">#             ######  ######  ###### #    #                                #</span>
+<span class="c1">#             #     # #    #  #    # # #  #                                #</span>
+<span class="c1">#             #     # #####   ###### #  # #                                #</span>
+<span class="c1">#             #     # #    #  #    # #   ##                                #</span>
+<span class="c1">#             ######  #    #  #    # #    #                                #</span>
+<span class="c1">#                                                                                            #</span>
+<span class="c1">#########################################################</span>
+
+<span class="c1">#     PROGRAM STARTED</span>
+
+
+<span class="c1">## SELECT OPTION:</span>
+<span class="o">-----------------------------------</span>
+
+<span class="mf">1.</span> <span class="n">Data</span> <span class="n">reduction</span>
+<span class="mf">2.</span> <span class="n">Open</span> <span class="n">GUI</span>
+<span class="mf">3.</span> <span class="n">Run</span> <span class="n">command</span> <span class="n">line</span> <span class="n">analysis</span>
+<span class="mf">4.</span> <span class="n">Open</span> <span class="n">documentation</span>
+<span class="mf">5.</span> <span class="n">Open</span> <span class="n">dashboard</span>
+<span class="mf">6.</span> <span class="n">Exit</span> <span class="n">program</span>
+
+<span class="n">Please</span> <span class="n">select</span> <span class="n">an</span> <span class="n">option</span>
+
+
+<span class="n">Option</span> <span class="n">Selected</span><span class="p">:</span>
+</pre></div>
+</div>
+</section>
+<section id="starting-the-program-with-command-line-options">
+<h2>Starting the program with command line options<a class="headerlink" href="#starting-the-program-with-command-line-options" title="Link to this heading"></a></h2>
+<p>To start the program with command line options.</p>
+<p>The program also has an added functionality to let a user type in specific commands that can be run directly
+from the comman line.
+To see these commands, type the following</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dran</span> <span class="o">-</span><span class="n">h</span>
+</pre></div>
+</div>
+<p>This will print out the set of options listed below,:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">dran</span><span class="o">.</span><span class="n">py</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">db</span> <span class="n">DB</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">f</span> <span class="n">F</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">force</span> <span class="n">FORCE</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">c</span> <span class="n">C</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">b</span> <span class="n">B</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">-</span><span class="n">delete_db</span> <span class="n">DELETE_DB</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">mfp</span> <span class="n">MFP</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">keep</span> <span class="n">KEEP</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">-</span><span class="n">deleteFrom</span> <span class="n">DELETEFROM</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">conv</span> <span class="n">CONV</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">saveLocs</span> <span class="n">SAVELOCS</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">-</span><span class="n">fitTheoretical</span> <span class="n">FITTHEORETICAL</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">-</span><span class="n">applyRFIremoval</span> <span class="n">APPLYRFIREMOVAL</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">fitLocs</span> <span class="n">FITLOCS</span><span class="p">]</span>
+
+<span class="n">Begin</span> <span class="n">processing</span> <span class="n">HartRAO</span> <span class="n">drift</span> <span class="n">scan</span> <span class="n">data</span>
+
+<span class="n">optional</span> <span class="n">arguments</span><span class="p">:</span>
+<span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>            <span class="n">show</span> <span class="n">this</span> <span class="n">help</span> <span class="n">message</span> <span class="ow">and</span> <span class="n">exit</span>
+<span class="o">-</span><span class="n">db</span> <span class="n">DB</span>                <span class="n">turn</span> <span class="n">debugging</span> <span class="n">on</span> <span class="ow">or</span> <span class="n">off</span><span class="o">.</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="o">-</span><span class="n">db</span> <span class="n">on</span><span class="p">,</span> <span class="n">by</span> <span class="n">default</span>
+                        <span class="n">debug</span> <span class="ow">is</span> <span class="n">off</span>
+<span class="o">-</span><span class="n">f</span> <span class="n">F</span>                  <span class="n">process</span> <span class="n">file</span> <span class="ow">or</span> <span class="n">folder</span> <span class="n">at</span> <span class="n">given</span> <span class="n">path</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="o">-</span><span class="n">f</span> <span class="n">data</span><span class="o">/</span><span class="n">Hydr</span>
+                        <span class="n">aA_13NB</span><span class="o">/</span><span class="mi">2019</span><span class="n">d133_16h12m15s_Cont_mike_HYDRA_A</span><span class="o">.</span><span class="n">fits</span> <span class="ow">or</span>
+                        <span class="o">-</span><span class="n">f</span> <span class="n">data</span><span class="o">/</span><span class="n">HydraA_13NB</span>
+<span class="o">-</span><span class="n">force</span> <span class="n">FORCE</span>          <span class="n">force</span> <span class="n">fit</span> <span class="nb">all</span> <span class="n">drift</span> <span class="n">scans</span> <span class="n">y</span><span class="o">/</span><span class="n">n</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="o">-</span><span class="n">force</span> <span class="n">y</span><span class="o">.</span> <span class="n">Default</span>
+                        <span class="ow">is</span> <span class="nb">set</span> <span class="n">to</span> <span class="n">n</span>
+<span class="o">-</span><span class="n">c</span> <span class="n">C</span>                  <span class="n">initiate</span> <span class="n">the</span> <span class="n">command</span> <span class="n">to</span> <span class="n">run</span> <span class="n">program</span><span class="o">.</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="o">-</span><span class="n">c</span> <span class="n">gui</span> <span class="ow">or</span> <span class="o">-</span><span class="n">c</span>
+                        <span class="n">analysis</span> <span class="ow">or</span> <span class="o">-</span><span class="n">c</span> <span class="n">cli</span>
+<span class="o">-</span><span class="n">b</span> <span class="n">B</span>                  <span class="n">initiate</span> <span class="n">browser</span><span class="o">.</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="o">-</span><span class="n">b</span> <span class="n">docs</span> <span class="ow">or</span> <span class="o">-</span><span class="n">b</span> <span class="n">dash</span>
+<span class="o">-</span><span class="n">delete_db</span> <span class="n">DELETE_DB</span>  <span class="n">delete</span> <span class="n">database</span> <span class="n">on</span> <span class="n">program</span> <span class="n">run</span><span class="o">.</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="o">-</span><span class="n">delete_db</span> <span class="n">y</span> <span class="ow">or</span>
+                        <span class="o">-</span><span class="n">delete_db</span> <span class="n">CALDB</span><span class="o">.</span><span class="n">db</span>
+<span class="o">-</span><span class="n">mfp</span> <span class="n">MFP</span>              <span class="n">multi</span><span class="o">-</span><span class="n">file</span> <span class="n">processing</span> <span class="n">of</span> <span class="n">data</span> <span class="n">between</span> <span class="n">two</span> <span class="n">dates</span><span class="o">.</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span>
+                        <span class="o">-</span><span class="n">mfp</span> <span class="n">fileList</span><span class="o">.</span><span class="n">txt</span>
+<span class="o">-</span><span class="n">keep</span> <span class="n">KEEP</span>            <span class="n">keep</span> <span class="n">original</span> <span class="n">plots</span> <span class="k">while</span> <span class="n">processing</span> <span class="n">data</span><span class="o">.</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="o">-</span><span class="n">keep</span>
+                        <span class="n">y</span>
+<span class="o">-</span><span class="n">deleteFrom</span> <span class="n">DELETEFROM</span>
+                        <span class="ow">in</span> <span class="n">coordination</span> <span class="n">eith</span> <span class="n">the</span> <span class="n">filename</span><span class="p">,</span> <span class="n">use</span> <span class="n">deleteFrom</span> <span class="n">to</span>
+                        <span class="n">delete</span> <span class="n">a</span> <span class="n">row</span> <span class="kn">from</span> <span class="nn">a</span> <span class="n">database</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="n">deleteFrom</span> <span class="n">CALDB</span>
+<span class="o">-</span><span class="n">conv</span> <span class="n">CONV</span>            <span class="n">convert</span> <span class="n">database</span> <span class="n">tables</span> <span class="n">to</span> <span class="n">csv</span><span class="o">.</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="o">-</span><span class="n">conv</span> <span class="n">CALDB</span>
+<span class="o">-</span><span class="n">saveLocs</span> <span class="n">SAVELOCS</span>    <span class="n">Save</span> <span class="n">fit</span> <span class="n">locations</span><span class="o">.</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="o">-</span><span class="n">saveLocs</span> <span class="n">y</span> <span class="p">,</span> <span class="n">default</span> <span class="ow">is</span> <span class="n">no</span>
+<span class="o">-</span><span class="n">fitTheoretical</span> <span class="n">FITTHEORETICAL</span>
+                        <span class="n">Fit</span> <span class="n">theoretical</span> <span class="n">locations</span> <span class="n">of</span> <span class="n">the</span> <span class="n">baseline</span><span class="p">,</span> <span class="n">i</span><span class="o">.</span><span class="n">e</span><span class="o">.</span> <span class="n">the</span>
+                        <span class="n">FNBW</span> <span class="n">locs</span><span class="o">.</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="o">-</span><span class="n">fitTheoretical</span> <span class="n">y</span> <span class="p">,</span> <span class="n">default</span> <span class="ow">is</span> <span class="n">no</span><span class="o">.</span>
+<span class="o">-</span><span class="n">applyRFIremoval</span> <span class="n">APPLYRFIREMOVAL</span>
+                        <span class="n">Apply</span> <span class="ow">or</span> <span class="n">don</span><span class="s1">&#39;t apply RFI removal e.g. -applyRFIremoval</span>
+                        <span class="n">n</span><span class="p">,</span> <span class="n">default</span> <span class="ow">is</span> <span class="n">yes</span>
+<span class="o">-</span><span class="n">fitLocs</span> <span class="n">FITLOCS</span>      <span class="n">Fit</span> <span class="n">data</span> <span class="n">at</span> <span class="n">sepcified</span> <span class="n">locations</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="o">-</span><span class="n">fitLocs</span>
+                        <span class="n">pathToFile</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If you enter a command that doesn’t exist the following error pops up</p>
+<p>e.g. $ python dran.py command_that_doesnt_exists</p>
+<p>usage: dran.py [-h] [-db DB] [-f F] [-force FORCE] [-c C] [-b B]
+[-delete_db DELETE_DB] [-mfp MFP] [-keep KEEP]
+[-deleteFrom DELETEFROM] [-conv CONV] [-saveLocs SAVELOCS]
+[-fitTheoretical FITTHEORETICAL]
+[-applyRFIremoval APPLYRFIREMOVAL] [-fitLocs FITLOCS]</p>
+<p>dran.py: error: unrecognized arguments: command_that_doesnt_exists</p>
+</div>
+<p>### For example:</p>
+<p>To perform data reduction on a single file, type in</p>
+<p>dran</p>
+<p>This will bring up the menu shown below with options to select how you want to proceeed with your data reduction or analysis.</p>
+<p>In our case we would select option 1 as we are looking to get an automated reduction.</p>
+<p>#### Option 1</p>
+<p>Upon selecting option 1, the following propmt will be displayed</p>
+<p>Here you will be shown 3 more options.
+- Option 1 : reduce 1 file
+- Option 2 : reduce a folder containg files of 1 source at a particular frequency
+- Option 3 : reduce all files in the directory where all of your sources are located.</p>
+<p>In our case we will select option 1 again as we are only looking to process a single file. From here a gui will pop up asking you to locate the file you want to process. Once the file has been located, the program will automatically process and fit your data and make plots of the fit which will be locate in the plots folder. Congratulations, you have just ran your first data reduction.</p>
+<p>#### Option 2</p>
+<p>Allows the user to manually reduce the data. With this option the user can tinker with fitting settings and options to get the best fit possible for what they are working on.</p>
+<p>#### Option 3</p>
+<p>Opens up the the GUI.</p>
+<p>#### Option 4</p>
+<p>Opens up the web resource. The resource contains the code documentation as well as <strong>step by step tutorials</strong> and results from the test data.</p>
+<p>#### Option 0</p>
+<p>Exits the program</p>
+<p>As shown above some options contain follow up options to further refine your processing selection. Its ultimately up to the user to decide how they want to process their data.</p>
+<p>### More examples.</p>
+<p>To perform autotomated data reduction on a single file given the absolute path</p>
+<p>dran -f filepath</p>
+<p>i.e.
+dran -f /Users/pfesesanivanzyl/Final-PhD/code/all_hartrao_data/HydraA_13NB/2014d047_20h30m12s_Cont_mike_HYDRA_A.fits</p>
+<p>To perform data reduction on a single file with debugging</p>
+<p>dran -f filepath -db y</p>
+<p>i.e.
+dran -f /Users/pfesesanivanzyl/Final-PhD/code/all_hartrao_data/HydraA_13NB/2014d047_20h30m12s_Cont_mike_HYDRA_A.fits -db y</p>
+<p>To perform data reduction/analysis using the GUI
+dran -g gui</p>
+<p>Once the GUI landing page pops up select the “Edit Driftscan” option.</p>
+<p>For a full tutorial please view the web resource on option 4.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="caveats.html" class="btn btn-neutral float-left" title="Caveats" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cli.html" class="btn btn-neutral float-right" title="The command line interface (CLI)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Pfesesani van Zyl.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -8,7 +8,7 @@ little bit helps, and credit will always be given.
 Bug reports
 ===========
 
-When `reporting a bug <https://github.com/Pfesi/dran/issues>`_ please include:
+When `reporting a bug <https://github.com/Pfesi/dran2/issues>`_ please include:
 
     * Your operating system name and version.
     * Any details about your local setup that might be helpful in troubleshooting.
@@ -37,7 +37,7 @@ Development
 
 To set up `dran` for local development:
 
-1. Fork `dran <https://github.com/Pfesi/dran/branches>`_
+1. Fork `dran <https://github.com/Pfesi/dran2/branches>`_
    (look for the "Fork" button).
 2. Clone your fork locally::
 
