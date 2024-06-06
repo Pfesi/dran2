@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.common.sqlite_db &mdash; dran v1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e160b93e"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            dran
+          </a>
+              <div class="version">
+                v1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/caveats.html">Caveats</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/quickstart.html">Quickstart Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/cli.html">The command line interface (CLI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html">The graphical user interface (GUI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#the-landing-page">The landing page</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#edit-driftscan">Edit driftscan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#edit-time-series">Edit Time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#view-plots">View plots</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/tuts/tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/commands.html">Commands</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guidelines:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/modules.html">src</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">dran</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.common.sqlite_db</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.common.sqlite_db</h1><div class="highlight"><pre>
+<span></span><span class="c1"># =========================================================================== #</span>
+<span class="c1"># File    : sqlite_db.py                                                      #</span>
+<span class="c1"># Author  : Pfesesani V. van Zyl                                              #</span>
+<span class="c1"># =========================================================================== #</span>
+
+<span class="c1"># Standard library imports</span>
+<span class="c1"># --------------------------------------------------------------------------- #</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">sqlite3</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">.msgConfiguration</span> <span class="kn">import</span> <span class="n">msg_wrapper</span>
+<span class="kn">from</span> <span class="nn">.miscellaneousFunctions</span> <span class="kn">import</span> <span class="n">set_table_name</span>
+
+<span class="c1"># Local imports</span>
+<span class="c1"># --------------------------------------------------------------------------- #</span>
+<div class="viewcode-block" id="SQLiteDB">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.sqlite_db.SQLiteDB">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">SQLiteDB</span><span class="p">:</span>
+    <span class="n">dbPath</span><span class="p">:</span> <span class="nb">str</span> <span class="c1"># name of database</span>
+    <span class="n">log</span><span class="p">:</span> <span class="nb">object</span> <span class="c1"># logger</span>
+    <span class="c1"># __dict__: dict</span>
+
+<div class="viewcode-block" id="SQLiteDB.create_db">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.sqlite_db.SQLiteDB.create_db">[docs]</a>
+    <span class="k">def</span> <span class="nf">create_db</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Create a new database. &quot;&quot;&quot;</span>
+
+        <span class="n">msg_wrapper</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="s1">&#39;Opened new Database&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conn</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dbPath</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SQLiteDB.close_db">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.sqlite_db.SQLiteDB.close_db">[docs]</a>
+    <span class="k">def</span> <span class="nf">close_db</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Close the database connection.&quot;&quot;&quot;</span>
+        
+        <span class="n">msg_wrapper</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="s1">&#39;Closed new Database&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+    
+<div class="viewcode-block" id="SQLiteDB.commit_changes">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.sqlite_db.SQLiteDB.commit_changes">[docs]</a>
+    <span class="k">def</span> <span class="nf">commit_changes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Commit/save changes you have implemented to the database. &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Commited changes&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SQLiteDB.create_table_stmt">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.sqlite_db.SQLiteDB.create_table_stmt">[docs]</a>
+    <span class="k">def</span> <span class="nf">create_table_stmt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">tableName</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Create table from dictionary. &quot;&quot;&quot;</span>
+
+        <span class="n">sqlStmt</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+       
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># print(key,value, type(value).__name__)</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;list&#39;</span><span class="p">:</span>
+                <span class="c1"># pass</span>
+                <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">=</span><span class="s1">&#39;;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="c1"># print(type(value))</span>
+
+            <span class="c1"># Make the filename a foreign key</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;FILENAME&quot;</span><span class="p">:</span>
+                <span class="n">sqlStmt</span> <span class="o">+=</span><span class="sa">f</span><span class="s1">&#39;CREATE TABLE IF NOT EXISTS </span><span class="si">{</span><span class="n">tableName</span><span class="si">}</span><span class="s1"> (&#39;</span>
+                <span class="n">idKey</span> <span class="o">=</span> <span class="n">sqlStmt</span> <span class="o">+</span> <span class="s2">&quot;id INTEGER PRIMARY KEY AUTOINCREMENT&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span>
+                <span class="n">sqlStmt</span> <span class="o">=</span> <span class="n">idKey</span> <span class="o">+</span> <span class="n">key</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="s2">&quot;TEXT&quot;</span> <span class="o">+</span> <span class="s2">&quot; UNIQUE , &quot;</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+                <span class="n">sqlStmt</span> <span class="o">=</span> <span class="n">sqlStmt</span> <span class="o">+</span> <span class="n">key</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="s2">&quot;REAL&quot;</span> <span class="o">+</span> <span class="s2">&quot; , &quot;</span>
+            <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;float64&quot;</span><span class="p">:</span>
+                <span class="n">sqlStmt</span> <span class="o">=</span> <span class="n">sqlStmt</span> <span class="o">+</span> <span class="n">key</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="s2">&quot;REAL&quot;</span> <span class="o">+</span> <span class="s2">&quot; , &quot;</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="n">sqlStmt</span> <span class="o">=</span> <span class="n">sqlStmt</span> <span class="o">+</span> <span class="n">key</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="s2">&quot;INTEGER&quot;</span> <span class="o">+</span> <span class="s2">&quot; , &quot;</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">sqlStmt</span> <span class="o">=</span> <span class="n">sqlStmt</span> <span class="o">+</span> <span class="n">key</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="s2">&quot;TEXT&quot;</span> <span class="o">+</span> <span class="s2">&quot; , &quot;</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">sqlStmt</span> <span class="o">=</span> <span class="n">sqlStmt</span> <span class="o">+</span> <span class="n">key</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="s2">&quot;TEXT&quot;</span> <span class="o">+</span> <span class="s2">&quot; , &quot;</span>
+        <span class="k">return</span> <span class="n">sqlStmt</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span></div>
+
+    
+<div class="viewcode-block" id="SQLiteDB.create_table">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.sqlite_db.SQLiteDB.create_table">[docs]</a>
+    <span class="k">def</span> <span class="nf">create_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">tableName</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Create an sql statement to create a table.&quot;&quot;&quot;</span>
+
+        <span class="n">tableName</span><span class="o">=</span><span class="n">set_table_name</span><span class="p">(</span><span class="n">tableName</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+
+        <span class="n">sqlStmt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_table_stmt</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">tableName</span><span class="p">)</span>
+        <span class="c1"># print(sqlStmt)</span>
+        <span class="c1"># sys.exit()</span>
+        <span class="c1"># self.c.execute(sqlStmt)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># sqlStmt = self.create_table_stmt(data, tableName)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sqlStmt</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;added&#39;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="c1"># tableName=f&#39;_{tableName}&#39;</span>
+            <span class="c1"># sqlStmt = self.create_table_stmt(data, tableName)</span>
+            
+            <span class="c1"># self.c.execute(sqlStmt)</span>
+            <span class="c1"># print(data)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Already exists&#39;</span><span class="p">)</span>
+            <span class="c1"># print(&#39;added&#39;)</span>
+
+        <span class="k">return</span> <span class="n">tableName</span></div>
+
+    
+<div class="viewcode-block" id="SQLiteDB.insert_into_table_stmt_with_pk">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.sqlite_db.SQLiteDB.insert_into_table_stmt_with_pk">[docs]</a>
+    <span class="k">def</span> <span class="nf">insert_into_table_stmt_with_pk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">tableName</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Insert values into table and create a primary key.&quot;&quot;&quot;</span>
+
+        <span class="n">sqlStmt</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="n">dataListKey</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">dataListKeyString</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">dataListValues</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="n">dataListValueString</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">dataListKeyString</span> <span class="o">=</span> <span class="n">dataListKeyString</span> <span class="o">+</span> <span class="n">dataListKey</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dataListKeyString</span> <span class="o">=</span> <span class="n">dataListKeyString</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span> <span class="o">+</span> <span class="n">dataListKey</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+
+        <span class="n">placeHolders</span> <span class="o">=</span> <span class="s2">&quot;?,&quot;</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="n">sqlStmt</span> <span class="o">=</span> <span class="s2">&quot;INSERT INTO &quot;</span> <span class="o">+</span> <span class="n">tableName</span> <span class="o">+</span> \
+            <span class="s2">&quot; (&quot;</span> <span class="o">+</span> <span class="n">dataListKeyString</span> <span class="o">+</span> <span class="s2">&quot;) VALUES (&quot;</span> <span class="o">+</span> <span class="n">placeHolders</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+
+        <span class="k">return</span> <span class="n">sqlStmt</span><span class="p">,</span> <span class="n">dataListValues</span></div>
+
+    
+<div class="viewcode-block" id="SQLiteDB.populate_table">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.sqlite_db.SQLiteDB.populate_table">[docs]</a>
+    <span class="k">def</span> <span class="nf">populate_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">tableName</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; populate a database table with values. &quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">create_db</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="c1">#print(&#39;data: &#39;,data)</span>
+
+        <span class="n">sqlStmt</span><span class="p">,</span> <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">insert_into_table_stmt_with_pk</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">tableName</span><span class="p">)</span>
+        <span class="c1"># for i in range(len(values)):</span>
+        <span class="c1">#     print(sqlStmt)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sqlStmt</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;issue: &quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">commit_changes</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SQLiteDB.set_database_name">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.sqlite_db.SQLiteDB.set_database_name">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_database_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">databaseName</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the name of the database. &quot;&quot;&quot;</span>
+
+        <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span> <span class="s2">&quot;Setup database name&quot;</span><span class="p">)</span>
+       
+        <span class="k">if</span> <span class="s2">&quot;.db&quot;</span> <span class="ow">in</span> <span class="n">databaseName</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">databaseName</span> <span class="o">=</span> <span class="n">databaseName</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">databaseName</span> <span class="o">=</span> <span class="n">databaseName</span><span class="o">+</span><span class="s2">&quot;.db&quot;</span></div>
+
+
+<div class="viewcode-block" id="SQLiteDB.get_table_names">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.sqlite_db.SQLiteDB.get_table_names">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_table_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">db</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get table names from the database.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            db (str): The name of the database</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            table_names (list): List of table names</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">msg_wrapper</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Getting tables from: </span><span class="si">{</span><span class="n">db</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_database_name</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+        
+        <span class="n">table_names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">sql_stmt</span> <span class="o">=</span> <span class="s2">&quot;SELECT name FROM sqlite_master WHERE type = &#39;table&#39;;&quot;</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">tables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql_stmt</span><span class="p">)</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">OperationalError</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Failed to fetch data from the server&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tables</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">tables</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">):</span>
+                <span class="n">table_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tables</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tables</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">tables</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;sqlite_sequence&quot;</span><span class="p">):</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">table_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tables</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">table_names</span></div>
+
+    
+<div class="viewcode-block" id="SQLiteDB.get_rows">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.sqlite_db.SQLiteDB.get_rows">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tbname</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the rows in the database table.</span>
+
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">                tbname : str</span>
+<span class="sd">                    table name</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">                rows: str</span>
+<span class="sd">                    table row list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># print(tbname)</span>
+        <span class="c1"># open the database</span>
+        <span class="c1"># self.create_db()</span>
+
+        <span class="c1"># read from selected table</span>
+        <span class="n">stmt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SELECT * FROM &#39;</span><span class="si">{</span><span class="n">tbname</span><span class="si">}</span><span class="s2">&#39; ORDER BY FILENAME ASC;&quot;</span>
+        <span class="c1"># print(stmt)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+
+        <span class="c1"># get filenames and return them</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">rows</span></div>
+
+    
+<div class="viewcode-block" id="SQLiteDB.get_all_table_coloumns">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.sqlite_db.SQLiteDB.get_all_table_coloumns">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_all_table_coloumns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Get coloumns of table</span>
+<span class="sd">            return index, coloumn name and coloumn type</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">col_ind</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">col_name</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">col_type</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;PRAGMA table_info(&#39;</span><span class="si">%s</span><span class="s2">&#39;) &quot;</span> <span class="o">%</span>
+                             <span class="n">table_name</span><span class="p">)</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+
+        <span class="c1"># print(res)</span>
+        <span class="c1"># sys.exit()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">)):</span>
+            <span class="n">col_ind</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">col_name</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">col_type</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">col_ind</span><span class="p">,</span> <span class="n">col_name</span><span class="p">,</span> <span class="n">col_type</span></div>
+</div>
+
+    
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Pfesesani van Zyl.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.common.calibrate &mdash; dran v1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e160b93e"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            dran
+          </a>
+              <div class="version">
+                v1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/caveats.html">Caveats</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/quickstart.html">Quickstart Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/cli.html">The command line interface (CLI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html">The graphical user interface (GUI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#the-landing-page">The landing page</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#edit-driftscan">Edit driftscan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#edit-time-series">Edit Time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#view-plots">View plots</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/tuts/tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/commands.html">Commands</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guidelines:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/modules.html">src</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">dran</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.common.calibrate</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.common.calibrate</h1><div class="highlight"><pre>
+<span></span><span class="c1"># =========================================================================== #</span>
+<span class="c1"># File: calc_pss.py                                                           #</span>
+<span class="c1"># Author: Pfesesani V. van Zyl                                                #</span>
+<span class="c1"># =========================================================================== #</span>
+
+<span class="c1"># Standard library imports</span>
+<span class="c1"># --------------------------------------------------------------------------- #</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span> 
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">.miscellaneousFunctions</span> <span class="kn">import</span> <span class="n">catch_zeroDivError</span>
+<span class="c1"># =========================================================================== #</span>
+
+<div class="viewcode-block" id="calc_pss">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.calibrate.calc_pss">[docs]</a>
+<span class="k">def</span> <span class="nf">calc_pss</span><span class="p">(</span><span class="n">flux</span><span class="p">,</span> <span class="n">Ta</span><span class="p">,</span> <span class="n">errTa</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the Point source sensitivity (PSS)</span>
+<span class="sd">        and its error for data with no pointing correction</span>
+<span class="sd">        applied.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            flux: the flux density of the source</span>
+<span class="sd">            Ta: the antenna temperature</span>
+<span class="sd">            errTa: the error in the antenna temperature</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pss: the point source sensitivity</span>
+<span class="sd">            errPSS: the error in the point source sensitivity</span>
+<span class="sd">            appEff: the apperture effeciency</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">pss</span> <span class="o">=</span> <span class="n">flux</span><span class="o">/</span><span class="mf">2.0</span><span class="o">/</span><span class="n">Ta</span>
+        <span class="n">errPSS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">errTa</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="n">Ta</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">pss</span>
+        <span class="n">appEff</span> <span class="o">=</span> <span class="mf">1380.0</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="p">(</span><span class="mf">25.9</span><span class="o">/</span><span class="mf">2.0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="n">pss</span>
+
+    <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+        <span class="n">pss</span> <span class="o">=</span> <span class="mf">.0</span>
+        <span class="n">errPSS</span> <span class="o">=</span> <span class="mf">.0</span>
+        <span class="n">appEff</span> <span class="o">=</span> <span class="mf">.0</span>
+
+    <span class="k">return</span> <span class="n">pss</span><span class="p">,</span> <span class="n">errPSS</span><span class="p">,</span> <span class="n">appEff</span></div>
+
+
+<div class="viewcode-block" id="calc_tcorr">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.calibrate.calc_tcorr">[docs]</a>
+<span class="k">def</span> <span class="nf">calc_tcorr</span><span class="p">(</span><span class="n">Ta</span><span class="p">,</span> <span class="n">pc</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the antenna temperature correction for high frequencies.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            Ta - the on scan antenna temperature </span>
+<span class="sd">            pc - the pointing correction </span>
+<span class="sd">            data - the dictionary containing all the drift scan parameters</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            corrTa - the corrected antenna temperature</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># print(data[&#39;FRONTEND&#39;],data[&#39;BEAMTYPE&#39;],data[&#39;OBJECT&#39;])</span>
+    <span class="c1"># sys.exit()</span>
+
+    <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;FRONTEND&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;01.3S&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;OBJECT&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;JUPITER&quot;</span><span class="p">:</span>
+                <span class="c1"># Only applying a size correction factor and atmospheric correction to Jupiter</span>
+                <span class="c1"># See van Zyl (2023) - in Prep</span>
+                <span class="n">corrTa</span> <span class="o">=</span> <span class="n">Ta</span> <span class="o">*</span> <span class="n">pc</span> <span class="o">*</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;ATMOS_ABSORPTION_CORR&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;SIZE_CORRECTION_FACTOR&quot;</span><span class="p">]</span>
+                <span class="k">return</span> <span class="n">corrTa</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># do we also apply a atmospheric correcttion factor directly to the target source ?</span>
+            <span class="c1"># find out, for now I&#39;m not applyin it</span>
+            <span class="c1"># tests this ASAP</span>
+            <span class="n">corrTa</span> <span class="o">=</span> <span class="n">Ta</span> <span class="o">*</span> <span class="n">pc</span> <span class="c1">#* data[&quot;ATMOS_ABSORPTION_CORR&quot;]</span>
+            <span class="k">return</span> <span class="n">corrTa</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">corrTa</span> <span class="o">=</span> <span class="n">Ta</span><span class="o">*</span><span class="n">pc</span>
+        <span class="k">return</span> <span class="n">corrTa</span></div>
+
+
+<div class="viewcode-block" id="test_for_nans">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.calibrate.test_for_nans">[docs]</a>
+<span class="k">def</span> <span class="nf">test_for_nans</span><span class="p">(</span><span class="n">Ta</span><span class="p">,</span><span class="n">errTa</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Test if data has nans</span>
+<span class="sd">    </span>
+<span class="sd">        Returns: </span>
+<span class="sd">            Ta : antenna temperature</span>
+<span class="sd">            errTa: error in antenna temperature</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">Ta</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;nan&quot;</span> <span class="ow">or</span> <span class="n">Ta</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">Ta</span><span class="o">==</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">:</span>
+        <span class="n">Ta</span><span class="o">=</span><span class="mf">0.0</span>
+        <span class="n">errTa</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">return</span> <span class="n">Ta</span><span class="p">,</span> <span class="n">errTa</span> </div>
+
+
+<div class="viewcode-block" id="calc_pc_pss">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.calibrate.calc_pc_pss">[docs]</a>
+<span class="k">def</span> <span class="nf">calc_pc_pss</span><span class="p">(</span><span class="n">scanNum</span><span class="p">,</span> <span class="n">hpsTa</span><span class="p">,</span> <span class="n">errHpsTa</span><span class="p">,</span> <span class="n">hpnTa</span><span class="p">,</span> <span class="n">errHpnTa</span><span class="p">,</span> <span class="n">onTa</span><span class="p">,</span> <span class="n">errOnTa</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span><span class="n">data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Calculate the pss for pointing corrected observations.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                scanNum: the index of the current scan, see plot_manager.py</span>
+<span class="sd">                hpsTa: the half power south antenna temperature</span>
+<span class="sd">                errHpsTa: the error in the half power south antenna temperature</span>
+<span class="sd">                hpnTa: the half power north antenna temperature</span>
+<span class="sd">                errHpnTa: the error in the half power north antenna temperature</span>
+<span class="sd">                onTa: the on source antenna temperature</span>
+<span class="sd">                errOnTa: the error in the on source antenna temperature</span>
+<span class="sd">                flux: the source flux density</span>
+<span class="sd">                data: the dictionary containing all the drift scan parameters</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                pss: the point source sensitivity</span>
+<span class="sd">                errPss: the error in the point source sensitivity</span>
+<span class="sd">                appEff: the apperture effeciency</span>
+<span class="sd">                corrTa: the corrected antenna temperature </span>
+<span class="sd">                errCorrTa: the error in the corrected antenna temperature</span>
+<span class="sd">                appEff: the apperture effeciency</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Check if data has nans</span>
+        <span class="n">onTa</span><span class="p">,</span> <span class="n">errOnTa</span> <span class="o">=</span> <span class="n">test_for_nans</span><span class="p">(</span><span class="n">onTa</span><span class="p">,</span><span class="n">errOnTa</span><span class="p">)</span>
+        <span class="n">hpsTa</span><span class="p">,</span> <span class="n">errHpsTa</span> <span class="o">=</span> <span class="n">test_for_nans</span><span class="p">(</span><span class="n">hpsTa</span><span class="p">,</span><span class="n">errHpsTa</span><span class="p">)</span>
+        <span class="n">hpnTa</span><span class="p">,</span> <span class="n">errHpnTa</span> <span class="o">=</span> <span class="n">test_for_nans</span><span class="p">(</span><span class="n">hpnTa</span><span class="p">,</span><span class="n">errHpnTa</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">onTa</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+
+            <span class="c1">#if no hpnTa</span>
+            <span class="k">if</span><span class="p">((</span><span class="n">hpnTa</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">hpsTa</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)):</span>
+                <span class="c1">#pc = exp[((ln(hpnTa) - ln(onTa) + ln(2))**2)/4ln(2)]</span>
+                <span class="c1">#corrTa = onTa x pc</span>
+
+                <span class="c1"># calculate the pointing and corrected antenna temp and its error</span>
+                <span class="n">pc</span><span class="p">,</span> <span class="n">der1</span><span class="p">,</span> <span class="n">der2</span> <span class="o">=</span> <span class="n">calc_pc_eq</span><span class="p">(</span><span class="n">hpsTa</span><span class="p">,</span> <span class="n">onTa</span><span class="p">)</span>
+                <span class="n">corrTa</span> <span class="o">=</span> <span class="n">calc_tcorr</span><span class="p">(</span><span class="n">scanNum</span><span class="p">,</span><span class="n">onTa</span><span class="p">,</span> <span class="n">pc</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+                <span class="n">errCorrTa</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">errOnTa</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">der2</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">errHpsTa</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">der1</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+
+                <span class="c1"># Calculate the PSS and appeture effeciency</span>
+                <span class="n">pss</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">flux</span><span class="p">)</span><span class="o">/</span><span class="mf">2.0</span><span class="o">/</span><span class="n">corrTa</span><span class="p">)</span>  <span class="c1"># 0.0</span>
+                <span class="n">errPss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">errCorrTa</span><span class="o">/</span><span class="n">corrTa</span><span class="p">))</span><span class="o">*</span><span class="n">pss</span>
+                <span class="n">appEff</span> <span class="o">=</span> <span class="mf">1380.0</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="p">(</span><span class="mf">25.9</span><span class="o">/</span><span class="mf">2.0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="n">pss</span>
+
+                <span class="c1">#print(&quot;\n,errCorrTa: %.3f, corrTa: %.3f, PSS: %.3f, errPSS: %.3f\n&quot; %</span>
+                <span class="c1">#      (errCorrTa, corrTa, pss,errPss))</span>
+
+            <span class="c1">#if no hpsTa</span>
+            <span class="k">elif</span><span class="p">((</span><span class="n">hpnTa</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">hpsTa</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)):</span>
+                <span class="c1"># pc = exp[((ln(onTa) - ln(hpnTa) + ln(2))**2)/4ln(2)]</span>
+                <span class="c1"># corrTa = onTa x pc</span>
+
+                <span class="c1"># calculate the pointing and corrected antenna temp and its error</span>
+                <span class="n">pc</span><span class="p">,</span><span class="n">der1</span><span class="p">,</span> <span class="n">der2</span> <span class="o">=</span> <span class="n">calc_pc_eq</span><span class="p">(</span><span class="n">onTa</span><span class="p">,</span> <span class="n">hpnTa</span><span class="p">)</span>
+                <span class="n">corrTa</span> <span class="o">=</span> <span class="n">calc_tcorr</span><span class="p">(</span><span class="n">scanNum</span><span class="p">,</span><span class="n">onTa</span><span class="p">,</span> <span class="n">pc</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+                <span class="n">errCorrTa</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">errOnTa</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">der1</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">errHpnTa</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">der2</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+
+                <span class="c1"># Calculate the PSS and apeture effeciency</span>
+                <span class="n">pss</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">flux</span><span class="p">)</span><span class="o">/</span><span class="mf">2.0</span><span class="o">/</span><span class="n">corrTa</span><span class="p">)</span>  <span class="c1"># 0.0</span>
+                <span class="n">errPss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">errCorrTa</span><span class="o">/</span><span class="n">corrTa</span><span class="p">))</span><span class="o">*</span><span class="n">pss</span>
+                <span class="n">appEff</span> <span class="o">=</span> <span class="mf">1380.0</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="p">(</span><span class="mf">25.9</span><span class="o">/</span><span class="mf">2.0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="n">pss</span>
+
+                <span class="c1">#print(&quot;\n,errCorrTa: %.3f, corrTa: %.3f, PSS: %.3f, errPSS: %.3f\n&quot; %</span>
+                <span class="c1">#      (errCorrTa, corrTa, pss, errPss))</span>
+
+            <span class="c1">#if all present</span>
+            <span class="k">elif</span><span class="p">((</span><span class="n">hpnTa</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">hpsTa</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)):</span>
+                <span class="c1"># pc = exp[((ln(hpsTa) - ln(hpnTa)**2)/16ln(2)]</span>
+                <span class="c1"># corrTa = Ton x pc</span>
+
+                <span class="c1"># calculate the pointing and corrected antenna temp and its error</span>
+                <span class="n">term2</span> <span class="o">=</span> <span class="mi">16</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">pc</span><span class="p">,</span> <span class="n">der1</span><span class="p">,</span> <span class="n">der2</span> <span class="o">=</span> <span class="n">calc_pc_eq</span><span class="p">(</span><span class="n">hpsTa</span><span class="p">,</span> <span class="n">hpnTa</span><span class="p">,</span> <span class="n">term2</span><span class="p">)</span>
+                <span class="n">corrTa</span> <span class="o">=</span> <span class="n">calc_tcorr</span><span class="p">(</span><span class="n">scanNum</span><span class="p">,</span> <span class="n">onTa</span><span class="p">,</span> <span class="n">pc</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+                <span class="n">errCorrTa</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">errHpnTa</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">der2</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">errHpsTa</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">der1</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+
+                <span class="c1"># Calculate the PSS and apeture effeciency</span>
+                <span class="n">pss</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">flux</span><span class="p">)</span><span class="o">/</span><span class="mf">2.0</span><span class="o">/</span><span class="n">corrTa</span><span class="p">)</span> 
+                <span class="n">errPss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">errCorrTa</span><span class="o">/</span><span class="n">corrTa</span><span class="p">))</span><span class="o">*</span><span class="n">pss</span>
+                <span class="n">appEff</span> <span class="o">=</span> <span class="mf">1380.0</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="p">(</span><span class="mf">25.9</span><span class="o">/</span><span class="mf">2.0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="n">pss</span>
+
+                <span class="c1">#print(&quot;\nTcorerr: %.3f, corrTa: %.3f, PSS: %.3f, errPSS: %.3f\n&quot; %</span>
+                <span class="c1">#      (errCorrTa, corrTa, pss, errPss))</span>
+         
+            <span class="c1">#if no hpnTa/hpsTa</span>
+            <span class="k">if</span><span class="p">((</span><span class="n">hpnTa</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">hpsTa</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)):</span>
+                <span class="n">pss</span><span class="p">,</span> <span class="n">errPss</span><span class="p">,</span> <span class="n">appEff</span> <span class="o">=</span> <span class="n">set_pss_to_zero</span><span class="p">()</span>
+                <span class="n">corrTa</span><span class="p">,</span> <span class="n">errCorrTa</span><span class="p">,</span> <span class="n">pc</span> <span class="o">=</span> <span class="n">set_corr_ta_to_zero</span><span class="p">()</span>
+                
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># if there&#39;s no on scan observation, everything defaults to zero</span>
+            <span class="n">pss</span><span class="p">,</span> <span class="n">errPss</span><span class="p">,</span> <span class="n">appEff</span> <span class="o">=</span> <span class="n">set_pss_to_zero</span><span class="p">()</span>
+            <span class="n">corrTa</span><span class="p">,</span> <span class="n">errCorrTa</span><span class="p">,</span> <span class="n">pc</span> <span class="o">=</span> <span class="n">set_corr_ta_to_zero</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">pss</span><span class="p">,</span> <span class="n">errPss</span><span class="p">,</span> <span class="n">pc</span><span class="p">,</span> <span class="n">corrTa</span><span class="p">,</span> <span class="n">errCorrTa</span><span class="p">,</span> <span class="n">appEff</span></div>
+
+
+<div class="viewcode-block" id="calibrate">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.calibrate.calibrate">[docs]</a>
+<span class="k">def</span> <span class="nf">calibrate</span><span class="p">(</span>  <span class="n">hpsTa</span><span class="p">,</span> <span class="n">errHpsTa</span><span class="p">,</span> <span class="n">hpnTa</span><span class="p">,</span> <span class="n">errHpnTa</span><span class="p">,</span> <span class="n">onTa</span><span class="p">,</span> <span class="n">errOnTa</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">log</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Calculate the pointing corrected antenna temperature.</span>
+<span class="sd">    </span>
+<span class="sd">            Parameters:</span>
+<span class="sd">                hpsTa: the half power south antenna temperature</span>
+<span class="sd">                errHpsTa: the error in the half power south antenna temperature</span>
+<span class="sd">                hpnTa: the half power north antenna temperature</span>
+<span class="sd">                errHpnTa: the error in the half power north antenna temperature</span>
+<span class="sd">                onTa: the on source antenna temperature</span>
+<span class="sd">                errOnTa: the error in the on source antenna temperature</span>
+<span class="sd">                data: the dictionary containing all the drift scan parameters</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                pc: the pointing correction</span>
+<span class="sd">                corrTa: the corrected antenna temperature </span>
+<span class="sd">                errCorrTa: the error in the corrected antenna temperature</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># # Check if data has nans</span>
+        <span class="n">onTa</span><span class="p">,</span> <span class="n">errOnTa</span> <span class="o">=</span> <span class="n">test_for_nans</span><span class="p">(</span><span class="n">onTa</span><span class="p">,</span> <span class="n">errOnTa</span><span class="p">)</span>
+        <span class="n">hpsTa</span><span class="p">,</span> <span class="n">errHpsTa</span> <span class="o">=</span> <span class="n">test_for_nans</span><span class="p">(</span><span class="n">hpsTa</span><span class="p">,</span> <span class="n">errHpsTa</span><span class="p">)</span>
+        <span class="n">hpnTa</span><span class="p">,</span> <span class="n">errHpnTa</span> <span class="o">=</span> <span class="n">test_for_nans</span><span class="p">(</span><span class="n">hpnTa</span><span class="p">,</span> <span class="n">errHpnTa</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">onTa</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+
+            <span class="c1">#if no hpnTa</span>
+            <span class="k">if</span><span class="p">((</span><span class="n">hpnTa</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">hpsTa</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)):</span>
+                <span class="c1">#pc = exp[((ln(hpsTa) - ln(Ton) + ln(2))**2)/4ln(2)]</span>
+                <span class="c1">#corrTa = Ton x pc</span>
+
+                <span class="c1"># calculate the pointing and corrected antenna temp and its error</span>
+                <span class="n">pc</span><span class="p">,</span> <span class="n">der1</span><span class="p">,</span> <span class="n">der2</span> <span class="o">=</span> <span class="n">calc_pc_eq</span><span class="p">(</span><span class="n">hpsTa</span><span class="p">,</span> <span class="n">onTa</span><span class="p">)</span>
+                <span class="n">corrTa</span> <span class="o">=</span> <span class="n">calc_tcorr</span><span class="p">(</span> <span class="n">onTa</span><span class="p">,</span> <span class="n">pc</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+                <span class="n">errCorrTa</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">errOnTa</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">der2</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">errHpsTa</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">der1</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+
+            <span class="c1">#if no hpsTa</span>
+            <span class="k">elif</span><span class="p">((</span><span class="n">hpnTa</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">hpsTa</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)):</span>
+                <span class="c1"># pc = exp[((ln(Ton) - ln(hpnTa) + ln(2))**2)/4ln(2)]</span>
+                <span class="c1"># corrTa = Ton x pc</span>
+
+                <span class="c1"># calculate the pointing and corrected antenna temp and its error</span>
+                <span class="n">pc</span><span class="p">,</span> <span class="n">der1</span><span class="p">,</span> <span class="n">der2</span> <span class="o">=</span> <span class="n">calc_pc_eq</span><span class="p">(</span><span class="n">onTa</span><span class="p">,</span> <span class="n">hpnTa</span><span class="p">)</span>
+                <span class="n">corrTa</span> <span class="o">=</span> <span class="n">calc_tcorr</span><span class="p">(</span><span class="n">onTa</span><span class="p">,</span> <span class="n">pc</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+                <span class="n">errCorrTa</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">errOnTa</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">der1</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">errHpnTa</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">der2</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+
+            <span class="c1">#if all present</span>
+            <span class="k">elif</span><span class="p">((</span><span class="n">hpnTa</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">hpsTa</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)):</span>
+                <span class="c1"># pc = exp[((ln(hpsTa) - ln(hpnTa)**2)/16ln(2)]</span>
+                <span class="c1"># corrTa = Ton x pc</span>
+
+                <span class="c1"># calculate the pointing and corrected antenna temp and its error</span>
+                <span class="n">term2</span> <span class="o">=</span> <span class="mi">16</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">pc</span><span class="p">,</span> <span class="n">der1</span><span class="p">,</span> <span class="n">der2</span> <span class="o">=</span> <span class="n">calc_pc_eq</span><span class="p">(</span><span class="n">hpsTa</span><span class="p">,</span> <span class="n">hpnTa</span><span class="p">,</span> <span class="n">term2</span><span class="p">)</span>
+                <span class="n">corrTa</span> <span class="o">=</span> <span class="n">calc_tcorr</span><span class="p">(</span> <span class="n">onTa</span><span class="p">,</span> <span class="n">pc</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+                <span class="n">errCorrTa</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">errHpnTa</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">der2</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span>
+                                  <span class="p">(</span><span class="n">errHpsTa</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">der1</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+
+            <span class="c1">#if no hpnTa/hpsTa</span>
+            <span class="k">if</span><span class="p">((</span><span class="n">hpnTa</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">hpsTa</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)):</span>
+                <span class="n">corrTa</span><span class="p">,</span> <span class="n">errCorrTa</span><span class="p">,</span> <span class="n">pc</span> <span class="o">=</span> <span class="n">set_corr_ta_to_zero</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">corrTa</span><span class="p">,</span> <span class="n">errCorrTa</span><span class="p">,</span> <span class="n">pc</span> <span class="o">=</span> <span class="n">set_corr_ta_to_zero</span><span class="p">()</span>
+            
+        <span class="c1">#print(&quot;\npc: {}, corrTa: {}, Tcorrerr: {}\n&quot;.format(pc, corrTa, errCorrTa))</span>
+        <span class="k">return</span> <span class="n">pc</span><span class="p">,</span> <span class="n">corrTa</span><span class="p">,</span> <span class="n">errCorrTa</span></div>
+
+
+<div class="viewcode-block" id="calc_pc_eq">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.calibrate.calc_pc_eq">[docs]</a>
+<span class="k">def</span> <span class="nf">calc_pc_eq</span><span class="p">(</span><span class="n">Ta1</span><span class="p">,</span> <span class="n">Ta2</span><span class="p">,</span> <span class="n">term2</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Calculate the pointing correction and its derivatives.</span>
+<span class="sd">    The pointing equations are given in the method </span>
+<span class="sd">    calc_pc_pss()</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">        Ta1: first temperature</span>
+<span class="sd">        Ta2: second temperature</span>
+<span class="sd">        term2: the second term of the pointing correction equation as defined </span>
+<span class="sd">        in thesis/reference.  </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pc: the pointing correction</span>
+<span class="sd">        der1: first derivative with respect to Ta1</span>
+<span class="sd">        der2: first derivative with respect to Ta2</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">term2</span><span class="o">==</span><span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="n">term1</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Ta1</span><span class="p">))</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Ta2</span><span class="p">))</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">term2</span> <span class="o">=</span> <span class="mi">4</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">term1</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Ta1</span><span class="p">))</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Ta2</span><span class="p">)))</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">term3</span> <span class="o">=</span> <span class="n">term1</span><span class="o">/</span><span class="n">term2</span>
+    <span class="n">pc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">term3</span><span class="p">)</span>
+
+    <span class="c1"># calculate the derivatives</span>
+    <span class="n">der1</span> <span class="o">=</span> <span class="n">pc</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">term3</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="n">Ta1</span><span class="p">)</span>
+    <span class="n">der2</span> <span class="o">=</span> <span class="n">pc</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">term3</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="o">/</span><span class="n">Ta2</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pc</span><span class="p">,</span> <span class="n">der1</span><span class="p">,</span> <span class="n">der2</span></div>
+
+
+<div class="viewcode-block" id="set_pss_to_zero">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.calibrate.set_pss_to_zero">[docs]</a>
+<span class="k">def</span> <span class="nf">set_pss_to_zero</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Set the estimation of the pss and apperture effeciency to zero &quot;&quot;&quot;</span>
+
+    <span class="n">pss</span><span class="p">,</span> <span class="n">errPss</span><span class="p">,</span> <span class="n">appEff</span> <span class="o">=</span> <span class="mf">.0</span><span class="p">,</span> <span class="mf">.0</span><span class="p">,</span> <span class="mf">.0</span>
+    <span class="k">return</span> <span class="n">pss</span><span class="p">,</span> <span class="n">errPss</span><span class="p">,</span> <span class="n">appEff</span></div>
+
+
+<div class="viewcode-block" id="set_corr_ta_to_zero">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.calibrate.set_corr_ta_to_zero">[docs]</a>
+<span class="k">def</span> <span class="nf">set_corr_ta_to_zero</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Set the estimation of the corrected antenna temp to zero. &quot;&quot;&quot;</span>
+
+    <span class="n">corrTa</span><span class="p">,</span> <span class="n">corrTaErr</span><span class="p">,</span> <span class="n">pc</span> <span class="o">=</span> <span class="mf">.0</span><span class="p">,</span> <span class="mf">.0</span><span class="p">,</span> <span class="mf">.0</span>
+    <span class="k">return</span> <span class="n">corrTa</span><span class="p">,</span> <span class="n">corrTaErr</span><span class="p">,</span> <span class="n">pc</span></div>
+
+
+<div class="viewcode-block" id="calc_flux">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.calibrate.calc_flux">[docs]</a>
+<span class="k">def</span> <span class="nf">calc_flux</span><span class="p">(</span><span class="n">ta</span><span class="p">,</span><span class="n">dta</span><span class="p">,</span><span class="n">pss</span><span class="p">,</span><span class="n">dpss</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the flux density. &quot;&quot;&quot;</span>
+
+        <span class="n">ta</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">ta</span><span class="p">)</span>
+        <span class="n">dta</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">dta</span><span class="p">)</span>
+        <span class="n">pss</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">pss</span><span class="p">)</span>
+        <span class="n">dpss</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">dpss</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">ta</span><span class="p">)</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="ow">and</span> <span class="nb">float</span><span class="p">(</span><span class="n">pss</span><span class="p">)</span><span class="o">!=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">:</span>
+<span class="c1">#             print(ta,pss)</span>
+            
+            <span class="n">flux</span><span class="o">=</span><span class="n">ta</span><span class="o">*</span><span class="n">pss</span>
+            <span class="n">lta</span><span class="o">=</span><span class="n">catch_zeroDivError</span><span class="p">(</span><span class="n">ta</span><span class="p">,</span><span class="n">dta</span><span class="p">)</span>
+            <span class="n">lps</span><span class="o">=</span><span class="n">catch_zeroDivError</span><span class="p">(</span><span class="n">pss</span><span class="p">,</span><span class="n">dpss</span><span class="p">)</span>
+            <span class="n">errta</span><span class="o">=</span><span class="p">(</span><span class="n">lta</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+            <span class="n">errpss</span><span class="o">=</span><span class="p">(</span><span class="n">lps</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+            <span class="n">dflux</span><span class="o">=</span><span class="n">flux</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">errta</span><span class="o">+</span><span class="n">errpss</span><span class="p">)</span>
+
+            
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">flux</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="n">dflux</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">return</span> <span class="n">flux</span><span class="p">,</span><span class="n">dflux</span></div>
+
+
+<div class="viewcode-block" id="calc_totFlux">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.calibrate.calc_totFlux">[docs]</a>
+<span class="k">def</span> <span class="nf">calc_totFlux</span><span class="p">(</span><span class="n">lcp</span><span class="p">,</span><span class="n">dlcp</span><span class="p">,</span><span class="n">rcp</span><span class="p">,</span><span class="n">drcp</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39; Calculate the total flux density of the source&#39;&#39;&#39;</span>
+        <span class="n">sumflux</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">lcp</span><span class="p">,</span><span class="n">rcp</span><span class="p">])</span>
+        <span class="n">n</span><span class="o">=</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">lcp</span><span class="p">,</span><span class="n">rcp</span><span class="p">])</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> 
+        <span class="n">fluxtot</span><span class="o">=</span><span class="p">(</span><span class="n">sumflux</span><span class="o">/</span><span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span>
+        <span class="n">dfluxtot</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="o">/</span><span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dlcp</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="n">drcp</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">fluxtot</span><span class="p">,</span><span class="n">dfluxtot</span></div>
+
+    
+<div class="viewcode-block" id="calc_dualtotFlux">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.calibrate.calc_dualtotFlux">[docs]</a>
+<span class="k">def</span> <span class="nf">calc_dualtotFlux</span><span class="p">(</span><span class="n">slcp</span><span class="p">,</span><span class="n">dslcp</span><span class="p">,</span><span class="n">srcp</span><span class="p">,</span><span class="n">dsrcp</span><span class="p">,</span><span class="n">bslcp</span><span class="p">,</span><span class="n">bdslcp</span><span class="p">,</span><span class="n">bsrcp</span><span class="p">,</span><span class="n">bdsrcp</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39; Calculate the total flux density of the source&#39;&#39;&#39;</span>
+        <span class="n">sumflux</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">slcp</span><span class="p">,</span><span class="n">srcp</span><span class="p">,</span><span class="n">bslcp</span><span class="p">,</span><span class="n">bsrcp</span><span class="p">])</span>
+        <span class="n">n</span><span class="o">=</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">slcp</span><span class="p">,</span><span class="n">srcp</span><span class="p">,</span><span class="n">bslcp</span><span class="p">,</span><span class="n">bsrcp</span><span class="p">])</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> 
+        <span class="n">fluxtot</span><span class="o">=</span><span class="p">(</span><span class="n">sumflux</span><span class="o">/</span><span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span>
+        <span class="n">dfluxtot</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="o">/</span><span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dslcp</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="n">dsrcp</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="n">bdslcp</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="n">bdsrcp</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">fluxtot</span><span class="p">,</span><span class="n">dfluxtot</span></div>
+
+
+<div class="viewcode-block" id="getpss">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.calibrate.getpss">[docs]</a>
+<span class="k">def</span> <span class="nf">getpss</span><span class="p">(</span><span class="n">pssdf</span><span class="p">,</span> <span class="n">date</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get the PSS of a given bin time-range.</span>
+<span class="sd">    </span>
+<span class="sd">        pssdf: dataframe containing the pss bins.</span>
+<span class="sd">        date: the date used to estimate the required bin range in order to extract the PSS. &quot;&quot;&quot;</span>
+    
+    <span class="n">date</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">date</span><span class="p">)</span>
+    <span class="n">pss</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="n">dpss</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+<span class="c1">#     print(pssdf.columns)</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pssdf</span><span class="p">)):</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">pssdf</span><span class="p">[</span><span class="s1">&#39;MJD_START&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+        <span class="n">end</span>   <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">pssdf</span><span class="p">[</span><span class="s1">&#39;MJD_END&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+<span class="c1">#         print(start,date,end)</span>
+        
+        <span class="k">if</span> <span class="n">date</span><span class="o">&gt;=</span><span class="n">start</span> <span class="ow">and</span> <span class="n">date</span><span class="o">&lt;=</span><span class="n">end</span><span class="p">:</span>
+<span class="c1">#             print(start,date,end)</span>
+            
+            <span class="n">pss</span><span class="o">=</span><span class="n">pssdf</span><span class="p">[</span><span class="s1">&#39;PSS&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="n">dpss</span><span class="o">=</span><span class="n">pssdf</span><span class="p">[</span><span class="s1">&#39;PSS_STDEV&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">pss</span><span class="p">,</span><span class="n">dpss</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Pfesesani van Zyl.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

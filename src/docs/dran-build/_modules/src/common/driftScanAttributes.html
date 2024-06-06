@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.common.driftScanAttributes &mdash; dran v1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e160b93e"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            dran
+          </a>
+              <div class="version">
+                v1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/caveats.html">Caveats</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/quickstart.html">Quickstart Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/cli.html">The command line interface (CLI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html">The graphical user interface (GUI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#the-landing-page">The landing page</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#edit-driftscan">Edit driftscan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#edit-time-series">Edit Time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#view-plots">View plots</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/tuts/tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/commands.html">Commands</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guidelines:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/modules.html">src</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">dran</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.common.driftScanAttributes</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.common.driftScanAttributes</h1><div class="highlight"><pre>
+<span></span><span class="c1"># ============================================================================#</span>
+<span class="c1"># File: driftScanAttributes.py                                                    #</span>
+<span class="c1"># Author: Pfesesani V. van Zyl                                                #</span>
+<span class="c1"># ============================================================================#</span>
+
+<span class="c1"># Standard library imports</span>
+<span class="c1"># --------------------------------------------------------------------------- #</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">.miscellaneousFunctions</span> <span class="kn">import</span> <span class="n">set_dict_item</span>
+<span class="c1"># =========================================================================== #</span>
+
+<div class="viewcode-block" id="DriftScanAttributes">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScanAttributes.DriftScanAttributes">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">DriftScanAttributes</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Class of parameters to be collected/saved to a database from the drift </span>
+<span class="sd">        scan fits file. These are the values that will be populated in the </span>
+<span class="sd">        CALDB or TARDB databases.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            parameters (dict): dictionary of all properties to be stored.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+
+<div class="viewcode-block" id="DriftScanAttributes.print_keys">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScanAttributes.DriftScanAttributes.print_keys">[docs]</a>
+    <span class="k">def</span> <span class="nf">print_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Print the keys of the dictionary. &quot;&quot;&quot;</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="DriftScanAttributes.print_dict">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScanAttributes.DriftScanAttributes.print_dict">[docs]</a>
+    <span class="k">def</span> <span class="nf">print_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Print the dictionary key value pairs. &quot;&quot;&quot;</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"># parameters: </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="p">[</span><span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="s2">&quot;: &quot;</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">values</span><span class="p">()))]</span></div>
+
+    
+<div class="viewcode-block" id="DriftScanAttributes.reset_dict">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScanAttributes.DriftScanAttributes.reset_dict">[docs]</a>
+    <span class="k">def</span> <span class="nf">reset_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Reset the dictionary. &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">=</span> <span class="p">{}</span></div>
+
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   COMMON SETTINGS</span>
+    <span class="c1"># =========================================================================</span>
+
+<div class="viewcode-block" id="DriftScanAttributes.set_common_parameters">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScanAttributes.DriftScanAttributes.set_common_parameters">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_common_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Dictionary of default values for parameters common to all scan types.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s2">&quot;FILENAME&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="s2">&quot;Name of fits file being processed&quot;</span><span class="p">)</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s2">&quot;SOURCEDIR&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="s2">&quot;Name of folder containing fits file&quot;</span><span class="p">)</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s2">&quot;MJD&quot;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;Modified julian date of observation&quot;</span><span class="p">)</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s2">&quot;LOGFREQ&quot;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;Log of central frequency&quot;</span><span class="p">)</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s2">&quot;HA&quot;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;Hour angle&quot;</span><span class="p">)</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s2">&quot;ZA&quot;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;Zenith angle , used to be DEC&quot;</span><span class="p">)</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s2">&quot;ELEVATION&quot;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;Elevation&quot;</span><span class="p">)</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s2">&quot;ATMOSABS&quot;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;Atmospheric absorption&quot;</span><span class="p">)</span></div>
+
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   WIDE BEAM SCAN SETTINGS</span>
+    <span class="c1"># =========================================================================</span>
+
+<div class="viewcode-block" id="DriftScanAttributes.set_wb_parameters">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScanAttributes.DriftScanAttributes.set_wb_parameters">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_wb_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">pols</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the parameters specific to a wide beam on lcp drift scan. &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">pol</span> <span class="ow">in</span> <span class="n">pols</span><span class="p">:</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;O</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TA&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;Peak antenna temperature [K]&quot;</span><span class="p">)</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;O</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TAERR&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;Error in peak antenna temperature [K]&quot;</span><span class="p">)</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;O</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s1">S2N&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;signal to noise ratio&quot;</span><span class="p">)</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;O</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TAPEAKLOC&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;Location of peak antenna temperature &quot;</span><span class="p">)</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;O</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s1">RMSB&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;RMS before spline fit to all data&quot;</span><span class="p">)</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;O</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s1">RMSA&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;RMS after spline fit to all data&quot;</span><span class="p">)</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;O</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s1">BSLOPE&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;Slope of baseline correction&quot;</span><span class="p">)</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;O</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s1">BRMS&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;RMS of baseline correction fit&quot;</span><span class="p">)</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;O</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">FLAG&quot;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;ON scan </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">CP flag parameter&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DriftScanAttributes.set_wb_dict">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScanAttributes.DriftScanAttributes.set_wb_dict">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_wb_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Combine wide beam common calibration parameters. &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_common_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_tau_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_wb_parameters</span><span class="p">([</span><span class="s1">&#39;L&#39;</span><span class="p">,</span><span class="s1">&#39;R&#39;</span><span class="p">])</span></div>
+
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   NARROW BEAM, 6.7, 12 &amp; 22 GHZ SCAN SETTINGS</span>
+    <span class="c1"># =========================================================================</span>
+
+<div class="viewcode-block" id="DriftScanAttributes.set_tau_parameters">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScanAttributes.DriftScanAttributes.set_tau_parameters">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_tau_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set tau (optical depth) parameters. &quot;&quot;&quot;</span>
+
+        <span class="c1"># TODO! Fix this NOW, figure out what exactly we are doing with the 15 GHz data</span>
+        <span class="c1">#! Figure out where all these values come from</span>
+        <span class="k">if</span> <span class="s1">&#39;02.5S&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;FRONTEND&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]:</span>
+            <span class="c1"># I think we decided to use the 10 GHz optical depth because its closer to </span>
+            <span class="c1"># 12 GHz, but need to confirm.</span>
+
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;TAU10&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;Optical depth at 10 GHz: # from SKA doc, i.e. measurements made in karnavon&quot;</span><span class="p">)</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;TAU15&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;Optical depth at 15 GHz: # from Meeks 1976 exptl Physics 12B p175&quot;</span><span class="p">)</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;MEAN_ATMOS_CORRECTION&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;Mean atmospheric correction.&quot;</span><span class="p">)</span>
+       
+        <span class="k">elif</span> <span class="s1">&#39;01.3S&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;FRONTEND&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]:</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;TAU221&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;Optical depth at 22.1 GHz: # from SKA doc&quot;</span><span class="p">)</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;TAU2223&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;Optical depth at 22.23 GHz: ??&quot;</span><span class="p">)</span>
+        
+        <span class="k">elif</span> <span class="s1">&#39;13.0S&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;FRONTEND&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]:</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;MEAN_ATMOS_CORRECTION&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;Mean atmospheric correction&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DriftScanAttributes.set_tbatmos_parameters">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScanAttributes.DriftScanAttributes.set_tbatmos_parameters">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_tbatmos_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set tbatmos (atmospheric temperature) parameters. &quot;&quot;&quot;</span>
+
+        <span class="c1"># See  set_tau_parameters()</span>
+        <span class="k">if</span> <span class="s1">&#39;02.5S&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;FRONTEND&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]:</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;TBATMOS10&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;Optical depth at 10 GHz&quot;</span><span class="p">)</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;TBATMOS15&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;Optical depth at 15 GHz&quot;</span><span class="p">)</span>
+       
+        <span class="k">elif</span> <span class="s1">&#39;01.3S&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;FRONTEND&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]:</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;TBATMOS221&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;Optical depth at 22.1 GHz&quot;</span><span class="p">)</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;TBATMOS2223&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;Optical depth at 22.23 GHz&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DriftScanAttributes.set_comm_weather_parameters">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScanAttributes.DriftScanAttributes.set_comm_weather_parameters">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_comm_weather_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set Common weather parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># TODO: finalize descriptions</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;PWV&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;Precipitable water vapour&quot;</span><span class="p">)</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;SVP&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;Saturated vapour pressure&quot;</span><span class="p">)</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;AVP&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;Ambient vapour pressure&quot;</span><span class="p">)</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;DPT&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;Dew point temperature&quot;</span><span class="p">)</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;WVD&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;Water vapor density&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DriftScanAttributes.set_nb_fit_parameters">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScanAttributes.DriftScanAttributes.set_nb_fit_parameters">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_nb_fit_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">pols</span><span class="p">,</span><span class="n">scanDirection</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the parameters specific to a narrow beam drift scan.</span>
+
+<span class="sd">        Attributes:</span>
+<span class="sd">        -----------</span>
+<span class="sd">            pols : list</span>
+<span class="sd">                List of polarizations - left circular polarization: LCP (L), : right circular polarization RCP (R).</span>
+<span class="sd">            scanDirection : list</span>
+<span class="sd">                List of scan directions - north (N), south (S) or center ON (O). Using O because C makes things confusing.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">pol</span> <span class="ow">in</span> <span class="n">pols</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">direction</span> <span class="ow">in</span> <span class="n">scanDirection</span><span class="p">:</span>
+                <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">direction</span><span class="si">}{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TA&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Peak antenna temperature [K] for </span><span class="si">{</span><span class="n">direction</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">CP&quot;</span><span class="p">)</span>
+                <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">direction</span><span class="si">}{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TAERR&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Error in peak antenna temperature [K] for </span><span class="si">{</span><span class="n">direction</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">CP&quot;</span><span class="p">)</span>
+                
+                <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;C&#39;</span><span class="p">:</span>
+                    <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">direction</span><span class="si">}{</span><span class="n">pol</span><span class="si">}</span><span class="s1">PC&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Pointing correction factor for </span><span class="si">{</span><span class="n">direction</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">CP&quot;</span><span class="p">)</span>
+                    <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;C</span><span class="si">{</span><span class="n">direction</span><span class="si">}{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TA&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Peak CORRECTED antenna temperature [K] for </span><span class="si">{</span><span class="n">direction</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">CP&quot;</span><span class="p">)</span>
+                    <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;C</span><span class="si">{</span><span class="n">direction</span><span class="si">}{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TAERR&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Error in peak CORRECTED antenna temperature [K] for </span><span class="si">{</span><span class="n">direction</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">CP&quot;</span><span class="p">)</span>
+                
+                <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">direction</span><span class="si">}{</span><span class="n">pol</span><span class="si">}</span><span class="s1">S2N&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;signal to noise ratio for </span><span class="si">{</span><span class="n">direction</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">CP &quot;</span><span class="p">)</span>
+                <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">direction</span><span class="si">}{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TAPEAKLOC&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Location of peak antenna temperature for </span><span class="si">{</span><span class="n">direction</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">CP &quot;</span><span class="p">)</span>
+                <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">direction</span><span class="si">}{</span><span class="n">pol</span><span class="si">}</span><span class="s1">RMSB&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;RMS before spline fit to all data for </span><span class="si">{</span><span class="n">direction</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">CP &quot;</span><span class="p">)</span>
+                <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">direction</span><span class="si">}{</span><span class="n">pol</span><span class="si">}</span><span class="s1">RMSA&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;RMS after spline fit to all data for </span><span class="si">{</span><span class="n">direction</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">CP &quot;</span><span class="p">)</span>
+                <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">direction</span><span class="si">}{</span><span class="n">pol</span><span class="si">}</span><span class="s1">BSLOPE&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Slope of baseline correction for </span><span class="si">{</span><span class="n">direction</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">CP &quot;</span><span class="p">)</span>
+                <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">direction</span><span class="si">}{</span><span class="n">pol</span><span class="si">}</span><span class="s1">BRMS&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;RMS of baseline correction fit for </span><span class="si">{</span><span class="n">direction</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">CP &quot;</span><span class="p">)</span>
+                <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">direction</span><span class="si">}{</span><span class="n">pol</span><span class="si">}</span><span class="s2">FLAG&quot;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">direction</span><span class="si">}</span><span class="s2"> scan </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">CP flag parameter&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DriftScanAttributes.set_nb_dict">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScanAttributes.DriftScanAttributes.set_nb_dict">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_nb_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Set Narrow beam calibration data dictionary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_common_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_comm_weather_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_tau_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_tbatmos_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_nb_fit_parameters</span><span class="p">([</span><span class="s1">&#39;L&#39;</span><span class="p">,</span><span class="s1">&#39;R&#39;</span><span class="p">],[</span><span class="s1">&#39;N&#39;</span><span class="p">,</span><span class="s1">&#39;S&#39;</span><span class="p">,</span><span class="s1">&#39;O&#39;</span><span class="p">])</span></div>
+
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1">#   DUAL BEAM, 4.8 &amp; 8.4 GHz SETTINGS</span>
+    <span class="c1"># =========================================================================</span>
+
+<div class="viewcode-block" id="DriftScanAttributes.set_db_fit_parameters">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScanAttributes.DriftScanAttributes.set_db_fit_parameters">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_db_fit_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">pols</span><span class="p">,</span><span class="n">beams</span><span class="p">,</span><span class="n">scanDirection</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set dual beam fit parameters.</span>
+
+<span class="sd">        Attributes:</span>
+<span class="sd">        -----------</span>
+<span class="sd">        pols : list</span>
+<span class="sd">            List of polarizations - left circular polarization: LCP (L), : right circular polarization RCP (R).</span>
+<span class="sd">        beams : list</span>
+<span class="sd">            List of drift scan beams - left (A) and right (B), beams are either +ve or -ve depending on frequency.</span>
+<span class="sd">        scanDirection : list</span>
+<span class="sd">            List of scan directions - north (N), south (S) or center ON (O). Using O because C makes things confusing.</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">pol</span> <span class="ow">in</span> <span class="n">pols</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">beam</span> <span class="ow">in</span> <span class="n">beams</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">direction</span> <span class="ow">in</span> <span class="n">scanDirection</span><span class="p">:</span>
+                    <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beam</span><span class="si">}{</span><span class="n">direction</span><span class="si">}{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TA&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Peak antenna temperature [K] for </span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s2"> beam </span><span class="si">{</span><span class="n">direction</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">CP&quot;</span><span class="p">)</span>
+                    <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beam</span><span class="si">}{</span><span class="n">direction</span><span class="si">}{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TAERR&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Error in peak antenna temperature [K] for </span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s2"> beam </span><span class="si">{</span><span class="n">direction</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">CP&quot;</span><span class="p">)</span>
+                
+                    <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;O&#39;</span><span class="p">:</span>
+                        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beam</span><span class="si">}{</span><span class="n">direction</span><span class="si">}{</span><span class="n">pol</span><span class="si">}</span><span class="s1">PC&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Pointing correction factor for </span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s2"> beam </span><span class="si">{</span><span class="n">direction</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">CP&quot;</span><span class="p">)</span>
+                        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s1">C</span><span class="si">{</span><span class="n">direction</span><span class="si">}{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TA&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Peak CORRECTED antenna temperature [K] for </span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s2"> beam </span><span class="si">{</span><span class="n">direction</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">CP&quot;</span><span class="p">)</span>
+                        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s1">C</span><span class="si">{</span><span class="n">direction</span><span class="si">}{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TAERR&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Error in peak CORRECTED antenna temperature [K] for </span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s2"> beam </span><span class="si">{</span><span class="n">direction</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">CP&quot;</span><span class="p">)</span>
+                    
+                    <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beam</span><span class="si">}{</span><span class="n">direction</span><span class="si">}{</span><span class="n">pol</span><span class="si">}</span><span class="s1">S2N&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;signal to noise ratio for </span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s2"> beam </span><span class="si">{</span><span class="n">direction</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">CP &quot;</span><span class="p">)</span>
+                    <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beam</span><span class="si">}{</span><span class="n">direction</span><span class="si">}{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TAPEAKLOC&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Location of peak antenna temperature for </span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s2"> beam </span><span class="si">{</span><span class="n">direction</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">CP &quot;</span><span class="p">)</span>
+                    <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beam</span><span class="si">}{</span><span class="n">direction</span><span class="si">}{</span><span class="n">pol</span><span class="si">}</span><span class="s1">RMSB&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;RMS before spline fit to all data for </span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s2"> beam </span><span class="si">{</span><span class="n">direction</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">CP &quot;</span><span class="p">)</span>
+                    <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beam</span><span class="si">}{</span><span class="n">direction</span><span class="si">}{</span><span class="n">pol</span><span class="si">}</span><span class="s1">RMSA&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;RMS after spline fit to all data for </span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s2"> beam </span><span class="si">{</span><span class="n">direction</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">CP &quot;</span><span class="p">)</span>
+                    <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beam</span><span class="si">}{</span><span class="n">direction</span><span class="si">}{</span><span class="n">pol</span><span class="si">}</span><span class="s1">BSLOPE&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Slope of baseline correction for </span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s2"> beam </span><span class="si">{</span><span class="n">direction</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">CP &quot;</span><span class="p">)</span>
+                    <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beam</span><span class="si">}{</span><span class="n">direction</span><span class="si">}{</span><span class="n">pol</span><span class="si">}</span><span class="s1">BRMS&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;RMS of baseline correction fit for </span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s2"> beam </span><span class="si">{</span><span class="n">direction</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">CP &quot;</span><span class="p">)</span>
+                    <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">beam</span><span class="si">}{</span><span class="n">direction</span><span class="si">}{</span><span class="n">pol</span><span class="si">}</span><span class="s2">FLAG&quot;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s2"> beam </span><span class="si">{</span><span class="n">direction</span><span class="si">}</span><span class="s2"> scan </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">CP flag parameter&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DriftScanAttributes.set_db_weather_parameters">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScanAttributes.DriftScanAttributes.set_db_weather_parameters">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_db_weather_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set dual beam weather related parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># TODO: finalize descriptions</span>
+        <span class="c1"># find out exactly what these mean or do</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;SEC_Z&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;secant of zenith ???&quot;</span><span class="p">)</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;X_Z&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;DRY_ATMOS_TRANSMISSION&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;dry atmospheric transmission&quot;</span><span class="p">)</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;ZENITH_TAU_AT_1400M&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;zenith tau (optical depth) at 1400m&quot;</span><span class="p">)</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;ABSORPTION_AT_ZENITH&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s2">&quot;absorption at zenith&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DriftScanAttributes.set_db_dict">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScanAttributes.DriftScanAttributes.set_db_dict">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_db_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set dual beam observation parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_comm_weather_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_weather_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_db_fit_parameters</span><span class="p">([</span><span class="s1">&#39;L&#39;</span><span class="p">,</span><span class="s1">&#39;R&#39;</span><span class="p">],[</span><span class="s1">&#39;A&#39;</span><span class="p">,</span><span class="s1">&#39;B&#39;</span><span class="p">],[</span><span class="s1">&#39;N&#39;</span><span class="p">,</span><span class="s1">&#39;S&#39;</span><span class="p">,</span><span class="s1">&#39;O&#39;</span><span class="p">])</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Pfesesani van Zyl.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

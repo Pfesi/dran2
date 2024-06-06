@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.common.miscellaneousFunctions &mdash; dran v1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e160b93e"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            dran
+          </a>
+              <div class="version">
+                v1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/caveats.html">Caveats</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/quickstart.html">Quickstart Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/cli.html">The command line interface (CLI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html">The graphical user interface (GUI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#the-landing-page">The landing page</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#edit-driftscan">Edit driftscan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#edit-time-series">Edit Time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#view-plots">View plots</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/tuts/tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/commands.html">Commands</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guidelines:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/modules.html">src</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">dran</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.common.miscellaneousFunctions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.common.miscellaneousFunctions</h1><div class="highlight"><pre>
+<span></span><span class="c1"># =========================================================================== #</span>
+<span class="c1"># File   : miscellaneousFunctions.py                                          #</span>
+<span class="c1"># Author : Pfesesani V. van Zyl                                               #</span>
+<span class="c1"># =========================================================================== #</span>
+
+<span class="c1"># Standard library imports</span>
+<span class="c1"># --------------------------------------------------------------------------- #</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="c1"># =========================================================================== #</span>
+
+<span class="kn">from</span> <span class="nn">.msgConfiguration</span> <span class="kn">import</span> <span class="n">msg_wrapper</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">..config</span> <span class="kn">import</span> <span class="n">logfile</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">config</span> <span class="kn">import</span> <span class="n">logfile</span>
+<div class="viewcode-block" id="set_dict_item">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.miscellaneousFunctions.set_dict_item">[docs]</a>
+<span class="k">def</span> <span class="nf">set_dict_item</span><span class="p">(</span><span class="n">dictionary</span><span class="p">,</span><span class="n">key</span><span class="p">,</span><span class="n">value</span><span class="p">,</span><span class="n">description</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set dictionary key, value and description</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        key (str): the key you are creating for the dictionary entry</span>
+<span class="sd">        value (str,float,list,dict or int): the value of the dictionary entry</span>
+<span class="sd">        description (_type_): the description of the dictionary entry</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dictionary</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">:</span><span class="n">description</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="delete_object">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.miscellaneousFunctions.delete_object">[docs]</a>
+<span class="k">def</span> <span class="nf">delete_object</span><span class="p">(</span><span class="n">objectName</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Delete an object from memory</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        objectName (str): the name of the object to delete</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">del</span> <span class="n">objectName</span></div>
+
+
+<div class="viewcode-block" id="calc_log_freq">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.miscellaneousFunctions.calc_log_freq">[docs]</a>
+<span class="k">def</span> <span class="nf">calc_log_freq</span><span class="p">(</span><span class="n">freq</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Calculate the log(frequency) &quot;&quot;&quot;</span>
+
+    <span class="c1"># msg_wrapper(&quot;debug&quot;, self.log.debug, &quot;Calculating log of frequency&quot;)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">logFreq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">freq</span><span class="p">))</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">logFreq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="c1"># msg_wrapper(&quot;warning&quot;, self.log.debug, &quot;missing &#39;CENTFREQ&#39;, setting it to NAN&quot;)</span>
+    <span class="k">return</span> <span class="n">logFreq</span></div>
+
+
+<div class="viewcode-block" id="check_for_nans">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.miscellaneousFunctions.check_for_nans">[docs]</a>
+<span class="k">def</span> <span class="nf">check_for_nans</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">log</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Check for missing data or incomplete data.</span>
+<span class="sd">        </span>
+<span class="sd">            Parameters:</span>
+<span class="sd">                x (array): A 1D array</span>
+<span class="sd">                log (object): Logging object.</span>
+<span class="sd">            </span>
+<span class="sd">            Returns:</span>
+<span class="sd">                flag (int): The flag value</span>
+<span class="sd">                x (array) : A 1D array without any NAN values</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">isNan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">isNan</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;critical&quot;</span><span class="p">,</span> <span class="n">log</span><span class="o">.</span><span class="n">critical</span><span class="p">,</span>
+                        <span class="s2">&quot;Found NANs, file has no data: skipping processing&quot;</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">flag</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span>
+                        <span class="s2">&quot;Checked data for missing values&quot;</span><span class="p">)</span>
+            <span class="n">flag</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">flag</span></div>
+
+        
+<div class="viewcode-block" id="create_current_scan_directory">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.miscellaneousFunctions.create_current_scan_directory">[docs]</a>
+<span class="k">def</span> <span class="nf">create_current_scan_directory</span><span class="p">():</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;rm -r currentScanPlots&#39;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="s1">&#39;currentScanPlots&#39;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="catch_zeroDivError">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.miscellaneousFunctions.catch_zeroDivError">[docs]</a>
+<span class="k">def</span> <span class="nf">catch_zeroDivError</span><span class="p">(</span><span class="n">col</span><span class="p">,</span><span class="n">colerr</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">colerr</span><span class="o">/</span><span class="n">col</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+    
+<div class="viewcode-block" id="sig_to_noise">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.miscellaneousFunctions.sig_to_noise">[docs]</a>
+<span class="k">def</span> <span class="nf">sig_to_noise</span><span class="p">(</span><span class="n">signalPeak</span><span class="p">,</span> <span class="n">noise</span><span class="p">,</span><span class="n">log</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    Calculate the signal to noise ratio. i.e. Amplitude / (stdDeviation of noise)</span>
+<span class="sd">    Taken from paper on &#39;Signal to Noise Ratio (SNR) Enhancement Comparison of Impulse-, </span>
+<span class="sd">    Coding- and Novel Linear-Frequency-Chirp-Based Optical Time Domain Reflectometry </span>
+<span class="sd">    (OTDR) for Passive Optical Network (PON) Monitoring Based on Unique Combinations of </span>
+<span class="sd">    Wavelength Selective Mirrors&#39;</span>
+
+<span class="sd">    Photonics 2014, 1, 33-46; doi:10.3390/photonics1010033</span>
+<span class="sd">    https://www.mdpi.com/2304-6732/1/1/33</span>
+<span class="sd">    https://www.mdpi.com/68484</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        signalPeak (float) : The maximum valueof a desired signal</span>
+<span class="sd">        noise (array): array of fit residuals</span>
+<span class="sd">        log(object): file logging object</span>
+<span class="sd">        </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        sig2noise (float): signal to noise ratio</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Calculate the signal to noise ratio&#39;</span>
+    <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="n">sig2noise</span> <span class="o">=</span> <span class="n">signalPeak</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">noise</span><span class="p">)</span>
+    <span class="c1">#sig2noise = signalPeak/(max(noise)+abs(min(noise)))</span>
+    <span class="k">return</span> <span class="n">sig2noise</span></div>
+
+
+<div class="viewcode-block" id="delete_logs">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.miscellaneousFunctions.delete_logs">[docs]</a>
+<span class="k">def</span> <span class="nf">delete_logs</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Delete the logfile if it exists</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># delete any previous log file</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">logfile</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="set_table_name">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.miscellaneousFunctions.set_table_name">[docs]</a>
+<span class="k">def</span> <span class="nf">set_table_name</span><span class="p">(</span><span class="n">src</span><span class="p">,</span><span class="n">log</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set the table name based on the declination.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        src (str): source or table name</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Fromat database atable name for </span><span class="si">{</span><span class="n">src</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s1">&#39;-&#39;</span> <span class="ow">in</span> <span class="n">src</span><span class="p">:</span>  
+        <span class="n">src</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span><span class="s1">&#39;m&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="s1">&#39;+&#39;</span> <span class="ow">in</span> <span class="n">src</span><span class="p">:</span>
+        <span class="n">src</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;+&#39;</span><span class="p">,</span><span class="s1">&#39;p&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">src</span></div>
+
+
+<div class="viewcode-block" id="fast_scandir">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.miscellaneousFunctions.fast_scandir">[docs]</a>
+<span class="k">def</span> <span class="nf">fast_scandir</span><span class="p">(</span><span class="n">dirname</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;Scan directory for all folders in the given directory&#39;&#39;&#39;</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Scanning the </span><span class="si">{</span><span class="n">dirname</span><span class="si">}</span><span class="s1"> directory&#39;</span><span class="p">)</span>
+    <span class="n">subfolders</span><span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">path</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">scandir</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()]</span>
+    <span class="k">for</span> <span class="n">dirname</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">subfolders</span><span class="p">):</span>
+        <span class="n">subfolders</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">fast_scandir</span><span class="p">(</span><span class="n">dirname</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">subfolders</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Pfesesani van Zyl.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

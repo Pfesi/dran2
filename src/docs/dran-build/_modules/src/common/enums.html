@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.common.enums &mdash; dran v1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e160b93e"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            dran
+          </a>
+              <div class="version">
+                v1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/caveats.html">Caveats</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/quickstart.html">Quickstart Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/cli.html">The command line interface (CLI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html">The graphical user interface (GUI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#the-landing-page">The landing page</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#edit-driftscan">Edit driftscan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#edit-time-series">Edit Time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#view-plots">View plots</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/tuts/tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/commands.html">Commands</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guidelines:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/modules.html">src</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">dran</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.common.enums</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.common.enums</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">auto</span>
+
+<div class="viewcode-block" id="ScanType">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.enums.ScanType">[docs]</a>
+<span class="k">class</span> <span class="nc">ScanType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Drift scan type </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        Enum (enum): Enum of the different scan types</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        SBW - wide single beam</span>
+<span class="sd">        SBN - narrow single beam</span>
+<span class="sd">        DB - dual beam</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">SBW</span><span class="o">=</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">SBN</span><span class="o">=</span><span class="n">auto</span><span class="p">()</span>
+    <span class="n">DB</span><span class="o">=</span><span class="n">auto</span><span class="p">()</span></div>
+
+
+
+
+<span class="c1"># class ScanBeamWidth(Enum):</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     Drift scan beam type</span>
+
+<span class="c1">#     Args:</span>
+<span class="c1">#         Enum (enum): Enum of the different beam types</span>
+
+<span class="c1">#     Attributes:    </span>
+<span class="c1">#         NB - narrow beam</span>
+<span class="c1">#         WB - wide beam        </span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+    
+<span class="c1">#     NB=auto</span>
+<span class="c1">#     WB=auto</span>
+
+<span class="c1"># class Weekday(Enum):</span>
+<span class="c1">#     MONDAY = 1</span>
+<span class="c1">#     TUESDAY = 2</span>
+<span class="c1">#     WEDNESDAY = 3</span>
+<span class="c1">#     THURSDAY = 4</span>
+<span class="c1">#     FRIDAY = 5</span>
+<span class="c1">#     SATURDAY = 6</span>
+<span class="c1">#     SUNDAY = 7</span>
+
+<div class="viewcode-block" id="Month">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.enums.Month">[docs]</a>
+<span class="k">class</span> <span class="nc">Month</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">Jan</span> <span class="o">=</span> <span class="s1">&#39;01&#39;</span>
+    <span class="n">Feb</span> <span class="o">=</span> <span class="s1">&#39;02&#39;</span>
+    <span class="n">Mar</span> <span class="o">=</span> <span class="s1">&#39;03&#39;</span>
+    <span class="n">Apr</span> <span class="o">=</span> <span class="s1">&#39;04&#39;</span>
+    <span class="n">May</span> <span class="o">=</span> <span class="s1">&#39;05&#39;</span>
+    <span class="n">Jun</span> <span class="o">=</span> <span class="s1">&#39;06&#39;</span>
+    <span class="n">Jul</span> <span class="o">=</span> <span class="s1">&#39;07&#39;</span>
+    <span class="n">Aug</span> <span class="o">=</span> <span class="s1">&#39;08&#39;</span>
+    <span class="n">Sep</span> <span class="o">=</span> <span class="s1">&#39;09&#39;</span>
+    <span class="n">Oct</span> <span class="o">=</span> <span class="s1">&#39;10&#39;</span>
+    <span class="n">Nov</span> <span class="o">=</span> <span class="s1">&#39;11&#39;</span>
+    <span class="n">Dec</span> <span class="o">=</span> <span class="s1">&#39;12&#39;</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Pfesesani van Zyl.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

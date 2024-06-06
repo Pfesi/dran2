@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.common.driftScanData &mdash; dran v1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e160b93e"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            dran
+          </a>
+              <div class="version">
+                v1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/caveats.html">Caveats</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/quickstart.html">Quickstart Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/cli.html">The command line interface (CLI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html">The graphical user interface (GUI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#the-landing-page">The landing page</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#edit-driftscan">Edit driftscan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#edit-time-series">Edit Time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#view-plots">View plots</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/tuts/tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/commands.html">Commands</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guidelines:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/modules.html">src</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">dran</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.common.driftScanData</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.common.driftScanData</h1><div class="highlight"><pre>
+<span></span><span class="c1"># ============================================================================#</span>
+<span class="c1"># File: driftScanData.py                                                      #</span>
+<span class="c1"># Author: Pfesesani V. van Zyl                                                #</span>
+<span class="c1"># ============================================================================#</span>
+
+<span class="c1"># Standard library imports</span>
+<span class="c1"># --------------------------------------------------------------------------- #</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pylab</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+
+
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">.miscellaneousFunctions</span> <span class="kn">import</span> <span class="n">set_dict_item</span><span class="p">,</span> <span class="n">calc_log_freq</span>
+<span class="kn">from</span> <span class="nn">.contextManagers</span> <span class="kn">import</span> <span class="n">open_file</span>
+<span class="kn">from</span> <span class="nn">.msgConfiguration</span> <span class="kn">import</span> <span class="n">msg_wrapper</span>
+<span class="kn">from</span> <span class="nn">.getResources</span> <span class="kn">import</span> <span class="n">get_jpl_results</span>
+<span class="kn">from</span> <span class="nn">.exceptions</span> <span class="kn">import</span> <span class="n">FileResourceNotFoundError</span><span class="p">,</span> <span class="n">ValueOutOfRangeException</span> 
+<span class="c1"># =========================================================================== #</span>
+<span class="c1"># import logging</span>
+<span class="c1"># logging.getLogger(&#39;matplotlib.font_manager&#39;).setLevel(logging.ERROR)</span>
+
+<div class="viewcode-block" id="DriftScanData">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScanData.DriftScanData">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">DriftScanData</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Class of parameters to be collected/saved to a database from the drift </span>
+<span class="sd">        scan fits file. These are the values that will be populated in the </span>
+<span class="sd">        CALDB or TARDB databases.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            parameters (dict): dictionary of all properties to be stored.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="vm">__dict__</span><span class="p">:</span> <span class="nb">object</span>
+
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="c1"># print(self.__dict__[&#39;CARDS&#39;])</span>
+        <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span> <span class="s2">&quot;Get data from driftscans&quot;</span><span class="p">)</span>
+        
+        <span class="n">lenhdu</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;HDULENGTH&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_missing_params</span><span class="p">()</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">lenhdu</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">5</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_chart_header_data</span><span class="p">(</span><span class="n">lenhdu</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;CARDS&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># msg_wrapper(&quot;debug&quot;, self.log.debug, f&#39;Getting driftscans from, {k}: {v}&#39;)</span>
+            <span class="c1"># print(k,&quot;: &quot;,v)</span>
+            <span class="n">frontend</span><span class="o">=</span><span class="s1">&#39;FRONTEND&#39;</span>
+                 
+            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;_HPNZ&#39;</span><span class="p">):</span>
+                <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span> <span class="s2">&quot;Getting driftscans from HPN header&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_driftscans</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="s1">&#39;HPN&#39;</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">v</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;_ZC&#39;</span><span class="p">):</span>
+                <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span> <span class="s2">&quot;Getting driftscans from ON/Center header&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_driftscans</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="s1">&#39;ON&#39;</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">v</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;_HPSZ&#39;</span><span class="p">):</span>
+                <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span> <span class="s2">&quot;Getting driftscans from HPS header&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_driftscans</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="s1">&#39;HPS&#39;</span><span class="p">)</span>
+
+        <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span> <span class="s2">&quot;Calculate the derived parameters&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_calc_water_vapour</span><span class="p">()</span>
+
+        <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span> <span class="s2">&quot;Calibrate the atmosphere parameters&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_calc_atmospheric_penetration</span><span class="p">()</span>
+
+<div class="viewcode-block" id="DriftScanData.get_missing_params">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScanData.DriftScanData.get_missing_params">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_missing_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># set missing parameters from primary header</span>
+        
+        <span class="n">LOGFREQ</span><span class="o">=</span><span class="n">calc_log_freq</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;CENTFREQ&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">])</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;LOGFREQ&#39;</span><span class="p">,</span><span class="n">LOGFREQ</span><span class="p">,</span><span class="s1">&#39;The log of the frequency: log(CENTFREQ)&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_multiple_entries</span><span class="p">(</span><span class="s1">&#39;LOGFREQ&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DriftScanData.get_frontend_header_data">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScanData.DriftScanData.get_frontend_header_data">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_frontend_header_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">index</span><span class="p">):</span>
+        <span class="c1"># set missing parameters from frontend header</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="DriftScanData.get_calibration_header_data">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScanData.DriftScanData.get_calibration_header_data">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_calibration_header_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">index</span><span class="p">):</span>
+        <span class="c1"># set missing parameters from calibration header</span>
+        <span class="k">pass</span></div>
+
+      
+<div class="viewcode-block" id="DriftScanData.log_multiple_entries">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScanData.DriftScanData.log_multiple_entries">[docs]</a>
+    <span class="k">def</span> <span class="nf">log_multiple_entries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">arg</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">arg</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DriftScanData.get_driftscans">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScanData.DriftScanData.get_driftscans">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_driftscans</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">index</span><span class="p">,</span><span class="n">tag</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the driftscan data&quot;&quot;&quot;</span>
+
+        <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Processing </span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s1"> header&#39;</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">open_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;FILEPATH&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">])</span> <span class="k">as</span> <span class="n">g</span><span class="p">:</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">g</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">index</span><span class="p">)]</span>
+            <span class="n">LCPDATA</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="s1">&#39;Count1&#39;</span><span class="p">)</span>
+            <span class="n">RCPDATA</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="s1">&#39;Count2&#39;</span><span class="p">)</span>
+            <span class="n">RA</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="s1">&#39;RA_J2000&#39;</span><span class="p">)</span>
+            <span class="n">MJD</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="s1">&#39;MJD&#39;</span><span class="p">)</span>
+
+            <span class="n">LENMJD</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">MJD</span><span class="p">)</span> <span class="c1"># length of MJD</span>
+
+            <span class="k">if</span> <span class="s1">&#39;ON&#39;</span> <span class="ow">in</span> <span class="n">tag</span><span class="p">:</span>
+                <span class="n">HA</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="s1">&#39;Hour_Angle&#39;</span><span class="p">)</span>
+                <span class="n">ELEVATION</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="s1">&#39;Elevation&#39;</span><span class="p">)</span>
+
+                <span class="c1"># find centre point of the data</span>
+                <span class="n">MID</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">LENMJD</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+
+                <span class="c1"># get Julian date, elevation, ha and Zenith from center of center/on source scan</span>
+                <span class="n">MJD</span> <span class="o">=</span> <span class="n">MJD</span><span class="p">[</span><span class="n">MID</span><span class="p">]</span>
+                <span class="n">HA</span> <span class="o">=</span> <span class="n">HA</span><span class="p">[</span><span class="n">MID</span><span class="p">]</span> <span class="c1"># corrected with help from Jon/Marisa</span>
+                <span class="n">ELEVATION</span> <span class="o">=</span> <span class="n">ELEVATION</span><span class="p">[</span><span class="n">MID</span><span class="p">]</span>
+                <span class="n">ZA</span> <span class="o">=</span> <span class="mf">90.0</span> <span class="o">-</span> <span class="n">ELEVATION</span>
+
+                <span class="c1"># self.__dict__[column] = {&#39;value&#39;:hdu[column],&#39;description&#39;:hdu.comments[column]}</span>
+                <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;ELEVATION&#39;</span><span class="p">,</span><span class="n">ELEVATION</span><span class="p">,</span><span class="s1">&#39;Source Elevation (deg) on CENTER scan&#39;</span><span class="p">)</span>
+                <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;ZA&#39;</span><span class="p">,</span><span class="n">ZA</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;Zenith angle (deg) on CENTER scan&#39;</span><span class="p">)</span>
+                <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;MJD&#39;</span><span class="p">,</span><span class="n">MJD</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;Modified julian date on CENTER scan&#39;</span><span class="p">)</span>
+                <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;HA&#39;</span><span class="p">,</span><span class="n">HA</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;Hour angle (deg) on CENTER scan&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log_multiple_entries</span><span class="p">(</span><span class="s1">&#39;ELEVATION&#39;</span><span class="p">,</span><span class="s1">&#39;ZA&#39;</span><span class="p">,</span><span class="s1">&#39;MJD&#39;</span><span class="p">,</span><span class="s1">&#39;HA&#39;</span><span class="p">)</span>
+
+            <span class="c1"># Get OFFSET data</span>
+            <span class="n">scandist</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;SCANDIST&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+
+            <span class="n">OFFSET</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="n">scandist</span><span class="o">/</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">scandist</span><span class="o">/</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">LENMJD</span><span class="p">)</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s1">_OFFSET&#39;</span><span class="p">,</span><span class="n">OFFSET</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;Offset of Scandist (deg) in </span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s1"> header&#39;</span><span class="p">)</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s1">_RA_J2000&#39;</span><span class="p">,</span><span class="n">RA</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;Right ascension (deg) in </span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s1"> header&#39;</span><span class="p">)</span>
+
+            <span class="c1"># # Get driftscan data</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;RAW_</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s1">_LCPDATA&#39;</span><span class="p">,</span><span class="n">LCPDATA</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;Raw LCP counts (deg) in </span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s1"> header&#39;</span><span class="p">)</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;RAW_</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s1">_RCPDATA&#39;</span><span class="p">,</span><span class="n">RCPDATA</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;Raw RCP counts (deg) in </span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s1"> header&#39;</span><span class="p">)</span>
+
+            <span class="n">testArray</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="s1">&#39;Hour_Angle&#39;</span><span class="p">)</span>
+            <span class="n">testArray</span><span class="p">[:]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="c1"># print(&#39;empty:&#39;,(testArray))</span>
+            <span class="c1"># # Convert data to antenna temperature</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">TA_LCP</span><span class="o">=</span><span class="p">(</span><span class="n">LCPDATA</span><span class="o">-</span><span class="n">LCPDATA</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;HZPERK1&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+                <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s1">_TA_LCP&#39;</span><span class="p">,</span><span class="n">TA_LCP</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;LCP scan in antenna temp (K) in </span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s1"> header&#39;</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;info&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">,</span> <span class="s1">&#39;Missing HZPERK1&#39;</span><span class="p">)</span>
+                <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;HZPERK1&#39;</span><span class="p">,</span><span class="n">testArray</span><span class="p">,</span><span class="s1">&#39;[Hz/K] Counter calibration&#39;</span><span class="p">)</span>
+                <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s1">_TA_LCP&#39;</span><span class="p">,</span><span class="n">testArray</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;LCP scan in antenna temp (K) in </span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s1"> header&#39;</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">TA_RCP</span><span class="o">=</span><span class="p">(</span><span class="n">RCPDATA</span><span class="o">-</span><span class="n">RCPDATA</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;HZPERK2&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+                <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s1">_TA_RCP&#39;</span><span class="p">,</span><span class="n">TA_RCP</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;RCP scan in antenna temp (K)  in </span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s1"> header&#39;</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;info&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">,</span> <span class="s1">&#39;Missing HZPERK2&#39;</span><span class="p">)</span>
+                <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;HZPERK2&#39;</span><span class="p">,</span><span class="n">testArray</span><span class="p">,</span><span class="s1">&#39;[Hz/K] Counter calibration&#39;</span><span class="p">)</span>
+                <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s1">_TA_RCP&#39;</span><span class="p">,</span><span class="n">testArray</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;RCP scan in antenna temp (K)  in </span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s1"> header&#39;</span><span class="p">)</span></div>
+
+
+            
+<div class="viewcode-block" id="DriftScanData.get_chart_header_data">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScanData.DriftScanData.get_chart_header_data">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_chart_header_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">index</span><span class="p">):</span>
+        <span class="c1"># set missing parameters from chart header</span>
+        <span class="k">pass</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_calc_water_vapour</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">-&gt;</span><span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Calculate water vapor parameters&quot;&quot;&quot;</span>
+
+        <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span> <span class="s2">&quot;Calculate the water vapour parameters&quot;</span><span class="p">)</span>
+
+        <span class="c1"># ensure PWV and WVD do not go negative! </span>
+        <span class="c1"># calculate PWV values - copy from Mikes drift_fits2asc_HINDv16.c file</span>
+        <span class="n">hum</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;HUMIDITY&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+        <span class="n">temp</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;TAMBIENT&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">pwv</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">4.39</span> <span class="o">*</span> <span class="n">hum</span><span class="o">/</span><span class="mf">100.0</span><span class="o">/</span><span class="n">temp</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mf">26.23</span><span class="o">-</span><span class="mi">5416</span><span class="o">/</span><span class="n">temp</span><span class="p">))</span>
+            <span class="n">svp</span> <span class="o">=</span> <span class="mf">0.611</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mf">17.27</span><span class="o">*</span><span class="p">(</span><span class="n">temp</span><span class="o">-</span><span class="mf">273.13</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">temp</span><span class="o">-</span><span class="mf">273.13</span><span class="o">+</span><span class="mf">237.3</span><span class="p">))</span>
+            <span class="n">avp</span> <span class="o">=</span> <span class="n">svp</span> <span class="o">*</span> <span class="n">hum</span><span class="o">/</span><span class="mf">100.0</span>
+            <span class="k">if</span> <span class="n">avp</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">dpt</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dpt</span><span class="o">=</span> <span class="p">(</span><span class="mf">116.9</span> <span class="o">+</span> <span class="mf">237.3</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">avp</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mf">16.78</span><span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">avp</span><span class="p">))</span> 
+            <span class="n">wvd</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">2164.0</span><span class="o">*</span><span class="n">avp</span><span class="o">/</span><span class="n">temp</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="c1">#! why are we setting these to 1? Find out</span>
+            <span class="n">pwv</span><span class="o">=</span><span class="mi">1</span>
+            <span class="n">svp</span><span class="o">=</span><span class="mi">1</span>
+            <span class="n">avp</span><span class="o">=</span><span class="mi">1</span>
+            <span class="n">dpt</span><span class="o">=</span><span class="mi">1</span>
+            <span class="n">wvd</span><span class="o">=</span><span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;PWV&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span><span class="n">pwv</span><span class="p">,</span><span class="s1">&#39;description&#39;</span><span class="p">:</span><span class="s1">&#39;# [mm] precip_water_vapour&#39;</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;SVP&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span><span class="n">svp</span><span class="p">,</span><span class="s1">&#39;description&#39;</span><span class="p">:</span><span class="s1">&#39;[kPa] sat_vap_pressure&#39;</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;AVP&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span><span class="n">avp</span><span class="p">,</span><span class="s1">&#39;description&#39;</span><span class="p">:</span><span class="s1">&#39;[kPa] amb_vap_pressure&#39;</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;DPT&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span><span class="n">dpt</span><span class="p">,</span><span class="s1">&#39;description&#39;</span><span class="p">:</span><span class="s1">&#39;[oC] dew_point_temp&#39;</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;WVD&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span><span class="n">wvd</span><span class="p">,</span><span class="s1">&#39;description&#39;</span><span class="p">:</span><span class="s1">&#39;[g/m^3] water_vapour_density&#39;</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_multiple_entries</span><span class="p">(</span><span class="s1">&#39;PWV&#39;</span><span class="p">,</span><span class="s1">&#39;SVP&#39;</span><span class="p">,</span><span class="s1">&#39;AVP&#39;</span><span class="p">,</span><span class="s1">&#39;DPT&#39;</span><span class="p">,</span><span class="s1">&#39;WVD&#39;</span><span class="p">,</span><span class="s1">&#39;HUMIDITY&#39;</span><span class="p">,</span><span class="s1">&#39;TAMBIENT&#39;</span><span class="p">)</span>
+
+    <span class="c1"># def set_frequency_bands(self):</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     Set frequency band limits</span>
+    <span class="c1">#     Frequency bands taken from https://www.everythingrf.com/tech-resources/frequency-bands</span>
+    
+    <span class="c1">#     &quot;&quot;&quot;</span>
+        
+    <span class="c1">#     # if float(self.__dict__[&#39;CENTFREQ&#39;])</span>
+    <span class="c1">#     freqs=  {  &#39;L&#39;:{&#39;low&#39;:1000,&#39;high&#39;:2000},</span>
+    <span class="c1">#                &#39;S&#39;:{&#39;low&#39;:2000,&#39;high&#39;:4000},</span>
+    <span class="c1">#                &#39;C&#39;:{&#39;low&#39;:4000,&#39;high&#39;:8000},</span>
+    <span class="c1">#                &#39;X&#39;:{&#39;low&#39;:8000,&#39;high&#39;:12000},</span>
+    <span class="c1">#                &#39;Ku&#39;:{&#39;low&#39;:12000,&#39;high&#39;:18000},</span>
+    <span class="c1">#                &#39;K&#39;:{&#39;low&#39;:18000,&#39;high&#39;:26500},</span>
+    <span class="c1">#                &#39;Ka&#39;:{&#39;low&#39;:26500,&#39;high&#39;:40000}</span>
+    <span class="c1">#                } </span>
+        
+    <span class="c1">#     for k,v in freqs.items():</span>
+    <span class="c1">#         print(k,v)</span>
+    <span class="c1">#     sys.exit()</span>
+        
+    <span class="k">def</span> <span class="nf">_calc_atmospheric_penetration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Calculate the atmospheric optical depth Tau and brightness temperature Tb at zenith.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">frontend</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;FRONTEND&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+        <span class="c1">#! Double check these values are correct</span>
+        <span class="k">if</span> <span class="n">frontend</span> <span class="o">==</span> <span class="s2">&quot;02.5S&quot;</span><span class="p">:</span>
+            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="s2">&quot;Calculate optical depth&quot;</span><span class="p">)</span>
+         
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;TAU10&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;Optical depth at 10GHz&#39;</span><span class="p">)</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;TAU15&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;Optical depth at 15GHz&#39;</span><span class="p">)</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;TBATMOS10&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;Atmospheric temperature at 10GHz&#39;</span><span class="p">)</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;TBATMOS15&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;Atmospheric temperature at 15GHz&#39;</span><span class="p">)</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;MEAN_ATMOS_CORRECTION&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;mean atmospheric correction&#39;</span><span class="p">)</span>
+            
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;TAU10&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0071</span> <span class="o">+</span> <span class="mf">0.00021</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;PWV&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>  
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;TAU15&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.055</span> <span class="o">+</span> <span class="mf">0.004</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;WVD&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">])</span><span class="o">/</span><span class="mf">4.343</span>
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;TBATMOS10&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">260</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;TAU10&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]))</span>  
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;TBATMOS15&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">260</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;TAU15&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]))</span> 
+            <span class="k">except</span><span class="p">:</span>
+                <span class="c1">#! why are we setting these to 1? Find out</span>
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;TAU10&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;TAU15&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;TBATMOS10&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;TBATMOS15&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">meanatm</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;TAU15&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;TAU10&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">])</span><span class="o">/</span><span class="mf">2.0</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;ZA&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">180.0</span><span class="p">))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">meanatm</span><span class="o">=</span><span class="mf">0.0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;MEAN_ATMOS_CORRECTION&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">meanatm</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log_multiple_entries</span><span class="p">(</span><span class="s1">&#39;TAU10&#39;</span><span class="p">,</span><span class="s1">&#39;TAU15&#39;</span><span class="p">,</span><span class="s1">&#39;TBATMOS10&#39;</span><span class="p">,</span><span class="s1">&#39;TBATMOS15&#39;</span><span class="p">,</span><span class="s1">&#39;MEAN_ATMOS_CORRECTION&#39;</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">frontend</span> <span class="o">==</span> <span class="s2">&quot;01.3S&quot;</span><span class="p">:</span>
+            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="s2">&quot;Calculate optical depth&quot;</span><span class="p">)</span>
+            
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;TAU221&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;Optical depth at 22.1 GHz&#39;</span><span class="p">)</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;TAU2223&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;Optical depth at 22.23 GHz&#39;</span><span class="p">)</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;TBATMOS221&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;Atmospheric temperature at 22.1 GHz&#39;</span><span class="p">)</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;TBATMOS2223&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;Atmospheric temperature at 22.23 GHz&#39;</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;TAU221&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>  <span class="o">=</span> <span class="mf">0.0140</span> <span class="o">+</span> <span class="mf">0.00780</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;PWV&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>   
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;TAU2223&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>  <span class="o">=</span> <span class="p">(</span><span class="mf">0.110</span> <span class="o">+</span> <span class="mf">0.048</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;WVD&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">])</span><span class="o">/</span><span class="mf">4.343</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;TBATMOS221&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>  <span class="o">=</span> <span class="mi">260</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;TAU221&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]))</span>  
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;TBATMOS2223&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>  <span class="o">=</span> <span class="mi">260</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;TAU2223&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]))</span> 
+            <span class="k">except</span><span class="p">:</span>
+                <span class="c1">#! why are we setting these to 1? Find out</span>
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;TAU221&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>  <span class="o">=</span> <span class="mi">1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;TAU2223&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>  <span class="o">=</span> <span class="mi">1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;TBATMOS221&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>  <span class="o">=</span> <span class="mi">1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;TBATMOS2223&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>  <span class="o">=</span> <span class="mi">1</span>
+
+            <span class="c1"># self.log_multiple_entries(&#39;TAU221&#39;,&#39;TAU2223&#39;,&#39;TBATMOS221&#39;,&#39;TBATMOS2223&#39;)</span>
+            <span class="c1"># set_dict_item(self.__dict__,&#39;TAU221&#39;,np.nan,f&#39;Optical depth at 22.1 GHz&#39;)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;OBJECT&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">==</span><span class="s1">&#39;JUPITER&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calibrate_jupiter_atm</span><span class="p">()</span>
+
+        <span class="k">elif</span> <span class="s1">&#39;13.0S&#39;</span> <span class="ow">in</span> <span class="n">frontend</span> <span class="ow">or</span> <span class="s1">&#39;18.0S&#39;</span> <span class="ow">in</span> <span class="n">frontend</span> <span class="ow">or</span> <span class="s1">&#39;04.5S&#39;</span> <span class="ow">in</span> <span class="n">frontend</span><span class="p">:</span>
+            <span class="c1"># calculate the atmospheric absorbtion</span>
+            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="s2">&quot;Calculate atmospheric absorption&quot;</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">atmabs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mf">0.005</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;ZA&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">*</span><span class="mf">0.017453293</span><span class="p">))</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">atmabs</span><span class="o">=</span><span class="mf">0.0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;ATMOSABS&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span><span class="n">atmabs</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">:</span><span class="s1">&#39;Atmospheric absorption&#39;</span><span class="p">}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log_multiple_entries</span><span class="p">(</span><span class="s1">&#39;ATMOSABS&#39;</span><span class="p">)</span>
+
+      
+
+        <span class="k">elif</span> <span class="s1">&#39;D&#39;</span> <span class="ow">in</span> <span class="n">frontend</span><span class="p">:</span>
+            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="s2">&quot;Calculate zenith absorption&quot;</span><span class="p">)</span>
+
+            <span class="n">dtr</span> <span class="o">=</span> <span class="mf">0.01745329</span> <span class="c1">#! TODO: where does this number come from??</span>
+
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;SEC_Z&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;X_Z&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;DRY_ATMOS_TRANSMISSION&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;ZENITH_TAU_AT_1400M&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s1">&#39;z&#39;</span><span class="p">)</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;ABSORPTION_AT_ZENITH&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;SEC_Z&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;ZA&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>  <span class="o">*</span> <span class="n">dtr</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;X_Z&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>  <span class="o">=</span> <span class="o">-</span><span class="mf">0.0045</span> <span class="o">+</span> <span class="mf">1.00672</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;SEC_Z&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>  <span class="o">-</span> <span class="mf">0.002234</span> <span class="o">*</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;SEC_Z&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>  <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="mf">0.0006247</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;SEC_Z&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">**</span><span class="mi">3</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;DRY_ATMOS_TRANSMISSION&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>  <span class="o">=</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mf">0.0069</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">((</span><span class="mi">90</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;ZA&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="p">)</span><span class="o">*</span><span class="n">dtr</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;ZENITH_TAU_AT_1400M&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>  <span class="o">=</span> <span class="mf">0.00610</span> <span class="o">+</span> <span class="mf">0.00018</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;PWV&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;ABSORPTION_AT_ZENITH&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;ZENITH_TAU_AT_1400M&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>  <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;X_Z&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log_multiple_entries</span><span class="p">(</span><span class="s1">&#39;SEC_Z&#39;</span><span class="p">,</span><span class="s1">&#39;X_Z&#39;</span><span class="p">,</span><span class="s1">&#39;DRY_ATMOS_TRANSMISSION&#39;</span><span class="p">,</span><span class="s1">&#39;ZENITH_TAU_AT_1400M&#39;</span><span class="p">,</span><span class="s1">&#39;ABSORPTION_AT_ZENITH&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;atmospheric calibration Not implemented for </span><span class="si">{</span><span class="n">frontend</span><span class="si">}</span><span class="s1">. Contact author&#39;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="DriftScanData.calibrate_jupiter_atm">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScanData.DriftScanData.calibrate_jupiter_atm">[docs]</a>
+    <span class="k">def</span> <span class="nf">calibrate_jupiter_atm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Calibrate the Jupiter atmosphere.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="s2">&quot;Calibrate Jupiter atmospheric data.&quot;</span><span class="p">)</span>
+       
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_planet_ang_diam</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_jupiter_dist</span><span class="p">()</span>
+
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;HPBW_ARCSEC&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;ADOPTED_PLANET_TB&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;SYNCH_FLUX_DENSITY&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;PLANET_ANG_EQ_RAD&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;PLANET_SOLID_ANG&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;THERMAL_PLANET_FLUX_D&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;SIZE_FACTOR_IN_BEAM&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;SIZE_CORRECTION_FACTOR&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;MEASURED_TCAL1&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;MEASURED_TCAL2&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;MEAS_TCAL1_CORR_FACTOR&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;MEAS_TCAL2_CORR_FACTOR&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;ZA_RAD&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;TOTAL_PLANET_FLUX_D&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;TOTAL_PLANET_FLUX_D_WMAP&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;ATMOS_ABSORPTION_CORR&#39;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="c1"># TODO: Verify this number</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;HPBW_ARCSEC&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.033</span><span class="o">*</span><span class="mi">3600</span>  <span class="c1"># why 0.033 ?, self.data[&quot;HPBW&quot;]*3600</span>
+
+        <span class="c1"># TODO: VERIFY ADOPTED TB</span>
+        <span class="c1"># from Jupiter Tb = 138.2 + 1.6 K = 139.8 K: Gibson, Welch, de Pater 2005, Icarus 173, 439;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;ADOPTED_PLANET_TB&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>  <span class="o">=</span> <span class="mi">136</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;SYNCH_FLUX_DENSITY&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>  <span class="o">=</span> <span class="mf">1.6</span> <span class="o">*</span> <span class="p">(</span><span class="mf">4.04</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;JUPITER_DIST_AU&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;PLANET_ANG_EQ_RAD&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;PLANET_ANG_DIAM&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">3600</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">180.</span><span class="o">/</span><span class="mf">2.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;PLANET_SOLID_ANG&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>  <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;PLANET_ANG_EQ_RAD&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="mf">0.935</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;THERMAL_PLANET_FLUX_D&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="mi">1380</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;ADOPTED_PLANET_TB&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">*</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;PLANET_SOLID_ANG&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="mi">300</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;CENTFREQ&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;TOTAL_PLANET_FLUX_D&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;SYNCH_FLUX_DENSITY&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">+</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;THERMAL_PLANET_FLUX_D&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+    
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;TOTAL_PLANET_FLUX_D_WMAP&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="mi">1380</span><span class="o">*</span><span class="mf">135.2</span> <span class="o">*</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;PLANET_SOLID_ANG&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="mi">300</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;CENTFREQ&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;SIZE_FACTOR_IN_BEAM&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;PLANET_ANG_DIAM&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">/</span> \
+            <span class="mf">2.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">0.935</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mf">0.6</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;HPBW_ARCSEC&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;SIZE_CORRECTION_FACTOR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;SIZE_FACTOR_IN_BEAM&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> \
+            <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;SIZE_FACTOR_IN_BEAM&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+
+        <span class="c1"># from ztcal (zenith temperature calibration - read mikes notes)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;MEASURED_TCAL1&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">71.4</span> <span class="c1"># zenith measured value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;MEASURED_TCAL2&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">70.1</span> <span class="c1"># check mikes notes</span>
+
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;TCAL1&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;MEAS_TCAL1_CORR_FACTOR&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;MEAS_TCAL1_CORR_FACTOR&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;MEASURED_TCAL1&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;TCAL1&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;TCAL2&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;TCAL2&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;MEAS_TCAL2_CORR_FACTOR&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># print(&#39;TCAL: &#39;,self.data[&quot;TCAL2&quot;])</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;TCAL2&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;MEAS_TCAL2_CORR_FACTOR&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="c1">#self.__dict__[&quot;MEASURED_TCAL2&quot;]/self.__dict__[&quot;TCAL2&quot;]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;MEAS_TCAL2_CORR_FACTOR&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;MEASURED_TCAL2&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;TCAL2&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;ZA_RAD&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;ZA&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">180.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;ATMOS_ABSORPTION_CORR&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;TAU221&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;ZA_RAD&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]))</span></div>
+
+        
+<div class="viewcode-block" id="DriftScanData.get_planet_ang_diam">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScanData.DriftScanData.get_planet_ang_diam">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_planet_ang_diam</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Get the planet angular diameter from horizon data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span>
+                    <span class="s1">&#39;Get the planet angular diameter from horizon data.&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Get observation date and split it</span>
+        <span class="n">date</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;OBSDATE&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">],</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">date</span><span class="o">=</span><span class="n">date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%b-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># year = date.year</span>
+        <span class="c1"># month = date.month</span>
+        <span class="c1"># day = date.day</span>
+
+        <span class="c1"># Get month of date in words</span>
+        <span class="c1"># mydate = datetime.date(year, month, day)</span>
+
+        <span class="c1"># extract data from file</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">jplResults</span><span class="o">=</span><span class="n">get_jpl_results</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">FileResourceNotFoundError</span><span class="p">:</span>
+            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;error&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">,</span>
+                        <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">FileResourceNotFoundError: The &#39;nasa_jpl_results.txt&#39; resource is not in the distribution</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+
+        <span class="c1"># print(jplResults)</span>
+        <span class="c1"># print(date)</span>
+        <span class="c1"># sys.exit()</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s2">&quot;PLANET_ANG_DIAM&quot;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;Planet angular diameter&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># date=mydate.strftime(&quot;%Y-%b-%d&quot;)</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">jplResults</span><span class="p">[</span><span class="n">jplResults</span><span class="p">[</span><span class="s1">&#39;DATE&#39;</span><span class="p">]</span><span class="o">==</span><span class="nb">str</span><span class="p">(</span><span class="n">date</span><span class="p">)]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;PLANET_ANG_DIAM&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ret</span><span class="p">[</span><span class="s2">&quot;ANG-DIAM&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># unit of arcseconds, see nasa jpl horizons file</span>
+        <span class="k">except</span> <span class="n">ValueOutOfRangeException</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">ValueOutOfRangeException: The date </span><span class="si">{</span><span class="n">date</span><span class="si">}</span><span class="s2"> has not been accounted for, contact mantainer&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="DriftScanData.get_jupiter_dist">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScanData.DriftScanData.get_jupiter_dist">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_jupiter_dist</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get Jupiter AU distance from NASA Planets Physical Parameters</span>
+<span class="sd">        https://ssd.jpl.nasa.gov/planets/phys_par.html</span>
+<span class="sd">        We use the mean radius because using the equatorial radius requires corrections.</span>
+<span class="sd">        Ask Jon Quick again to explain.</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="kn">import</span> <span class="nn">datetime</span>
+
+        <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span>
+                    <span class="s1">&#39;Get Jupiter AU distance from calsky data or calculation&#39;</span><span class="p">)</span>
+
+        <span class="c1"># # Get observation date and split it</span>
+        <span class="c1"># year = int(self.data[&quot;OBSDATE&quot;][:4])</span>
+        <span class="c1"># month = int(self.data[&quot;OBSDATE&quot;][5:7])</span>
+        <span class="c1"># day = int(self.data[&quot;OBSDATE&quot;][8:])</span>
+
+        <span class="c1"># ls</span>
+        
+        <span class="c1"># Get month of date in words</span>
+        <span class="c1"># myDate = datetime.date(year, month, day)</span>
+        <span class="c1"># myMonth=myDate.strftime(&quot;%b&quot;)</span>
+
+        <span class="c1"># convert 1 arcsec to radians</span>
+        <span class="n">rad</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="mi">206264</span> 
+
+        <span class="c1"># calculate jupiter distance in km</span>
+        <span class="n">theta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;PLANET_ANG_DIAM&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">rad</span> <span class="c1"># in radians</span>
+        <span class="n">jupDiameter</span> <span class="o">=</span> <span class="mi">69911</span><span class="o">*</span><span class="mi">2</span> <span class="c1"># from nasa jpl horizons ephemeris data, i.e. mean radius times 2, Last Updated 24/04/2024 </span>
+        <span class="n">jupDistancs</span> <span class="o">=</span> <span class="n">jupDiameter</span><span class="o">/</span><span class="n">theta</span>
+
+        <span class="c1"># convert to AU</span>
+        <span class="n">au</span><span class="o">=</span><span class="mf">1.45979e8</span> <span class="c1"># km, from </span>
+        <span class="n">JUPITER_DIST_AU</span> <span class="o">=</span> <span class="n">jupDistancs</span><span class="o">/</span><span class="n">au</span> <span class="c1"># should be between ~ 4 and 6 AU</span>
+        <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s2">&quot;JUPITER_DIST_AU&quot;</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;Distance to Jupiter in astronomical units&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;JUPITER_DIST_AU&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">JUPITER_DIST_AU</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_multiple_entries</span><span class="p">(</span><span class="s1">&#39;JUPITER_DIST_AU&#39;</span><span class="p">,</span><span class="s1">&#39;PLANET_ANG_DIAM&#39;</span><span class="p">)</span></div>
+</div>
+
+        <span class="c1"># print(jupDistancs, JUPITER_DIST_AU)</span>
+        <span class="c1"># sys.exit()</span>
+        <span class="c1"># Get AU distance / radius</span>
+        <span class="c1"># try:</span>
+        <span class="c1">#     # calskyRes=get_calsky_results(year)</span>
+        <span class="c1">#     # row=calskyRes[(calskyRes[&#39;month&#39;]==myMonth) &amp; (calskyRes[&#39;day&#39;]==day)]</span>
+        <span class="c1">#     self.data[&quot;JUPITER_DIST_AU&quot;] = row[&#39;radius&#39;].iloc[0]</span>
+        <span class="c1"># except ex.ValueOutOfRangeException:</span>
+        <span class="c1">#     print(f&quot;\nValueOutOfRangeException: The date {myDate} has not been accounted for, contact mantainer&quot;)</span>
+        <span class="c1">#     sys.exit()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Pfesesani van Zyl.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src package &mdash; dran v1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=e160b93e"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="src.cli package" href="src.cli.html" />
+    <link rel="prev" title="src" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            dran
+          </a>
+              <div class="version">
+                v1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../extras/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../extras/caveats.html">Caveats</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../extras/quickstart.html">Quickstart Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../extras/cli.html">The command line interface (CLI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../extras/gui.html">The graphical user interface (GUI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../extras/gui.html#the-landing-page">The landing page</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../extras/gui.html#edit-driftscan">Edit driftscan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../extras/gui.html#edit-time-series">Edit Time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../extras/gui.html#view-plots">View plots</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../extras/tuts/tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../extras/commands.html">Commands</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guidelines:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../extras/changelog.html">Changelog</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">src package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="src.cli.html">src.cli package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html">src.common package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html">src.gui package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.predefs.html">src.predefs package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-src.config">src.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-src">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">dran</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">src</a></li>
+      <li class="breadcrumb-item active">src package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/docs/src.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="src-package">
+<h1>src package<a class="headerlink" href="#src-package" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="src.cli.html">src.cli package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="src.cli.html#module-src.cli">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="src.common.html">src.common package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="src.common.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.common.html#module-src.common.calibrate">src.common.calibrate module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.calibrate.calc_dualtotFlux"><code class="docutils literal notranslate"><span class="pre">calc_dualtotFlux()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.calibrate.calc_flux"><code class="docutils literal notranslate"><span class="pre">calc_flux()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.calibrate.calc_pc_eq"><code class="docutils literal notranslate"><span class="pre">calc_pc_eq()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.calibrate.calc_pc_pss"><code class="docutils literal notranslate"><span class="pre">calc_pc_pss()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.calibrate.calc_pss"><code class="docutils literal notranslate"><span class="pre">calc_pss()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.calibrate.calc_tcorr"><code class="docutils literal notranslate"><span class="pre">calc_tcorr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.calibrate.calc_totFlux"><code class="docutils literal notranslate"><span class="pre">calc_totFlux()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.calibrate.calibrate"><code class="docutils literal notranslate"><span class="pre">calibrate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.calibrate.getpss"><code class="docutils literal notranslate"><span class="pre">getpss()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.calibrate.set_corr_ta_to_zero"><code class="docutils literal notranslate"><span class="pre">set_corr_ta_to_zero()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.calibrate.set_pss_to_zero"><code class="docutils literal notranslate"><span class="pre">set_pss_to_zero()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.calibrate.test_for_nans"><code class="docutils literal notranslate"><span class="pre">test_for_nans()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.common.html#module-src.common.contextManagers">src.common.contextManagers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.contextManagers.change_dir"><code class="docutils literal notranslate"><span class="pre">change_dir()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.contextManagers.open_database"><code class="docutils literal notranslate"><span class="pre">open_database()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.contextManagers.open_file"><code class="docutils literal notranslate"><span class="pre">open_file()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.common.html#module-src.common.dataProcessingFlowManager">src.common.dataProcessingFlowManager module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.dataProcessingFlowManager.DataProcessingFlowManager"><code class="docutils literal notranslate"><span class="pre">DataProcessingFlowManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.dataProcessingFlowManager.DataProcessingFlowManager.FNBW"><code class="docutils literal notranslate"><span class="pre">DataProcessingFlowManager.FNBW</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.dataProcessingFlowManager.DataProcessingFlowManager.HPBW"><code class="docutils literal notranslate"><span class="pre">DataProcessingFlowManager.HPBW</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.dataProcessingFlowManager.DataProcessingFlowManager.applyRFIremoval"><code class="docutils literal notranslate"><span class="pre">DataProcessingFlowManager.applyRFIremoval</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.dataProcessingFlowManager.DataProcessingFlowManager.autoFit"><code class="docutils literal notranslate"><span class="pre">DataProcessingFlowManager.autoFit</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.dataProcessingFlowManager.DataProcessingFlowManager.clean_data"><code class="docutils literal notranslate"><span class="pre">DataProcessingFlowManager.clean_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.dataProcessingFlowManager.DataProcessingFlowManager.fileName"><code class="docutils literal notranslate"><span class="pre">DataProcessingFlowManager.fileName</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.dataProcessingFlowManager.DataProcessingFlowManager.fit_theoretical_baselines"><code class="docutils literal notranslate"><span class="pre">DataProcessingFlowManager.fit_theoretical_baselines()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.dataProcessingFlowManager.DataProcessingFlowManager.flag"><code class="docutils literal notranslate"><span class="pre">DataProcessingFlowManager.flag</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.dataProcessingFlowManager.DataProcessingFlowManager.force"><code class="docutils literal notranslate"><span class="pre">DataProcessingFlowManager.force</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.dataProcessingFlowManager.DataProcessingFlowManager.freq"><code class="docutils literal notranslate"><span class="pre">DataProcessingFlowManager.freq</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.dataProcessingFlowManager.DataProcessingFlowManager.frontend"><code class="docutils literal notranslate"><span class="pre">DataProcessingFlowManager.frontend</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.dataProcessingFlowManager.DataProcessingFlowManager.locate_baseline_blocks_fnbw"><code class="docutils literal notranslate"><span class="pre">DataProcessingFlowManager.locate_baseline_blocks_fnbw()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.dataProcessingFlowManager.DataProcessingFlowManager.locate_baseline_blocks_masked"><code class="docutils literal notranslate"><span class="pre">DataProcessingFlowManager.locate_baseline_blocks_masked()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.dataProcessingFlowManager.DataProcessingFlowManager.locate_main_beam_data"><code class="docutils literal notranslate"><span class="pre">DataProcessingFlowManager.locate_main_beam_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.dataProcessingFlowManager.DataProcessingFlowManager.log"><code class="docutils literal notranslate"><span class="pre">DataProcessingFlowManager.log</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.dataProcessingFlowManager.DataProcessingFlowManager.make_initial_plots"><code class="docutils literal notranslate"><span class="pre">DataProcessingFlowManager.make_initial_plots()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.dataProcessingFlowManager.DataProcessingFlowManager.pol"><code class="docutils literal notranslate"><span class="pre">DataProcessingFlowManager.pol</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.dataProcessingFlowManager.DataProcessingFlowManager.savefolder"><code class="docutils literal notranslate"><span class="pre">DataProcessingFlowManager.savefolder</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.dataProcessingFlowManager.DataProcessingFlowManager.src"><code class="docutils literal notranslate"><span class="pre">DataProcessingFlowManager.src</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.dataProcessingFlowManager.DataProcessingFlowManager.srcTag"><code class="docutils literal notranslate"><span class="pre">DataProcessingFlowManager.srcTag</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.dataProcessingFlowManager.DataProcessingFlowManager.theoFit"><code class="docutils literal notranslate"><span class="pre">DataProcessingFlowManager.theoFit</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.dataProcessingFlowManager.DataProcessingFlowManager.x"><code class="docutils literal notranslate"><span class="pre">DataProcessingFlowManager.x</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.dataProcessingFlowManager.DataProcessingFlowManager.y"><code class="docutils literal notranslate"><span class="pre">DataProcessingFlowManager.y</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.common.html#module-src.common.driftScanAttributes">src.common.driftScanAttributes module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.driftScanAttributes.DriftScanAttributes"><code class="docutils literal notranslate"><span class="pre">DriftScanAttributes</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.driftScanAttributes.DriftScanAttributes.print_dict"><code class="docutils literal notranslate"><span class="pre">DriftScanAttributes.print_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.driftScanAttributes.DriftScanAttributes.print_keys"><code class="docutils literal notranslate"><span class="pre">DriftScanAttributes.print_keys()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.driftScanAttributes.DriftScanAttributes.reset_dict"><code class="docutils literal notranslate"><span class="pre">DriftScanAttributes.reset_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.driftScanAttributes.DriftScanAttributes.set_comm_weather_parameters"><code class="docutils literal notranslate"><span class="pre">DriftScanAttributes.set_comm_weather_parameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.driftScanAttributes.DriftScanAttributes.set_common_parameters"><code class="docutils literal notranslate"><span class="pre">DriftScanAttributes.set_common_parameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.driftScanAttributes.DriftScanAttributes.set_db_dict"><code class="docutils literal notranslate"><span class="pre">DriftScanAttributes.set_db_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.driftScanAttributes.DriftScanAttributes.set_db_fit_parameters"><code class="docutils literal notranslate"><span class="pre">DriftScanAttributes.set_db_fit_parameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.driftScanAttributes.DriftScanAttributes.set_db_weather_parameters"><code class="docutils literal notranslate"><span class="pre">DriftScanAttributes.set_db_weather_parameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.driftScanAttributes.DriftScanAttributes.set_nb_dict"><code class="docutils literal notranslate"><span class="pre">DriftScanAttributes.set_nb_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.driftScanAttributes.DriftScanAttributes.set_nb_fit_parameters"><code class="docutils literal notranslate"><span class="pre">DriftScanAttributes.set_nb_fit_parameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.driftScanAttributes.DriftScanAttributes.set_tau_parameters"><code class="docutils literal notranslate"><span class="pre">DriftScanAttributes.set_tau_parameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.driftScanAttributes.DriftScanAttributes.set_tbatmos_parameters"><code class="docutils literal notranslate"><span class="pre">DriftScanAttributes.set_tbatmos_parameters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.driftScanAttributes.DriftScanAttributes.set_wb_dict"><code class="docutils literal notranslate"><span class="pre">DriftScanAttributes.set_wb_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.driftScanAttributes.DriftScanAttributes.set_wb_parameters"><code class="docutils literal notranslate"><span class="pre">DriftScanAttributes.set_wb_parameters()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.common.html#module-src.common.driftScanData">src.common.driftScanData module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.driftScanData.DriftScanData"><code class="docutils literal notranslate"><span class="pre">DriftScanData</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.driftScanData.DriftScanData.calibrate_jupiter_atm"><code class="docutils literal notranslate"><span class="pre">DriftScanData.calibrate_jupiter_atm()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.driftScanData.DriftScanData.get_calibration_header_data"><code class="docutils literal notranslate"><span class="pre">DriftScanData.get_calibration_header_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.driftScanData.DriftScanData.get_chart_header_data"><code class="docutils literal notranslate"><span class="pre">DriftScanData.get_chart_header_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.driftScanData.DriftScanData.get_driftscans"><code class="docutils literal notranslate"><span class="pre">DriftScanData.get_driftscans()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.driftScanData.DriftScanData.get_frontend_header_data"><code class="docutils literal notranslate"><span class="pre">DriftScanData.get_frontend_header_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.driftScanData.DriftScanData.get_jupiter_dist"><code class="docutils literal notranslate"><span class="pre">DriftScanData.get_jupiter_dist()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.driftScanData.DriftScanData.get_missing_params"><code class="docutils literal notranslate"><span class="pre">DriftScanData.get_missing_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.driftScanData.DriftScanData.get_planet_ang_diam"><code class="docutils literal notranslate"><span class="pre">DriftScanData.get_planet_ang_diam()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.driftScanData.DriftScanData.log_multiple_entries"><code class="docutils literal notranslate"><span class="pre">DriftScanData.log_multiple_entries()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.common.html#module-src.common.driftScans">src.common.driftScans module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.driftScans.DriftScans"><code class="docutils literal notranslate"><span class="pre">DriftScans</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.driftScans.DriftScans.add_missing_values"><code class="docutils literal notranslate"><span class="pre">DriftScans.add_missing_values()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.driftScans.DriftScans.fill_in_missing_data_db_beams"><code class="docutils literal notranslate"><span class="pre">DriftScans.fill_in_missing_data_db_beams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.driftScans.DriftScans.fill_in_missing_data_db_common"><code class="docutils literal notranslate"><span class="pre">DriftScans.fill_in_missing_data_db_common()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.driftScans.DriftScans.fill_in_missing_data_sb"><code class="docutils literal notranslate"><span class="pre">DriftScans.fill_in_missing_data_sb()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.driftScans.DriftScans.getScanData"><code class="docutils literal notranslate"><span class="pre">DriftScans.getScanData()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.driftScans.DriftScans.process_data"><code class="docutils literal notranslate"><span class="pre">DriftScans.process_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.driftScans.DriftScans.process_data_only"><code class="docutils literal notranslate"><span class="pre">DriftScans.process_data_only()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.driftScans.DriftScans.try_test"><code class="docutils literal notranslate"><span class="pre">DriftScans.try_test()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.common.html#module-src.common.enums">src.common.enums module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.enums.Month"><code class="docutils literal notranslate"><span class="pre">Month</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.enums.Month.Apr"><code class="docutils literal notranslate"><span class="pre">Month.Apr</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.enums.Month.Aug"><code class="docutils literal notranslate"><span class="pre">Month.Aug</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.enums.Month.Dec"><code class="docutils literal notranslate"><span class="pre">Month.Dec</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.enums.Month.Feb"><code class="docutils literal notranslate"><span class="pre">Month.Feb</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.enums.Month.Jan"><code class="docutils literal notranslate"><span class="pre">Month.Jan</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.enums.Month.Jul"><code class="docutils literal notranslate"><span class="pre">Month.Jul</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.enums.Month.Jun"><code class="docutils literal notranslate"><span class="pre">Month.Jun</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.enums.Month.Mar"><code class="docutils literal notranslate"><span class="pre">Month.Mar</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.enums.Month.May"><code class="docutils literal notranslate"><span class="pre">Month.May</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.enums.Month.Nov"><code class="docutils literal notranslate"><span class="pre">Month.Nov</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.enums.Month.Oct"><code class="docutils literal notranslate"><span class="pre">Month.Oct</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.enums.Month.Sep"><code class="docutils literal notranslate"><span class="pre">Month.Sep</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.enums.ScanType"><code class="docutils literal notranslate"><span class="pre">ScanType</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.enums.ScanType.DB"><code class="docutils literal notranslate"><span class="pre">ScanType.DB</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.enums.ScanType.SBN"><code class="docutils literal notranslate"><span class="pre">ScanType.SBN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.enums.ScanType.SBW"><code class="docutils literal notranslate"><span class="pre">ScanType.SBW</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.common.html#module-src.common.exceptions">src.common.exceptions module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.exceptions.BeamTypeNotFoundError"><code class="docutils literal notranslate"><span class="pre">BeamTypeNotFoundError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.exceptions.DB_READ_ERROR"><code class="docutils literal notranslate"><span class="pre">DB_READ_ERROR</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.exceptions.DB_WRITE_ERROR"><code class="docutils literal notranslate"><span class="pre">DB_WRITE_ERROR</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.exceptions.EmptyFilePathError"><code class="docutils literal notranslate"><span class="pre">EmptyFilePathError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.exceptions.EmptyFolderError"><code class="docutils literal notranslate"><span class="pre">EmptyFolderError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.exceptions.EmptyTableError"><code class="docutils literal notranslate"><span class="pre">EmptyTableError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.exceptions.Error"><code class="docutils literal notranslate"><span class="pre">Error</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.exceptions.FileResourceNotFoundError"><code class="docutils literal notranslate"><span class="pre">FileResourceNotFoundError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.exceptions.InvalidFileExtensionError"><code class="docutils literal notranslate"><span class="pre">InvalidFileExtensionError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.exceptions.InvalidFilePath"><code class="docutils literal notranslate"><span class="pre">InvalidFilePath</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.exceptions.MissingChartHeaderError"><code class="docutils literal notranslate"><span class="pre">MissingChartHeaderError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.exceptions.MissingParameterException"><code class="docutils literal notranslate"><span class="pre">MissingParameterException</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.exceptions.ValueOutOfRangeException"><code class="docutils literal notranslate"><span class="pre">ValueOutOfRangeException</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.common.html#module-src.common.fitting">src.common.fitting module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.calc_residual"><code class="docutils literal notranslate"><span class="pre">calc_residual()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.calc_residual_and_rms"><code class="docutils literal notranslate"><span class="pre">calc_residual_and_rms()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.clean_data"><code class="docutils literal notranslate"><span class="pre">clean_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.clean_data_iterative_fitting"><code class="docutils literal notranslate"><span class="pre">clean_data_iterative_fitting()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.clean_rfi"><code class="docutils literal notranslate"><span class="pre">clean_rfi()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.correct_drift"><code class="docutils literal notranslate"><span class="pre">correct_drift()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.fit_beam"><code class="docutils literal notranslate"><span class="pre">fit_beam()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.fit_dual_beam"><code class="docutils literal notranslate"><span class="pre">fit_dual_beam()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.gauss"><code class="docutils literal notranslate"><span class="pre">gauss()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.gauss_lin"><code class="docutils literal notranslate"><span class="pre">gauss_lin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.get_base"><code class="docutils literal notranslate"><span class="pre">get_base()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.locate_baseline_blocks_auto"><code class="docutils literal notranslate"><span class="pre">locate_baseline_blocks_auto()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.poly_coeff"><code class="docutils literal notranslate"><span class="pre">poly_coeff()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.spline"><code class="docutils literal notranslate"><span class="pre">spline()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.test_gauss_fit"><code class="docutils literal notranslate"><span class="pre">test_gauss_fit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.test_position_validity"><code class="docutils literal notranslate"><span class="pre">test_position_validity()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.common.html#module-src.common.getResources">src.common.getResources module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.getResources.get_cal_list"><code class="docutils literal notranslate"><span class="pre">get_cal_list()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.getResources.get_jpl_results"><code class="docutils literal notranslate"><span class="pre">get_jpl_results()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.common.html#module-src.common.logConfiguration">src.common.logConfiguration module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.logConfiguration.configure_console_logger"><code class="docutils literal notranslate"><span class="pre">configure_console_logger()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.logConfiguration.configure_logging"><code class="docutils literal notranslate"><span class="pre">configure_logging()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.common.html#module-src.common.miscellaneousFunctions">src.common.miscellaneousFunctions module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.miscellaneousFunctions.calc_log_freq"><code class="docutils literal notranslate"><span class="pre">calc_log_freq()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.miscellaneousFunctions.catch_zeroDivError"><code class="docutils literal notranslate"><span class="pre">catch_zeroDivError()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.miscellaneousFunctions.check_for_nans"><code class="docutils literal notranslate"><span class="pre">check_for_nans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.miscellaneousFunctions.create_current_scan_directory"><code class="docutils literal notranslate"><span class="pre">create_current_scan_directory()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.miscellaneousFunctions.delete_logs"><code class="docutils literal notranslate"><span class="pre">delete_logs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.miscellaneousFunctions.delete_object"><code class="docutils literal notranslate"><span class="pre">delete_object()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.miscellaneousFunctions.fast_scandir"><code class="docutils literal notranslate"><span class="pre">fast_scandir()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.miscellaneousFunctions.set_dict_item"><code class="docutils literal notranslate"><span class="pre">set_dict_item()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.miscellaneousFunctions.set_table_name"><code class="docutils literal notranslate"><span class="pre">set_table_name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.miscellaneousFunctions.sig_to_noise"><code class="docutils literal notranslate"><span class="pre">sig_to_noise()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.common.html#module-src.common.msgConfiguration">src.common.msgConfiguration module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.msgConfiguration.disclaimer"><code class="docutils literal notranslate"><span class="pre">disclaimer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.msgConfiguration.load_prog"><code class="docutils literal notranslate"><span class="pre">load_prog()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.msgConfiguration.msg_wrapper"><code class="docutils literal notranslate"><span class="pre">msg_wrapper()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.msgConfiguration.print_start"><code class="docutils literal notranslate"><span class="pre">print_start()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.common.html#module-src.common.plotting">src.common.plotting module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.plotting.fit_plot"><code class="docutils literal notranslate"><span class="pre">fit_plot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.plotting.make_plot"><code class="docutils literal notranslate"><span class="pre">make_plot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.plotting.plotBaselineEstimate"><code class="docutils literal notranslate"><span class="pre">plotBaselineEstimate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.plotting.plotCorrectedData"><code class="docutils literal notranslate"><span class="pre">plotCorrectedData()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.plotting.plotDualBeamFit"><code class="docutils literal notranslate"><span class="pre">plotDualBeamFit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.plotting.plotPeakFit"><code class="docutils literal notranslate"><span class="pre">plotPeakFit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.plotting.plot_no_fit"><code class="docutils literal notranslate"><span class="pre">plot_no_fit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.plotting.plot_overlap"><code class="docutils literal notranslate"><span class="pre">plot_overlap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.plotting.plot_scan"><code class="docutils literal notranslate"><span class="pre">plot_scan()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.common.html#module-src.common.sqlite_db">src.common.sqlite_db module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.sqlite_db.SQLiteDB"><code class="docutils literal notranslate"><span class="pre">SQLiteDB</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.sqlite_db.SQLiteDB.close_db"><code class="docutils literal notranslate"><span class="pre">SQLiteDB.close_db()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.sqlite_db.SQLiteDB.commit_changes"><code class="docutils literal notranslate"><span class="pre">SQLiteDB.commit_changes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.sqlite_db.SQLiteDB.create_db"><code class="docutils literal notranslate"><span class="pre">SQLiteDB.create_db()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.sqlite_db.SQLiteDB.create_table"><code class="docutils literal notranslate"><span class="pre">SQLiteDB.create_table()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.sqlite_db.SQLiteDB.create_table_stmt"><code class="docutils literal notranslate"><span class="pre">SQLiteDB.create_table_stmt()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.sqlite_db.SQLiteDB.dbPath"><code class="docutils literal notranslate"><span class="pre">SQLiteDB.dbPath</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.sqlite_db.SQLiteDB.get_all_table_coloumns"><code class="docutils literal notranslate"><span class="pre">SQLiteDB.get_all_table_coloumns()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.sqlite_db.SQLiteDB.get_rows"><code class="docutils literal notranslate"><span class="pre">SQLiteDB.get_rows()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.sqlite_db.SQLiteDB.get_table_names"><code class="docutils literal notranslate"><span class="pre">SQLiteDB.get_table_names()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.sqlite_db.SQLiteDB.insert_into_table_stmt_with_pk"><code class="docutils literal notranslate"><span class="pre">SQLiteDB.insert_into_table_stmt_with_pk()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.sqlite_db.SQLiteDB.log"><code class="docutils literal notranslate"><span class="pre">SQLiteDB.log</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.sqlite_db.SQLiteDB.populate_table"><code class="docutils literal notranslate"><span class="pre">SQLiteDB.populate_table()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.sqlite_db.SQLiteDB.set_database_name"><code class="docutils literal notranslate"><span class="pre">SQLiteDB.set_database_name()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.common.html#module-src.common">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="src.gui.html">src.gui package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="src.gui.html#module-src.gui">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="src.predefs.html">src.predefs package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="src.predefs.html#module-src.predefs">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-src.config">
+<span id="src-config-module"></span><h2>src.config module<a class="headerlink" href="#module-src.config" title="Link to this heading"></a></h2>
+</section>
+<section id="module-src">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="src" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="src.cli.html" class="btn btn-neutral float-right" title="src.cli package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Pfesesani van Zyl.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
