@@ -17,7 +17,6 @@ src/predefs/__p**
 plots
 currentScanPlots
 build
-dist
 HART26DATA.db
 .vscode
 test.py
