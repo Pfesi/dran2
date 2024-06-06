@@ -34,7 +34,7 @@ Installation
 DRAN is conveniently available for installation through the [PYPI package manager](https://pypi.org) using the following command:
 
 ``` 
-  $ pip install dran
+  $ pip install dran2
 ```
 
 Data files
@@ -119,7 +119,7 @@ Get Help and Contribute
 
 Having trouble with DRAN? Have questions about the software or features? We encourage you to:
 
-* Report Issues: Encounter any bugs or unexpected behavior? Please [OPEN AN ISSUE](https://github.com/Pfesi/dran26m/issues) on the GitHub repository.
+* Report Issues: Encounter any bugs or unexpected behavior? Please [OPEN AN ISSUE](https://github.com/Pfesi/dran2/issues) on the GitHub repository.
 * Share your thoughts: We value your feedback! Feel free to use the GitHub issue tracker to suggest improvements or request new features.
 
 
