@@ -15,7 +15,6 @@ contourpy==1.2.0
 cycler==0.12.1
 distlib==0.3.8
 docutils==0.20.1
-dran2 @ file:///Users/pfesesanivanzyl/dran/dist/dran2-0.0.0-py3-none-any.whl#sha256=cd69c723eb17fe0720e68cd4273dcb33161c743948843cb8b8390338d7602e01
 esbonio==0.16.4
 filelock==3.14.0
 fonttools==4.49.0
