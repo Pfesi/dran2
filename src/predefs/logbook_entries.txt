@@ -1,0 +1,375 @@
+General maintenance for 26m
+(2011d004, ) Replaced cooling water horse on Dec wrap. Fitted new ab- sorber in 18 cm compressor. Flushed out the cooling coil on the compres- sor.
+(2011d007, ) 2.5cm/13cm compressor failed. Changed with spare.
+(2011d011, ) Maintenance to Program for 2011.
+(2011d012, ) Maintenance to program for 2011.
+(2011d017, ) Install temporary support for Sump Pump. Repair mount- ings on Dec wrap east.
+(2011d024, ) Replaced AC1 fan bearings. Installed new AC filter Dec+Cone.
+(2011d027, ) Measured delays through pulsar tuner.
+(2011d061, ) Problem: 2cm and 6 cm outputs (NB/LCP) drops by ap- proximately A dB, from time to time. Tightned all the connectors in the 4-8GHz mixer drawer.
+(2011d137, ) Replaced the expander value disk on 13 cm expander. 
+(2011d159, ) Cooldown 13 cm after in situ service of APD coldhead.
+(2011d189, ) Pulsar (using 13 cm) had RCP error. Tested 13cm and others using CALT for RF switch errors, none found.
+(2011d195, ) Focus- returned to operational status. Installed 2nd Synth Dec room for VLBI on 18th.
+2011d199, ) 4.5cm Synth plumbed in.
+(2011d207, ) Focus unit, Tripped on Overload. Reset Focus. Replaced high noie diode box. To modify mixer drawer for easy switch over of synth’s. (done)
+• (2011d209, ) Reset the (integrator) on analogue HA card. Fault RF switch (SEM163) replaced. (IF filter selector drawer).
+• (2011d213, ) Changed cable 4-8 mixer drawer.
+• (2011d214, ) Focus checked-connector to POT - good knick, cleared/contact cleaned. measured reference 50.4V.
+• (2011d216, ) Focus - Fresh oil in gearbox (Omala 150) changed. Digital card cleaned up analogue board did measurements.
+• (2011d224, ) Faulty RF cable replaced in the cone, phase cal box -t- 13cm reciever. Attenuation fromm the phase cal box-t0-X band reciever was decreased from 12 dB to 9 dB. RG214 RF cables replaced with LMR400 RF cable in the Dec room. Synth to ”Lo patch panel” - ”LO patch panel” to ”4-8 GHZ mixer drawer that was done to improve the ”LO” level to the mixer drawer. SDIO (cone) parallel OOT installed from Dec room to control room using fibre no 28 (now version of TX and RX cards) used in control room SDIO integrated box, linked to this new OOT (on patch panel). 10MHz installed to rack N28.
+• (2011d243, ) Checked HA encoder PSU in cone 6.31V. Checked HA en- coder in enclosure 4.976V great!!. Servicing 3.5 cm expander in situ. Take in pressure sensor for calibration.
+• (2011d245, ) New temperature unit fitted. New Expander fitted on X- band receiver. Noise diode Cable (LCP) repaired.
+• (2011d247, ) Pressure sensor refitted (after calibration). New Oil filter system installed on HA drive gearboxes.
+• (2011d248, ) 10:45 Installed sun-shield over HA encoder housing.
+• (2011d249, ) Emergency stop triggered. – Unknown cuase - switch, cable, PSU 24V, studnet??
+• (2011d250, ) Exchange out encoder parallel to serial board on HA (Note RH screw in stripped needs fixing. Test all E.Stops on antenna + Hy- dromech. These all passed test A.OK. Test omn All N.diodes via menu (A.OK.).
+• (2011d253, ) Repair E.Stop cable to Dec room. (note: other problem DEc brake trip, new leds don’t work - to replace). Replace HA encoder. New offset -0.003 (note: levvel antenna first).
+• (2011d276, ) Driver boards were cleaned with alcohol and reinstalled.
+• (2011d278, ) Driver board, DR6, (SINK) was replaced with a spare.
+• (2011d279, ) The final limit was overwritten for the VLBI experiment. The fault was found cable.
+• (2011d280, ) 4-8GHz mixer drawer was modified to allow easy connection of 8257D signal generator on RCP channel. The spare wire was put in parallel with the suspicius wire. the limit was then tested. Dec North pre-limit = 47.4, final limit 48.017. South pre-limit = faulty, South final limit -86.8.
+• (2011d281, ) Rewire DEC prelimit bx. Test prelimit south = -85.1. west 89.572 North limit 47.4, corner limit 74.64.
+• (2011d284, ) Introduced RFI filter dilution correction into DAS adjust- level) ie. do-auto-lvl() (may affect spectroscopy calibration.
+• (2011d286, ) Fix-up final limit problem. Pin”E” wire was broken in cable link from HA SKIO to Dec SKIO repaired cable!!.
+• (2011d292, ) Repaired A broken RF cable from the phase cal box to X- band receiver coupler.
+• (2011d295, ) Replaced electric motor dec north + coupling (note: this motor has +24V tachometer due to tracking irregularities.
+• (2011d303, ) The 3x9V regulators on the cone has been cleaned and con- nected in parallel via diodes.
+• (2011d306, ) Dismantle sub-reflector shafts.
+• (2011d307, ) Install new sub-reflector shafts.
+• (2011d310, ) The 5V motor encoder was swapped at the Dec room.
+• (2011d355, ) Dec encoder jump. Cover removed temporarily voltage in Dec PSU = 5.37 V, voltage in encoder 4.97V.
+• (2012d005, ) Noise adding radiometer IF filter selector (LCP input switch was replaced, RCP input switch wire (oranje wire), must be resoldered!).
+• (2012d018, ) Noise adding radiometer IF input selector (old RF switches were replaced with new switches).
+• (2012d046, ) Dec encoder jumps - cover removed.
+• (2012d051, ) Fixed water leak on Dec aircon supply.
+• (2012d052, ) Changed the North HA bearing oil, filled with Shell Vitron 460. Painted the aircon ducting of cone. Installed the Dec gearbox oil filters. Worked on Focus problems, replaced potentiometer. Replaced cannon SKT.
+• (2012d059, ) Worked on Tilt-drive problem. 1) Cannon connector has 4-5 erroded pins. cleaned with contact cleaner. 2) Loose wire on relay (Neg side of coil). 3) South side final limit. relay stuck on open, loosened. Needs further attention. 4) Final limit. Fault doesn’t register... This needs investigation. Problem- Tilt readout not stable.
+• (2012d108, ) Replace digital board on Tilt unit.
+• (2012d177, ) Top up of North polar bearings oil.
+• (2012d209, ) Started investigation of cracking ”noise” on 26m.
+• (2012d214, ) 2nd investigation of noises -found crack in beam?? temporary chains added to dampen load box.
+• (2012d220, ) SNOW at Hartebeesthoek!!.
+• (2012d279, ) Level 26m telescope. HA -0.034, -25.871.
+• (2012d321, ) Focus fixed. Wire loose between controller box and the power motor drive box. (Fault was would only drive in).
+• (2012d326, ) Cleaned, flushed, descaled compressor chiller plant.
+• (2012d335, ) Installed new set on PCal line stretchers. Checked oil level in North bearing. Greased South bearing.
+• (2013d007, ) Offset panel reset to original setting. Replaced the LCP RF switch in noise adding radiometer IF input selector (LCP) rack no 28.
+• (2013d011, ) All systems stopped working, NCCS shutdown, and nccs start up twice. Installed cooling coil on Dec East encoder.
+• (2013d015, ) Change parallel cord of Dec encoder.
+• (2013d016, ) Installed two new oil seals at HA north bearing. Refilled with new oil.
+• (2013d018, ) Looked for 110V UPS fault to the 26m. nothing obvious.
+• (2013d021, ) Repaired the 110V UPS supply cable at HA wrap. Neutral was off. Fitted a weather prove splice. Switched off breakers 110V RAW feed to cone. (Cable is dangerous) Repaired RF cable 160 NB IF R. Repaired RS485 cable to 3.5 SCADA system. Further investigation is required in the Cone.
+• (2013d023, ) Replaced broken non-return valve 26m cooling water supply.
+• (2013d063, ) Problems with the 3.5 and 6 cm dickie switching, it resets every now and again. Dickie noise diode controller box was uninstalled for cleaning and testing annd reinstalled. Motor Problem - motor temp HA west. Blow out dust from motor needs watching.
+• (2013d065, ) Tilt/Focus coms problem (in manual shows flashing LED). No comms to focus at all. Limited comms/once every 2 seconds to tilt. Replaced interface card (Tilt/Focus) in NCCS cage) will investigate fur- ther (original board). Tested computer control of sub-reflector with test observing file for continuum. Tested 18cm and tested 2.5 cm to see if sub-reflector works. Normal observing continued.
+• (2013d077, ) 4-8 GHz mixer drawer (Dec room) narrow band ”RCP” mixer LO replaced by the new signal gen.
+• (2013d093, ) Lightning strike. Reset cage, reset steer, replaced protocol converter.
+• (2013d094, ) Identify faults. Compressor room link Dec room SPIB link. XDM N.diode controller. SDIO s x2, SCADAs x2, N.diodes x2, F.boards x2 (Tx + Rx) 2xTx. Control room, Rx SPIB Fibre boards Rx + Tx (XDM link). Start repairs to SCADAs and SCIOs.
+• (2013d095, ) Continue repairs on SCADAs and SDIOs.
+• (2013d098, ) Fixed up spare niose diode controller box for XDM.
+• (2013d099, ) Install new cable control room to Compressor room. (includes splicing boxes and test link).
+• (2013d100, ) Install copper busbar/cable XDM rack. Install N.diode + protection in Phase cal box.
+• (2013d101, ) Install additional tranient diodes in XDM rack. Water temp sensor repaired and reinstalled.
+• (2013d102, ) Completion/ Commission fibre-link to compressor room.
+• (2013d105, ) Work on radiometers XDM. Tested 8 off counters for NCCS cage. Fixing Tx fibre Bds.
+• (2013d107, ) Reinstalled temperature sensor in the east leg of 26m.
+• (2013d112, ) Replace HA east motor with Spare. Run . Autotune. ( Note 7.5kW motor was 9kW)
+• (2013d115, ) Replaced the resistors with temporary, ”Had a failed break drive resistor and fuse” cleaned all corroded fuses. Replaced the correct resistors on the east electric drive.
+• (2013d126, ) Encoder (HA) offset updated from -0.302 to -0.264.
+• (2013d127, ) Antenna leveled readout HA 0.003 DEC -25.882.
+• (2013d172, ) Replaced RF switches (LCP and RCP) on noise adding ra- diometer IF input selector.
+• (2013d191, ) Timing room UPS breaker tripped – caused correlator failure due to ATDC.
+• (2013d197, ) Installed new version of continuum correctly implementing ZC pant for all scan types (only drift was correct before). Also fixes handedness of EW offsets for drift scans (not used sub-marine bug).
+• (2013d199, ) Tested Tilt north and South final limits (new software). Replaced LCP RF switch on NB IF selector in the Dec room.
+• (2013d221, ) Focus pre-limit switch failed.
+• (2013d226, ) Focus limit switch replaced. limit 100.
+• (2013d228, ) Running test steer machine.
+• (2013d238, ) Now running lenny OS on steer (original hardware) but still Etch binaries. (except for cage driver).
+• (2013d044, ) Clean up. Focus and Tilt boards. Replaced RCP RF switch on the ”noise adding radiometer IF input selector” with an RF switch which was from the LCP in the same system.
+• (2014d010, ) Exchanged hardline carrying the 5MHz reference signal up the 26m to Dec-Room with a spare line (after unstable LO report).
+• (2014d032, ) 26m TILT problem. pre-limit switch (or cable) failure. Tem- porary defect switch (line limit to pre-limit with line). Keith
+• (2014d036, ) Tilt pre-limit switch problem diagnosis. Tilt was driven to its limits and switch normally closed pin reading was 0V (pre-limit upper). Tilt position: 966, the antenna had to be driven off the limit. The jumper temporary wire was removed and normal connection re-done.
+• (2014d042,) Communication failure in the dec room ON the temperature sensor PSU which supplier the box that converts RS485 to RS232, there wasno 415V (LED was off). The fuse was was blown and rectifier replaced.
+• (2014d056, )Tilt problem: The potensiometer from hyperbola was directly connected to the control board due to connector being wet; The connector was bypassed to get correct reading and normal driving state. Initially the +15V was dropped to 0.7V, going to the board (Tilt board).
+• (2014d072, ) Radiometer fault, faulty ”NAR LCP” drawer on Rack N20 had faulse readings instead of +.290. The -12V supply had dropped to -11V, the two cards were removed one by one to see the cause of false readings and the bottom board was faulty. The capacitor was replaced (33uF 35V).
+• (2014d079, ) Fault on the multi-beam correlator rack power supply. Four modules were removed to check for loose connectors/wires and pins. 1 sma connector seem to have been previously repaired (on a N3 module - Digital filter. On the N2 (High Resolution Sampler) there was one sma connector that was loose and the was tightened up.
+• (2014d126, ) RCP radiometer ”zero” switch replaced as it showed non- repeatable losses.
+• (2014d154, ) DEC N motor problem. Replaced Rotor + new bearings and replaced encoder.
+• (2014d202, ) RF switch (SP6T) was replaced with new one because posi- tion 0 and 1 were acting up. Noise adding radiometer IF input selector (RCP).
+• (2014d211, ) Moved Dec final limit (10) links south.
+• (2014d213, ) Replaced pressure gauge on DEc gearbox west J.A.G.
+• (2014d245, ) Switched over to new steer computer hardware. Noise adding radiometer IF input selector. LCP, RF switch replaced with a new one because of contact resistance problem with the firast position.
+• (2014d269, ) The network comtrol box was installed in the declination room witb the following connections for the input and outputs. SDIO address B: Port 0 pin3 as the output. SDIO address A: Port 2 pin 0 as the input. The telephones were installed in both the dec room and the cone controlled via the same box. All functional.
+• (2014d287, ) Removed HA earth cable due to J.A.G. failed lag on moving structure.
+• (2014d311, ) Comms error messages appeared repeatedly. The sinthesizer failed, one of the Rx GPIB fibre board was temporarily replaced since the problem was not yet identified (could be a faulty fibre board). A loose wire was found in the dec room which is the communication link from one of the fibre board (TX) to the GPIB box.
+• (2015d063, ) The proximity switch was installed and all the connections were done, tested and calibrated. The installed switch was for the pre-limit (in-limit) in junction box 4
+• (2015d105, ) The Focus in the ”Dec-room” was faulty, the problem was not found and it was disabled and left on manual phases, swapped the red and the white.
+• (2015d107, ) Fault in the ”Focus” box, could not be driven ”in” position the thyristor was replaced (3rd one from the left, looking from the front).
+• (2015d180, ) New sub-reflector controller (using encoder) activated. Started measuring new pointing model. 18 cm untilted from here.
+• (2015d183, ) New pointing model no 4 installed on 26 m.
+• (2015d188, ) Update new controller software, upper software limit cor- rected. Servo soft linked improve settling time. 18 cm Tilted operating again.
+• (2015d224, ) Crashed focus (operational mistake - forgot to switch of 3, . was attempting to install new version of focus. Repaired focus to old version.
+• (2015d252, ) Changed the focus version 14 to version 15. Moved Final limit override switch.
+• (2015d288, ) 160 MHz NB IF distribution LCP ground connection for the IF amplifier (correlator) was loose and was properly connected.
+• (2015d315, ) Installed new filter for air temperature (Stevenson box).
+• (2016d013, ) Alarm junction box relay board - redone. CPU alar interface PSU board - replaces components.
+• (2016d015 ,) Tracing and connecting watchdog program timer wire to Alarm junction box relay board.
+• (2016d029, ) Updated Tilt software, new version tilt dec. Tilt at 18cm sometimes fail to get to 818 sticks at 814, modified version gets to 817 which is ok within Software tolerance band.
+• (2016d032, ) Focus board fuse replaced and trip switch reset. Cabling of Tilt sub-reflector was tight, loosened and cable-tied.
+• (2016d039, ) Installed new idler tention sprocket on focus drive chain.
+• (2016d070, ) Focus problem, appeared to be connector in focus control box - replaced.
+• (2016d071, ) Sub-reflector Pre-lim sensor faulty /Sensor removed. By passed for now.
+• (2016d077, ) Replaced, Fibre T+ board in Dec room ”dead” for GPIB interface. to Synths..
+• (2016d086, ) Call out, Dec encoder. Encoder of but problem with cable, enable to true.
+• (2016d088, ) Found fault on path Dec encoder, removed. Faulty section. Replaced connectors at Encoder.
+• (2016d116, ) Replace cone air handler pully and clean pullies. 8
+• (2016d137, ) Cone, 3 wires broken off. Reset A, B, C SDIO’s in dec room. SDIO C in control room, very loose. Alarm in control room Fuse blown - replaced.
+• (2016d188, ) Temperature sensor 4, module changed, and SCADA inputs 4 and 5 swapped.
+• (2016d209, ) Power failure for longer than a hour. Batteries OK. Antenna prelim came in to soon. New setting 47.214. Final limit 48.065. Tensioner needs fixing on both. Modified.
+• (2016d223, ) RCP radiometer VTF output was marginal +- 2.2 V output. Replaced driwer cup and G nd pin wired resoldered.
+• (2016d235, ) LCP radiometer in control room, ”Changed the PSU”.
+• (2016d251, ) Momentary failure of drive in Dec room.
+• (2016d258, ) Failure of drive in Dec room @ -71 DEC, shows final limit error, possible cable problem in wrap.
+• (2016d263, ) Focus chain snagged. ”Faulty jockey needs replacing at 472. 18cm observing removed.
+• (2016d305, ) Drive problem EAST/South showed healthy but did not ”RUN”. Brownout? to be investigated.
+• (2016d308, ) Replaced faulty PSU in Tilt-limit adjusted soft limit away from tilted position.
+• (2016d312, ) Final limit of cable rejoined at HA rap.
+• (2016d321, ) Main PSU in Cone (+20V and +13.8V LEDS OFF), causes SDIO ERRORS. Power cord at back of unit was loose (probably knocked working on 18 cm Post ans panel.
+• (2016d323, ) Cone Aircon - Q3 circuit breaker was down (AMP rating, in Dec room panel). measured current 0.6 AMP, no obvious reason.
+• (2016d333, ) 18cm post amp drawer was modified in order to have an option of bypassing the band-pass filter (1.67GHz/160Mhz BW) that is installed between the LNA and the post AMP- in preparation for VLBI GNSS satellite tracking experiment.
+• (2016d349, ) Niose adding radiometer IF filter selection drawer. RCP (input side) coax switch was replaced with a new switch because output number 1 (Through) was not working satisfactory. (intermittent).
+• (2017d003, ) Replaced FAILED motor (HA-west) with new Spanish type manufactured adapter plates to fit. Used auto-tune changed plate RPM from 1500 – 1718 the rest-same SAVED changes. Alignment is fine, but needs to be Redone.
+• (2017d005, ) Motor-gearbox alignment done on HA-west.
+• (2017d009, ) 30dB attenuator connected between the pre-and post amp in preparation for the GNSS satellite experiment.
+• (2017d031, ) Connected 2 120 ohm resistors to the Dec room SCADA comms ports. Removed resistors.
+• (2017d034, ) Focus control failure: +-25V PSU board. Replaced burnt resistor. Analogue board: replaced failed capastor on the negative rail. This was causing a 10 ohm short to the PSU above. Connector for display is out.
+• (2017d055, ) ”Focus Failure” locked in tilted mode for weekend. Control box is intermittent (possibly faulty thyristor), removed from Antenna for investigation.
+• (2017d058, ) Replaced focus control box. Water damage on connector interface repaired. (Note: Trip opto is faulty) to be worked - a replacement to be made.
+• (2017d100, ) 10 MHz power divider for the signal generators, in the DEC room was replaced with a new (same model) power divider.
+• (2017d109, ) Changed motor HA west, fixed sheared bolts, fixed tacko cable.
+• (2017d132, ) HA drive failed.
+• (2017d135, ) TACHO on west cable removed , tested, replaced. Connector was assembled incorrectly.
+• (2017d145, ) Check out. Cables to Dec encoder, measured 4.956V at encoder (Dec 5.3V). No regulator in housing. No obvious faults in two cables on Dec or HA wraps.
+• (2017d184, ) Hyperbola B-stop error- Bypassed.
+• (2017d185, ) Hyperbola B-stop checked, Erroded, Demared and Shorteel.
+• (2017d195, ) Hyperbola B-stop replaced and rewired, tested, All good.
+• (2017d216, ) Dicke switch power supply tested. 28V level was checked and all good. Main 5V was 5.0V, main capasitor was replaced recently (2 years). Noise diodes levels tested. Signals at dicke switch box were monitored and were good. Loose round wire was found and reconnected.
+• (2017d219, ) Focus board glitch – Hung up the comms (Dec room) needed a reset.
+• (2017d226, ) Chiller plant- Tripped main breaker no 1, BUT 2 phases are still ALIVE. Noise diode (LOW) kept failing. Cleaned plugs on both sides of cable and for Hi diode. Lo N.doide 27.87V (on), 3.3V (off), some for Hi N.diode
+• (2017d235, ) Hydromech SCADA failed early morning. Reduced level on TX of max 485 driver chip S. Replaced those resistors - working OK. (note: Spare unit was the same, so those were also replaced).
+• (2017d243, ) Focus controller regulator had broken track- repaired. Swapped Andogne board for the spare. swapped PIC micro chip for the Spare. Tem- porarily linked in a spare pot. Sub-reflector locked in level position. (18cm untilted.)
+• (2017d244, ) Focus readout found to be damaged – track rod bent. bolt joint had failed. New potentiometer bought in.
+• 2017d247, ) Intermittent problem with hydromech scada over the weekend. link between temp scada box and Helium scada was loose. Replaced the solid cone wires - with flexible ones and with ferrules fitted.
+• (2017d251, ) Refitted focus readout unit. Focus: Electronics analogue board refitted (modified) to shift pot into centre of range of the rack arm. 18cm is now using a tilted sub-reflector again.
+• (2017d274, ) CALLOUT: Problem with TILT bypassed final limit relay.
+• (2017d275, ) Final limit switch removed, Focus left in ”normal” level mode.
+• (2017d279, ) Focus limit switch diagnosed as faulty. Sanded contacts.
+• (2017d299, ) Fitted cooling ciol into HA encoder housing (517V at Dec room) Replaced bearings in Dec Motor (south). Attend to pre-limit chain– Replaced chaiin. Limits set up.
+• (2017d317, ) Changed Oil on North bearing. Omala 54 320 20Litre. Re- move K-band receiver. Installed stickers on Sub-reflector for photopoleme- try.
+• (2017d321, ) Chiller 1 main circuit breaker replaced.
+• (2017d326, ) Adjusted 2 panels for holography. R3 no4 (3mm) and R2 no5 (1.5mm)
+• (2017d329, ) Significant water in Dec room - Puddle on control box. Fo- cus problem - Found to be jammed beyond limit0 needs mechanical ass- sistance.
+• (2017d331, ) Focus; Jammed beyond ”out” limit. Water damage on digital board cleaned off. Analogue board blown PCB track to +5V reference chip which feeds the ADC chip (ie. readout). Another fault still to be found on this board. Focus returned to normal position. But cannot be used in Computer mode AS final limit switch is disabled and requires mechanical repairs. NOTE: 18cm reciever will need to be used in Level mode until focus is fully repaired.
+• (2017d334, ) All panels reset to original positions, 2 panels on ring 4-5+6 east of south set up by 1.5 mm.
+• (2017d335, ) Set panel ring 5 panel 5 west from north 0.5 mm down.
+• (2017d341, ) Re-enabled Tilt, but limits were a problem.
+• (2017d242, ) Tilt working, new blocks for sensors fitted, pre-limit at 101, soft limit (one way only) at 145.
+• (2017d348, ) Replaced compressor chiller pump.
+• (2017d359, ) Issue with Dec Room tachometer, cannot drive to Zenith.
+• (2017d360, ) Cameout: Tested drive- Appears to be South Tacho.
+• (2017d361, ) Replaced south Tacho
+• (2018d009, ) Replaced Cone A/H poly V-belt. Greased bearings.
+• (2018d039, ) Dec motor fan faillure - on inspection power cable gotten sheared and shortened. Reconnected and working again.
+• (2018d052, ) Final limit north needs checking. Dec at 44 comes final limit to activate.
+• (2018d053, ) Focus went into final limit during the night. Some water in Dec room. Reads ”0000” (in limit) drove out of limit - reading functioned correctly. Fixed up the Pre-limit problem (missing wire in Dec room). Note pre-limit = 130, soft limit 144.
+• (2018d056, ) Sub-reflector tilt controller glitched, reset by toggling CMP - MAN - CMP.
+• (2018d058, ) Sub-reflector tilt controller glitched and jammed actuator at extreme north position. Unjammed by disassembly and manua drive.
+• (2018d059, ) Checked Final switch on tilt moved in to limit activates 831. Block had been changed. In Computer: Focus appears to jump ”noise” from where?
+• (2018d060, ) Focus readouts jitters. Noise on readout. First changed analogue board then changed ribbon cable, ribbon was the culprit. Board will be tested.
+• (2018d062, ) Dec Final limit shifted 14 times removed one LINF. Note reset to 45.2 temporary.
+• (2018d063, ) Big storm: Focus failed - reading 1023 after longtime ”0000”.
+• (2018d064, ) Found found to be final limit (+ in limit pre-lim, reading 0000 = correct). Drove out using final override sw + pre-limit switch. Water leak in Dec found and properly plugged. (Remove 2 LMR400’s which were unused.)
+• (2018d068, ) S/X PDRO replaced with an old PDRO.
+• (2018d075, ) Tilt aux display reading garbage, fixed dagy wire in Dec room. Also wired up display in Dec room properly, now working. Set final limits in Dec-axis. Pre-south = -85.725. Final south = -87.13. Pre- north = 47.183. Final-north = 47.65. E-stop Dec SKID working.
+• (2018d082, ) Focus was in the OUT limit. Bent readout arm. (At the knuckle joint). Found that ”the limits” are beyond the scale, this needs attention urgently. Reason for driving to the limit not found yet. MAybe triac’s being triggered by lightning or power failure.
+• (2018d085, ) Trimmed the focus limits rod to 92.5 mm. Checked all the limits pre and final, in and out, all working as it should.
+• (2018d100, ) TESTED new focus controller with old motor cable works AOK.
+• (2018d103, ) Disconnected water to Dec Room air handler and switched off fan. started final pipe assembly.
+• (2018d104, ) Breaker on HA and Dec serviced.
+• (2018d134, ) Replaced Tachometer Dec North.
+• (2018d135, ) Observed drive system whilst running VLBI, during night unaccounted speed problem on DEC, 0.2 deg/sec. Issue not resolved.
+• (2018d136, ) UPS failed overnight. One battery failed completely. 29 batteries load tested individually all OK. Purchased in 2015. Replaced faulty battery with NEW.
+• (2018d141, ) Problem with pre-selector 4-8G Narrow band. Comms looked fine on scope. On investigation port 2 bit 0 was not stable. Fixed now.
+• (2018d152, ) Intermittent Drive/Tacho in cold weather fault on Dec Axis. Problem manifested in the cold night time, it was found to be a discon- nected coupling on the South Motor.
+• (2018d176, ) Tilt: Jon’s software ran tilt into final limit =224. Problem: Final limit override switch is not wired to relay in tilt box. Located the necessary wire on back panel. Feedback wire is not connected to the control box, wire has been located. Pre-limit at tilted position is virtually at final limit position. Position at opposite travel has been moved away from F-limit, but hysterisis on this switch is excessive.
+• (2018d197, ) OLD CTI communications technique DRO (S/N 7752001) replaced with ”repaired” Herley CTI DRO (S/N: 35149016001).
+• (2018d227, ) Replaced 12V PSU in MK4 VLBI rack.
+• (2018d235, ) Partially greased HA bullgear on 26m.
+• (2018d236, ) Partially greased HA bullgear and greased South Polar bear- ing.
+• (2018d240, ) Install new focus drive system. (new motor cable). Final limit sensor and software still to be changed to add in LCD back light. Position measurements needs to be checked to narrow.
+• (2018d241, ) Installed new focus final limit sensor and connected wiring. Updated software focus+tilt for LCD back lighting. Removed Old tilt readouts/wired tilt micro to new readout in Dec room. Installed focus jocky pully NW.
+• (2018d247, ) Lubricated focus chain and greased jocky pullys and jack screws.
+• (2018d269, ) Updated focus software.
+• (2018d275, ) Updated Focus software, Widened Hi-limit from 500 to 850.
+• (2018d311, ) Checked out Noise diode controller ND2 no fault found.
+• (2018d359, ) HA east drive controller failed.
+• (2018d361, ) Fault find: HA drive failure ”east” remove failed unit (as it blows input fuses) with a spare from workshop, update software differ- ences. Test HA drive system manually- seems OK except readout speed is a bit erratic. Test Computer drive, discovered Dec Fails.
+• (2018d363, ) Work on HA system again, figured out additional software changes needed to correct readout of speed. Replaced Dec Analogue card (with spare in workshop as integrator reset in not released in computer mode.
+• (2019d014, ) Fit Goldy locks to HA encoder.
+• (2019d043, ) Removed PSU that was used to power a detector for phase Cal. level monitoring.
+• (2019d045, ) Poor tracking on HA drive, shows occasional ”stall” error on EAST drive. (Torgue demand @100% > 10 seconds). Input 3 value for true was 0% should be 0.01%.
+• (2019d079, ) 3.5cm and 13cm is swapped on the drive splitter box.
+• (2019d084, ) West motor failed. Replaced with spare from workshop. Tachometer dead. Bearing very noisy, ran a auto-tune. Replaced spyders on both couplings.
+• (2019d086, ) Drive testing: Hour angle measured at s/p sum 2. West: - 10% (EM), +10.2% (WM) East: -10.2% (EM), West: +10% (WM), North: -10.06% (SM), +10.2% (NM), South: -10.25% (SM), +10% (NM).
+• (2019d094, ) Auto-tune and configure drives. HA west done on 25 march 2019: 400V, 59Hz, 1718 RPM. HA East: 400V, 50 Hz, 1435 RPM ( pre- viously 380V, 60Hz, 1500RPM) DEC South: 400V, 60Hz, 1735RPM ( previously 380V, 60Hz, 1500RPM). DEC North: 400V, 60Hz, 1735RPM ( previously 380 V, 60Hz, 1500RPM).
+• 2019d165, ) Investigating noisy HA drive. Noise swapped O/P chokes around - no difference. Reset base frequencies. 59-> 60 and 50 -> 60.
+• (2019d211, ) Overnight problem with TILT/FOCUS - Stuck at level po- sition. Fault System: Focus 7 segment display was partially dimmed and partial comms to focus unit in Dec room. Reset (+5v) to the display, fixed up display and restored full comms to Dec room. Note: HA readout was unstable- jittery (seems to be related). cleared after fixing focus. Focus micro board from lab was installed in Dec room for testing (was a later version of the software).
+• (2019d212, ) Focus- returned to original card. (Small offsets that needs to be checked in LAB).
+• (2019d248, ) Updated Tilt focus interface board from ver 10 to ver 10 updated in 2019 to fix J2C hang up.
+• (2019d246, ) Downloaded active configuration on all four parker drives.
+• (2019d247, ) Updated software on HA west drive, removed unused blocks/references to Home, changed level for true/false values to 1%.
+• (2019d296, ) Replaced integrator reset relays on analogue card. Suspect read relays not functioning correctly.
+• (2019d323, ) Moved SDIO cone comms from old fibre to new fibre link in the Dec room.
+• (2019d331, ) Removed the fibre boards that were connected to the Old fibre link. The new installation has been working properly for a week.
+• (2020d001, ) HA encoder false carry bit errors become continuous instead of being heat triggered. HA encoder recovers enough to allow some ob- serving.
+• (2020d002, ) HA encoder fault trips out steer-sub again and is now too severe to allow observing to continue even at 21:30UT.
+• (2020d003, ) Restarted observing again with flaky HA encoder. First (incorrect) software patch to steer-sub allows observing to continue, but subreflector is stuck in pre-limit. Sub-reflector driven out of South pre- limit. Next iteration of Steer sub fix installed and observing restored. However, observations show the fix introduces a +100mdeg bias into HA encoder. Bad data!!!!
+• (2020d005, ) New ”sterr-sub” version installed which undoes false carry bit errors and pointing checked.
+• (2020d006, ) Visual inspectioncomfirms steer-sub software patch is cor- rectly compensating for carry bit errors most of the time (still a minor issue near 359.9xx).
+• (2020d031, ) Problem: HA readout jumps to 0, Antenna reports tele- scope in limits (Dec) suspect. HA encoder interface card swapped out to monitor.
+• (2020d037, ) Problem: HA readouts jumps randomly. When it jumps, the brakes engage momentarily Traced the input (from the antenna) and output (to the steer computer) withut picking up the behaviour on the oscilloscope. Test: Swapped the HA encoder output to the computer with the dummy encoder. Problem still there. Investigated the PSU to the HA encoder on the antenna. reading 4.2 V, should be 5V. Input (from Dec room) was at 5.1V (too low for regulator) Adjusted it upwards to 5.8V (max @ Dec room) but should be  6.5V. 2nd Problem: Speed feedback error on Dec axis. Test: Checked encoder (working correctly) Checked brake: disintegrated-needs replacement.
+• (2020d007, ) Top setting changed on UPS feed to 26m. Replaced brake discs on Dec South. Adjusted HA encoder power supply in Dec room to 6.6V. Needs upgrade/replacement to provide sufficient voltage to current and future encoders.
+• (2020d048, ) Adjusted positioner plate on sub-reflector shaft was scraping against plate when adjusting tilt.
+• (2020d049, ) Swapped Tilt baord in Dec room for Spare. Same check-sum.
+• (2020d068, ) Replaced regulator on tilt board PSU. Was overheating and limiting output voltage to motors. Tilt seems to be functioning correctly now. Changed PWM freq to 2kHz and added diagnostic display. First regulator failed (unknown reason as yet).
+(2020d153, ) Swapped Tilt/Focus interface card in control room. Problem: Tilt readout incorrect at 818 position , bottom 8 bits missing on computer Display (red LED) was still correct. Suspect I/O buffer chip.
+(2020d296, ) 160 MHz IF selector drawer (Dec room) RCP RF electrome- chanical switch replaced ”4th position faulty”.
+(2020d325, ) Niose adding radiometer IF filter selector. All 4 mechanical coax switches were replaced. PSU 4 IF amps was also fixed.
+
+L and S band receivers for 26m
+(2011d251, ) Reinstalled 18cm displacer and started cooldown. Topped up Helium.
+(2011d276, ) 1612MHz filters removed from 18cm filter selector drawer. Connected the black cable labeled heater on 18cm SCADA channel 4.
+(2011d278, ) 1612 MHz (LCP) filter was connected back (18cm filter se- lector drawer).
+(2011d280, ) 1612 MHz filter was put back in the 18cm filter select drawer, tested and was found to be working satisfactory.
+(2012d324, ) Vac service 18 cm.
+(2014d203, ) Serviced L-band receiver’s coldhaul, fitted new service kit. changed the absorber in comp H2.
+(2015d280, ) Installed new He-Comp on 18 cm.
+(2016d131, ) Replaced TDR in 18 cm compressor. 
+(2016d145, ) Installed new service kit on 18cm cryo-purged.
+(2016d301, ) Tilt was failing to converge to 18 cm position in time. Prob- lem foundable +24V PSU was only +17.00V ( motor will not work at the lower voltage (decreased speed) However, brake was probably not released fully causing drag. Temporary PSU fitted in the limited time period before VLBI.
+(2017d102, ) Post amp drawer – RCP a 10db coupler was installed be- tween the pre amp and post amp to allow GPS reciever connection to the LNA.
+(2017d216, ) Post-AMP box drawer, Faulty UT 141 RCP and LCP cables repaired.
+(2019d014, ) Service 18 cm Cryo coder with new service kit. Replace airpipe on vac valve with new.
+(2019d079, ) Fitted new drive motor on cryo (13cm) also installed new drive cable with ..?
+(2019d275, ) Installed new 18 cm continuous cal capable variable level diode. Incorrectly connected it as ”low” diode in place of original cal diode. Will require PSS correction (16 OCT 2019).
+(2019d289, ) Re-established original 18 cm ”low” noise diode connection.
+(2020d230, ) 13 cm WB IF distribution drawer. RFI rejection filters in- talled.
+
+5-6GHz receiver
+(2011d247, ) 6cm - Noise diode cracked RF cable (LCP) and post amp RF cable (RCP), brought down to be repaired.
+(2011d278, ) Noisy 6cm/LCP (both N and W band) problem was found to be caused by a problem inside the package by LNA voltage and current settings. Post amp chan bracket should be modified to enable easy access to RF filter input cable.
+(2013d162, ) Serviced 6 cm expander.
+(2014d041, ) 6 cm MIXER drawer (4-8GHz) modified. K and L band- pass filters (12ED30-5200/U1000-0/0 – (Enter = 5200 MHz, B/W = 1000MHz) – added before W/B mixers.
+(2014d139, ) The 6cm RCP cable was removed and re-done and that didn’t solve the low signal problem. The cable was from the noise diode. Receiver removed to do do troubleshooting.
+(2014d140, ) 6cm receiver troubleshooting and testing, all repaired RF cables installed and tested.
+(2014d141, ) The coupler was found to be broken on the 6cm receiver.
+(2014d146, ) Reset of the 6 cm volt/current on LNA. Back to factory setting. Visual inspection on wave-guide (missing nut on pickle. Out 1. otherwise- nothing found.
+(2014d147, ) The noise problem on the 6cm. The reciever taken down for the second time to be troubleshooted, testing and repairing.
+(2014d150, ) The 6 cm receiver was re-installed with; New LNA’s were fitted: RCP old berkshire LNA serno” 204, LCP– new quinster LNA serno: 001. Input isolator to LNA replaced. High noise diode cable was cracked / a touch up was done.
+(2016d145, ) Clean 6cm cryo cooler and purge system. 
+(2016d308, ) Serviced 6 cm cryo.
+(2017d055, ) Replace broken slack capasitor DE202, cryo encoder.
+(2018d023, ) 6 cm PSU. Investigate +27.3V with ripple. Temporary fix - added in addition CAP across resistor +- 4700uF reduced ripple - now reads 27.95V replaced faulty 1uF CAP across +5V supply. New Trans- formewr is required.
+
+6.7GHz receiver
+(2013d163, ) Serviced 4.5 cm expander.
+(2015d280, ) Service 4.5 cm Cryo receiver. Replaced fan belt on cone air handler.
+(2016d131, ) Repaired broken slack-up in 4.5 cm. 
+(2017d054, ) Service 4.5cm cryo system, new service kit.
+
+X-band receiver
+(2012d170, ) 3.5 cm receiver. Cryo receiver LNA power supply units swapped.
+(2012d215, ) Remove 3.5 cm dicke switch.
+(2012d216, ) swop dickie switchs over L to R and R to L.
+(2012d292, ) 3.5 cm receiver was removed from the 26m to investigate the cause on instability.
+(2012d303, ) 3.5 cm receiver was re-installed.
+(2012d314, ) 3.5 cm receiver tied down properly. pointing adjusted to correct angle.
+(2012d326, ) 3.5 cm receiver , LNA’s stage 3 currents adjusted to 10 mA, from 12.3 mA(LCP) and 13.2 mA (RCP).
+(2013d053, ) 3.5 recevier cables were swapped (LCP and RCP) between pre-amp and post-amp.
+(2013d056, ) LNA PSU cables A on B and B on A. Reciever cables swapped on 22nd that way around. (Stage 3 I’s are still reduced by 2mA from factory).
+(2013d058, ) Adjusted 3.5 cm system LNA currents. (Also note cable swop after LNA to post amp, so in control room L and R are crossed over.
+(2013d066, ) LCP and RCP cables (between pre and post amp) were swapped back to their original positions.
+(2013d163, ) Re-installed X-band receiver after overhaul.
+(2014d136, ) X-RCP V TOF output was 0 on the terminal block in the control room, The screws has to be tightened to recover the signal. The circuit on the vero board also was loose (on the green connector, RAD001).
+(2014d141, ) X-band problem: Jon could not see the noise diode (high). The T-piece (BNC) was broken, it was replaced by a new one. The cable from the high noise diode power supply had a bad joint (ground connec- tion. The RG58 cable was replaced by a 3m one.
+(2014d230, ) Serviced 3.5 cm cryo expander, installed new service kit.
+(2016d127, ) Repaired X-band cryo, slackups broken, replaced with new service kit.
+(2016d130, ) Installed X-band.
+
+12.2GHz receiver
+(2014d106, ) Moved the Ku-band receiver to a new position to make space for the new K-band cryogenic receiver. New Ku-band position 350mm North and 480 mm West.
+(2014d107, ) Ku-band receiver feed offsets HA = -0.456, and DEC= -0.311, measured relative to X-band on Orion-A.
+(2017d312, ) Removed 12 GHz receiver.
+(2017d346, ) Receiver re-fitted and beam offsets measured (was tinkered with for holography use).
+(2018d015, ) Removed receiver, damaged output coax cable was replaced.
+
+22.2GHz receiver - Prior to the cryogenic receiver installation. 
+20/07/2010 (201, 55397) The telescope restarted. In 2008 there was also Holography done on the dish. After the Holography was done Calibration and Spectroscopic observations restarted until the 26m telescope’s bearing failed. 
+20/07/2010 -> 26/04/2014 (116, 56773) observations commenced again.
+17/01/2011 -> 23/10/2011, no calibration observations was recorded (probably forgot to put back in the scheduler). Replaced 22GHz IF cables from Dec ton cone used LMR400. Gained 6dB on the RG214-5.
+
+22.2GHz receiver - During and After cryogenic receiver installation
+• 2014d112, 22/04/2014, 112, 56769) Old K-band receiver removed.
+• 23/04/2014, 113, 56770 (new Cryogenic receiver installed)  
+24/04/2014 (114, 56771) Cryogenic receiver – turned-on. 
+30/04/2014 (120, 56777) Attenuation changed 
+05/05/2014 (125, 56782) the Hi diode Tcal values refined, and 
+06/05/2014 (126, 55783) ra- diometer switch replaced. During this time, the LCP and RCP connectors was swapped and swapped to the right positions.
+• 07/05/2014 (127, 56784) the noise diodes was Re-calibrated to values of 29.3 and 31.8.
+• 07/05/2014 (127, 55784) -> 11/11/2017 (315, 58068) includes the following changes: Adjusted NB attenuators to 9db(L) and 10db (R). – Slow decrease in PSS value in this period, possible cause is slow drift in analogue focus readouts.
+27/10/2014 (300, 56957) - 22 GHz post amp box uninstalled for modifications.  
+10/11/2014 (314, 56971) - 22 GHz post amp box installed (modified) and all the cables were connected (coax and power). – This can definitely cause a step Change in the PSS values. and could have caused the messy data. 
+12/08/2015 ( , ) - Post amp box – RCP 20dB attenuator replaced with a 14 dB (7+7) attenuators in order to increase power level by 6dB. 
+12/08/2015 (, ) - LCP 17dB attenuation replaced by 15 dB attenuation. 
+07/10/2016 (,) Problem with N diode (low). Ronnie CAL. Cleaned BNC cable connections and sockets. 
+26/02/2017 focus failure (focus disabled). 
+24/07/2017 Complete focus failure. Gradual decrease in PSS up and till this point, sensitivity improved after focus was disabled.
+• 11/11/2017 -> 17/12/2017, Receiver down for Holography. TCal was re-done and re-cabling was done during Holography. TCAL1, TCAL2 – 34.1, 39.5.
+1/11/2017 (305, 58058) -> 12/12/2017 (346, 58099): Gap in observations.
+13/11/2017 (317, 58070) - K-band receiver removed before holography. – 
+22/11/2017 (326, 58079) - panels adjusted.
+30/11/2017 (334, 58087) - panels adjusted.
+1/12/2017 (335, 58088) - panels adjusted.
+12/12/2017 (346, 58099) - K-band receiver re-installed
+13/12/2017 (347, 58100) - power supply modification
+24/10/2017 - 11/11/2017 Operated without focus control. Focus not so optimal.
+26/08/2018 - updated focus software – 
+28/08/2018 - new focus drive system installed.
+02/10/2018 - updated focus software – 
+01/06/2020 - swapped tilt/focus interface card in control room. – The PSS have caused a jump to a lower value after the updated focus and control software.
+
+Maintenance on 15 m
+(2011d154, ) Serviced XDM.
+(2012d115,) Allign the feed @ 36 deg El. The back mountings cross was spot on center. The front of the receiver was swung of axis by +1 25mm (clockwise direction). Using the focus bolts front was swung on axis to within 1 mm. Focus still needs to be done.
+(2012d354, ) Installed new Batteries in UPS.
+(2012d355, ) Load test UPS for 5 min. Test OK.
+(2013d338, ) Replace PSU-1 5V PSU in rack in pedestal.
+(2013d015, ) Temporarily installed the 80Hz ref no3 signal from the DBBc [15m] to the 15m dish (used inverted signal at the 15m side.
+(2013d211, ) Fibre optic link to 15m was tested and the ground lead was fitted on the converter box.
+(2014d034, ) Both S and X band LCP were 0, removed both cables from package to post-amp box (common 26 pin). Found signs of water residuals: cleaned with alcohol and compressed hair to dry and heat gun. Both cables properly screened with wire connected to outer screening and lug connected to cannon. The connector wrapped in insulation tape through- out to prevent water entering. LNA PSU’s showed high currents –30mA.
+(2014d035, ) Re-installed cables and tested for verification. The X-RCP was the reading that went up, could be due to the cable not tight. X db higher that actual reading (setpoint).
+(2014d091, ) The cable in the 15 m antenna was found to be faulty. The elevation discrete I/O harness between junction box and junction box 2 was replaced. Cable: tasker C24x0.15 C24015
+• (2014d155, ) There was an intermittent communication problem problem, usually occurring in the early hours of the morning. A lid was fitted on one of the SDIO and screws were tightened on the tagboards (both in the control room and the shed).
+• Changing the DB board in the Hydromech passage Main 3 phase. Un- available, affecting the focus on the 15m. Temporary power in place SLR.
+• (2015d070, ) Problem: DRO 5 MHz signal level suspect. Done: 5MHz signal level going into the post amp box was mmeasured to be within limits (0 dbm). – It was decided that the signal level should be pushed up by 2 dB (from 0dBm to +2dBm). – That was acheived by replacing a 6dB attenuator in the control room, with a 4dB attenuator.
+• (2016d155, ) Receiver taken down. 1) A fault radiator and a faulty fan could be replaced. 2oise diode box could be modified. WB noise diodes were replaced by NB noise diodes. Coax switches were installed so that they could be used to allow the calibration through as apposed to switching 28V on/off. 3) Apex box labels were changed in order to match the RF patch labels.
+• (2016d285, ) Receiver back on the 15m.
+• (2017d009, ) 20dB attenuation was connected between pre- and post am- plifiers on both LCP and RCP in preparation for the GNSS satellite ex- periment.
+• (2017d010, ) The attenuators was disconnected after experiment. Faulty X-band RCP down conversion section (post amp box) was temporarily replaced with X band LCP down-conversion section. The plan is to repair the faulty X-band RCP section after the VLBI experiment.
+• (2018d024, ) Replace motor mount swing arm bushes on AZ.
+• (2018d032, ) Replaced faulty E-stop switch in pedestal front panel.
+• (2018d064, ) Fibre-link to Vac pump problem. Faulty Rx-board in pedestal. RX-board on left fron the front replaced with spare. Fan in the box i also faulty. Replacement unit runs but insufficient air flow. Receiver: DRO not Locked.
+• (2018d066,) Faulty not locking (5MHz) DRO was replaced with a similar DRO from the 26m dish.
+• (2019d154, ) Problem: 2020/8080 DRO not locked. Reason: 5MHz signal level was found to be low (20db low). Sol 1: Surge protection was replaced [15m pedestal]. Did not solve problem. Sol 2: N-Male to N-male adaptor was replaced (control room LMR 600 cable end side). Seem to have solved problem.
+• (2019d317, ) DRO 5MHz reference signal level increased by 2 dB. esti- mated level @ DRO input port +2dB.
