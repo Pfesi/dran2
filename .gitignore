@@ -27,3 +27,5 @@ code*
 dran.py
 *.csv
 src/docs
+src/_cli.py
+quick*

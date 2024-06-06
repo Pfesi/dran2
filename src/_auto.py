@@ -93,7 +93,7 @@ class Observation:
         return
 
     def get_data_only(self):
-        """ Get data from fits file hdu
+        """ Get data from fits file hdu. This is for the quick file view.
         """
 
         msg_wrapper("debug",self.log.debug,f"Getting data from fits file hdulist")

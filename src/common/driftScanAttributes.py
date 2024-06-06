@@ -136,7 +136,7 @@ class DriftScanAttributes:
         Set the parameters specific to a narrow beam drift scan.
 
         Attributes:
-        ----------
+        -----------
             pols : list
                 List of polarizations - left circular polarization: LCP (L), : right circular polarization RCP (R).
             scanDirection : list
@@ -181,7 +181,7 @@ class DriftScanAttributes:
         Set dual beam fit parameters.
 
         Attributes:
-        ----------
+        -----------
         pols : list
             List of polarizations - left circular polarization: LCP (L), : right circular polarization RCP (R).
         beams : list

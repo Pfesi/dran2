@@ -22,12 +22,7 @@ def main():
 
     print("Opening docs")
     print(resources.contents('docs'))
-   
-    # with resources.path('docs', "index.html") as p:
-    #     package_path = p
-    # print(package_path)
-    
-    # sys.exit()
+
     try:
         webbrowser.open_new_tab('file://' + x)
         print('Browser opened ')
