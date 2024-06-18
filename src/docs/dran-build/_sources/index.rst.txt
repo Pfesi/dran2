@@ -74,7 +74,7 @@ CONTACTS
 ---------
 
 If you have any problems, questions, ideas or suggestions, please 
-`OPEN AN ISSUE <https://github.com/Pfesi/dran/issues>`_ 
+`OPEN AN ISSUE <https://github.com/Pfesi/dran2/issues>`_ 
 or email Dr. Pfesi van Zyl on pfesi24@gmail.com
 
 

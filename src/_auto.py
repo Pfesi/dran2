@@ -92,7 +92,7 @@ class Observation:
             msg_wrapper("debug",self.log.debug,msg)
         return
 
-    def get_data_only(self):
+    def get_data_only(self,qv='no'):
         """ Get data from fits file hdu. This is for the quick file view.
         """
 
@@ -148,7 +148,7 @@ class Observation:
 
             # get driftscan data from file
             driftScans=DriftScans(self.__dict__)
-            driftScans.process_data_only() # process the data
+            driftScans.process_data_only(qv) # process the data
             del driftScans # release from memory
 
         elif 'D' in (frontend):
@@ -156,7 +156,7 @@ class Observation:
 
             # get driftscan data from file
             driftScans=DriftScans(self.__dict__)
-            driftScans.process_data_only() # process the data
+            driftScans.process_data_only(qv) # process the data
             del driftScans # release from memory
 
     def get_data(self):
@@ -488,7 +488,7 @@ def run(args):
             
             else:
                 obs=Observation(FILEPATH=args.f, theoFit='',autoFit='',log=log)
-                obs.get_data_only()
+                obs.get_data_only(qv='yes')
                 sys.exit()
 
         else:

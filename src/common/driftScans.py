@@ -623,7 +623,7 @@ class DriftScans(DriftScanAttributes):
             print(f"Unknown source frontend value : {self.__dict__[frontend]['value']}. Contact author to have it included.")
             sys.exit()
 
-    def process_data_only(self):
+    def process_data_only(self,qv='no'):
         """
         Process the drift scan observations. Get observations from the files
         and prepare it for analysis.
@@ -685,33 +685,51 @@ class DriftScans(DriftScanAttributes):
                 plt.figure(figsize=(20,10))
             
             cnt=1
-            print(cnt)
+            # print(cnt)
             # plt.title(f'Plot of {self.__dict__['FILENAME']}')
-            for i in range(len(scans)):
-                # print(i)
-                
-                if i%3==0:
-                    print('--',i,i+1,i+2)
-                    plt.subplot(3,2,cnt)
-                    plt.ylabel('Ta [K]')
-                    plt.xlabel('Offset [deg]')
-                    plt.title(f'{scans[i+1]} - scan of {fileName}')
-                    # plt.title(f'{scans[i+1]}')
-                    plt.plot(dataScans[i],dataScans[i+1])
-                    print(dataScans[i+1])
-
-                    plt.subplot(3,2,cnt+1)
-                    plt.ylabel('Ta [K]')
-                    plt.xlabel('Offset [deg]')
-                    # plt.title(f'{scans[i+2]}')
-                    plt.title(f'{scans[i+2]} - scan of {fileName}')
-                    plt.plot(dataScans[i],dataScans[i+2])
-                    cnt=cnt+2
+            print(len(scans))
+            if frontend != '13.0S' and frontend != "18.0S":
+                for i in range(len(scans)):
+                    # print(i)
                     
-                    # print('--',cnt)
+                    if i%3==0:
+                        # print('--',i,i+1,i+2)
+                        plt.subplot(3,2,cnt)
+                        plt.ylabel('Ta [K]')
+                        plt.xlabel('Offset [deg]')
+                        plt.title(f'{scans[i+1]} - scan of {fileName}')
+                        # plt.title(f'{scans[i+1]}')
+                        plt.plot(dataScans[i],dataScans[i+1])
+                        print(dataScans[i+1])
+
+                        plt.subplot(3,2,cnt+1)
+                        plt.ylabel('Ta [K]')
+                        plt.xlabel('Offset [deg]')
+                        # plt.title(f'{scans[i+2]}')
+                        plt.title(f'{scans[i+2]} - scan of {fileName}')
+                        plt.plot(dataScans[i],dataScans[i+2])
+                        cnt=cnt+2
+                        
+                        # print('--',cnt)
+            else:
+                cnt=1
+                for i in range(len(scans)):
+                    if cnt<=2:
+                        # print(i+1)
+                        plt.subplot(1,2,cnt)
+                        plt.ylabel('Ta [K]')
+                        plt.xlabel('Offset [deg]')
+                        plt.title(f'{scans[i+1]} - scan of {fileName}')
+                        # plt.title(f'{scans[i+1]}')
+                        plt.plot(dataScans[0],dataScans[i+1])
+                        # print(dataScans[i+1])
+                    cnt=cnt+1
 
             plt.tight_layout()
-            plt.savefig(f'quickview_{src}_{int(frq)}-{fileName}.png')
+            if qv=='yes':
+                plt.savefig(f'quickview_{src}_{int(frq)}-{fileName}.png')
+            else:
+                pass
             # plt.show()
             plt.close()
             msg_wrapper("info",self.log.info,f'Quickview file saved to: quickview_{src}_{int(frq)}-{fileName}.png')
@@ -779,3 +797,4 @@ class DriftScans(DriftScanAttributes):
         else:
             print(f"Unknown source frontend value : {self.__dict__[frontend]['value']}. Contact author to have it included.")
             sys.exit()
+

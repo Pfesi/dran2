@@ -28,14 +28,14 @@ using the following commands
  
    $ mkdir dran
    $ cd dran
-   $ conda create --name dran --file requests.txt
+   $ conda create --name dran --file reqs.txt
    $ conda activate dran
 
 Alternatively, you can use the pypi package manager 
 
 .. code:: bash
  
-   $ pip install dran
+   $ pip install dran2
 
 Once your virtual environment is activated. You can now head over 
 to :doc:`tuts/tutorials` to start using DRAN.

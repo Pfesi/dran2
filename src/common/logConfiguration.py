@@ -61,7 +61,7 @@ def configure_console_logger(toggle="off"):
     handler2 = logging.StreamHandler(sys.stdout)
 
     # Configure message logging level to INFO by default
-    if toggle == "off":
+    if toggle != "off":
         handler2.setLevel(logging.INFO)
     else:
         handler2.setLevel(logging.DEBUG)

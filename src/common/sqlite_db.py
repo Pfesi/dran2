@@ -232,3 +232,46 @@ class SQLiteDB:
 
         return col_ind, col_name, col_type
     
+    def get_rows_of_cols(self, tbname,cols):
+        """ Get the rows in the database table.
+
+            Parameters
+            ----------
+                tbname : str
+                    table name
+
+            Returns
+            -------
+                rows: str
+                    table row list
+        """
+
+        print('Getting rows of cols for table '+tbname)
+        colNames=""
+        for i in range(len(cols)):
+                if i == len(cols)-1:
+                    colNames = colNames + cols[i]+" "
+                else:
+                    colNames = colNames + cols[i]+", "
+     
+        # read from selected table
+        stmt = "SELECT "+colNames[:-1]+"  FROM '"+tbname+"' ORDER BY FILENAME ASC;"
+
+        # print(stmt)
+        # print('\nExecuting: ',stmt,'\n')
+        self.c.execute(stmt)
+        data = self.c.fetchall()
+
+        # get filenames and return them
+        rows = []
+        for row in data:
+            rows.append(row)
+
+        return rows
+    
+    # def set_table_name(self,tableName):
+    #     msg_wrapper("debug", self.log.debug, "Setting table name to: "+tableName)
+    #     return tableName
+
+
+

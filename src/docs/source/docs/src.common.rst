@@ -28,6 +28,14 @@ src.common.dataProcessingFlowManager module
    :undoc-members:
    :show-inheritance:
 
+src.common.dialog\_app module
+-----------------------------
+
+.. automodule:: src.common.dialog_app
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 src.common.driftScanAttributes module
 -------------------------------------
 
@@ -68,6 +76,14 @@ src.common.exceptions module
    :undoc-members:
    :show-inheritance:
 
+src.common.file\_handler module
+-------------------------------
+
+.. automodule:: src.common.file_handler
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 src.common.fitting module
 -------------------------
 
@@ -104,6 +120,14 @@ src.common.msgConfiguration module
 ----------------------------------
 
 .. automodule:: src.common.msgConfiguration
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.common.observation module
+-----------------------------
+
+.. automodule:: src.common.observation
    :members:
    :undoc-members:
    :show-inheritance:

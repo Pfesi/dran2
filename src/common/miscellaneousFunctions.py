@@ -14,6 +14,7 @@ try:
     from ..config import logfile
 except:
     from config import logfile
+    
 def set_dict_item(dictionary,key,value,description) -> None:
     """
     Set dictionary key, value and description
@@ -150,3 +151,6 @@ def fast_scandir(dirname):
     for dirname in list(subfolders):
         subfolders.extend(fast_scandir(dirname))
     return subfolders
+
+# def reset_lists(listName):
+#     listName = []

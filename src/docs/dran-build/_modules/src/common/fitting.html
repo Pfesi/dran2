@@ -109,6 +109,7 @@
 <span class="c1"># with warnings.catch_warnings(action=&quot;ignore&quot;):</span>
 <span class="c1">#     fxn()</span>
 
+
 <div class="viewcode-block" id="clean_rfi">
 <a class="viewcode-back" href="../../../docs/src.common.html#src.common.fitting.clean_rfi">[docs]</a>
 <span class="k">def</span> <span class="nf">clean_rfi</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
@@ -3080,6 +3081,66 @@
                             <span class="n">baserr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scan_len</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">base</span><span class="p">,</span> <span class="n">basel</span><span class="p">,</span><span class="n">baser</span><span class="p">,</span><span class="n">basell</span><span class="p">,</span><span class="n">baserr</span><span class="p">,</span><span class="n">lp</span><span class="p">,</span><span class="n">rp</span></div>
+
+
+<div class="viewcode-block" id="filter_scans">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.fitting.filter_scans">[docs]</a>
+<span class="k">def</span> <span class="nf">filter_scans</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">window_len</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="s1">&#39;flat&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        smooth the data using a window with requested size.</span>
+<span class="sd">    </span>
+<span class="sd">        This method is based on the convolution of a scaled window with the signal.</span>
+<span class="sd">        The signal is prepared by introducing reflected copies of the signal </span>
+<span class="sd">        (with the window size) in both ends so that transient parts are minimized</span>
+<span class="sd">        in the begining and end part of the output signal.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            x: the input signal </span>
+<span class="sd">            window_len: the dimension of the smoothing window; should be an odd integer</span>
+<span class="sd">            window: the type of window from &#39;flat&#39;, &#39;hanning&#39;, &#39;hamming&#39;, &#39;bartlett&#39;, </span>
+<span class="sd">                &#39;blackman&#39; flat window will produce a moving average smoothing.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the smoothed signal</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="s2">&quot;smooth only accepts 1 dimension arrays.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">size</span> <span class="o">&lt;</span> <span class="n">window_len</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="s2">&quot;Input vector needs to be bigger than window size.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">window_len</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">x</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">window</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;flat&#39;</span><span class="p">,</span> <span class="s1">&#39;hanning&#39;</span><span class="p">,</span> <span class="s1">&#39;hamming&#39;</span><span class="p">,</span> <span class="s1">&#39;bartlett&#39;</span><span class="p">,</span> <span class="s1">&#39;blackman&#39;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="p">(</span>
+            <span class="ne">ValueError</span><span class="p">,</span> <span class="s2">&quot;Window is one of &#39;flat&#39;, &#39;hanning&#39;, &#39;hamming&#39;, &#39;bartlett&#39;, &#39;blackman&#39;&quot;</span><span class="p">)</span>
+
+    <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="n">window_len</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:</span><span class="o">-</span><span class="n">window_len</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+
+    <span class="k">if</span> <span class="n">window</span> <span class="o">==</span> <span class="s1">&#39;flat&#39;</span><span class="p">:</span>  <span class="c1"># moving average</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">window_len</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;np.&#39;</span><span class="o">+</span><span class="n">window</span><span class="o">+</span><span class="s1">&#39;(window_len)&#39;</span><span class="p">)</span>
+
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">w</span><span class="o">/</span><span class="n">w</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="n">s</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;valid&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">y</span></div>
+
+
+<div class="viewcode-block" id="fit_poly_peak">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.fitting.fit_poly_peak">[docs]</a>
+<span class="k">def</span> <span class="nf">fit_poly_peak</span><span class="p">(</span><span class="n">xp</span><span class="p">,</span> <span class="n">yp</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span><span class="n">log</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fit the peak and estimate the errors.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">peakCoeffs</span> <span class="o">=</span> <span class="n">poly_coeff</span><span class="p">(</span><span class="n">xp</span><span class="p">,</span> <span class="n">yp</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span>
+    <span class="n">peakModel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyval</span><span class="p">(</span><span class="n">peakCoeffs</span><span class="p">,</span> <span class="n">xp</span><span class="p">)</span>
+
+    <span class="c1"># Calculate the residual and rms of the peak fit</span>
+    <span class="n">peakRes</span><span class="p">,</span> <span class="n">peakRms</span> <span class="o">=</span> <span class="n">calc_residual</span><span class="p">(</span><span class="n">peakModel</span><span class="p">,</span> <span class="n">yp</span><span class="p">,</span><span class="n">log</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">peakRes</span><span class="p">,</span> <span class="n">peakRms</span><span class="p">,</span> <span class="n">peakModel</span></div>
 
 </pre></div>
 

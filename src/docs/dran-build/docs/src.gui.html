@@ -113,6 +113,233 @@
              
   <section id="src-gui-package">
 <h1>src.gui package<a class="headerlink" href="#src-gui-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-src.gui.canvasManager">
+<span id="src-gui-canvasmanager-module"></span><h2>src.gui.canvasManager module<a class="headerlink" href="#module-src.gui.canvasManager" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.gui.canvasManager.CanvasManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.gui.canvasManager.</span></span><span class="sig-name descname"><span class="pre">CanvasManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hgt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cursorState</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'off'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/canvasManager.html#CanvasManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.canvasManager.CanvasManager" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">FigureCanvasQTAgg</span></code></p>
+<p>Manages the plot canvas for the GUI.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.canvasManager.CanvasManager.clear_canvas">
+<span class="sig-name descname"><span class="pre">clear_canvas</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/canvasManager.html#CanvasManager.clear_canvas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.canvasManager.CanvasManager.clear_canvas" title="Link to this definition"></a></dt>
+<dd><p>Clear the figure on the Canvas.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.canvasManager.CanvasManager.clear_dual_canvas">
+<span class="sig-name descname"><span class="pre">clear_dual_canvas</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/canvasManager.html#CanvasManager.clear_dual_canvas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.canvasManager.CanvasManager.clear_dual_canvas" title="Link to this definition"></a></dt>
+<dd><p>Clear the figure on the Canvas.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.canvasManager.CanvasManager.clear_figure">
+<span class="sig-name descname"><span class="pre">clear_figure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/canvasManager.html#CanvasManager.clear_figure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.canvasManager.CanvasManager.clear_figure" title="Link to this definition"></a></dt>
+<dd><p>Clear the current figure of the given axis.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.canvasManager.CanvasManager.delete_canvas">
+<span class="sig-name descname"><span class="pre">delete_canvas</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/canvasManager.html#CanvasManager.delete_canvas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.canvasManager.CanvasManager.delete_canvas" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.canvasManager.CanvasManager.init_dual_fig_canvas">
+<span class="sig-name descname"><span class="pre">init_dual_fig_canvas</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/canvasManager.html#CanvasManager.init_dual_fig_canvas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.canvasManager.CanvasManager.init_dual_fig_canvas" title="Link to this definition"></a></dt>
+<dd><p>Initiate layout for the canvases.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.canvasManager.CanvasManager.init_fig_canvas">
+<span class="sig-name descname"><span class="pre">init_fig_canvas</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/canvasManager.html#CanvasManager.init_fig_canvas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.canvasManager.CanvasManager.init_fig_canvas" title="Link to this definition"></a></dt>
+<dd><p>Initiate layout for the canvases.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.canvasManager.CanvasManager.label_dual_res">
+<span class="sig-name descname"><span class="pre">label_dual_res</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/canvasManager.html#CanvasManager.label_dual_res"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.canvasManager.CanvasManager.label_dual_res" title="Link to this definition"></a></dt>
+<dd><p>Add labels to the residuals</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.canvasManager.CanvasManager.label_res">
+<span class="sig-name descname"><span class="pre">label_res</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/canvasManager.html#CanvasManager.label_res"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.canvasManager.CanvasManager.label_res" title="Link to this definition"></a></dt>
+<dd><p>Add labels to the residuals</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.canvasManager.CanvasManager.onmove">
+<span class="sig-name descname"><span class="pre">onmove</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/canvasManager.html#CanvasManager.onmove"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.canvasManager.CanvasManager.onmove" title="Link to this definition"></a></dt>
+<dd><p>Track the cursor movement within the figure canvas</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.canvasManager.CanvasManager.onpick">
+<span class="sig-name descname"><span class="pre">onpick</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/canvasManager.html#CanvasManager.onpick"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.canvasManager.CanvasManager.onpick" title="Link to this definition"></a></dt>
+<dd><p>Pick points on the x-axis where you want to fit your data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.canvasManager.CanvasManager.plot_dual_peaks">
+<span class="sig-name descname"><span class="pre">plot_dual_peaks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xpA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ypA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peakA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rmsA</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xpB</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ypB</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peakB</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rmsB</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Peak</span> <span class="pre">fitted</span> <span class="pre">data'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/canvasManager.html#CanvasManager.plot_dual_peaks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.canvasManager.CanvasManager.plot_dual_peaks" title="Link to this definition"></a></dt>
+<dd><p>plot peak fits overlayed on drift scans.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.canvasManager.CanvasManager.plot_dual_residuals">
+<span class="sig-name descname"><span class="pre">plot_dual_residuals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Residuals'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/canvasManager.html#CanvasManager.plot_dual_residuals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.canvasManager.CanvasManager.plot_dual_residuals" title="Link to this definition"></a></dt>
+<dd><p>Plot the residuals</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.canvasManager.CanvasManager.plot_figure">
+<span class="sig-name descname"><span class="pre">plot_figure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Main</span> <span class="pre">plot</span> <span class="pre">window'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/canvasManager.html#CanvasManager.plot_figure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.canvasManager.CanvasManager.plot_figure" title="Link to this definition"></a></dt>
+<dd><p>Create a figure.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.canvasManager.CanvasManager.plot_peak">
+<span class="sig-name descname"><span class="pre">plot_peak</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peak</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Peak</span> <span class="pre">fitted</span> <span class="pre">data'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/canvasManager.html#CanvasManager.plot_peak"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.canvasManager.CanvasManager.plot_peak" title="Link to this definition"></a></dt>
+<dd><p>Pleat peak fit overlayed on drift scan.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.canvasManager.CanvasManager.plot_residual">
+<span class="sig-name descname"><span class="pre">plot_residual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Residuals'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/canvasManager.html#CanvasManager.plot_residual"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.canvasManager.CanvasManager.plot_residual" title="Link to this definition"></a></dt>
+<dd><p>Plot the residuals</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.canvasManager.CanvasManager.reset_lists">
+<span class="sig-name descname"><span class="pre">reset_lists</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/canvasManager.html#CanvasManager.reset_lists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.canvasManager.CanvasManager.reset_lists" title="Link to this definition"></a></dt>
+<dd><p>Setup/reset lists to store data for the click_index and fit_points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>click_index</strong> – the indeces of the points clicked on the figure.</p></li>
+<li><p><strong>fit_points</strong> – the values of the click_index</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.canvasManager.CanvasManager.set_labels">
+<span class="sig-name descname"><span class="pre">set_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'My</span> <span class="pre">title'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Dist</span> <span class="pre">[Deg]'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Ta</span> <span class="pre">[K]'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/canvasManager.html#CanvasManager.set_labels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.canvasManager.CanvasManager.set_labels" title="Link to this definition"></a></dt>
+<dd><p>Set labels for basic plot.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.gui.edit_driftscan_window">
+<span id="src-gui-edit-driftscan-window-module"></span><h2>src.gui.edit_driftscan_window module<a class="headerlink" href="#module-src.gui.edit_driftscan_window" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.gui.edit_driftscan_window.Ui_DriftscanWindow">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.gui.edit_driftscan_window.</span></span><span class="sig-name descname"><span class="pre">Ui_DriftscanWindow</span></span><a class="reference internal" href="../_modules/src/gui/edit_driftscan_window.html#Ui_DriftscanWindow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.edit_driftscan_window.Ui_DriftscanWindow" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.edit_driftscan_window.Ui_DriftscanWindow.retranslateUi">
+<span class="sig-name descname"><span class="pre">retranslateUi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">DriftscanWindow</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/edit_driftscan_window.html#Ui_DriftscanWindow.retranslateUi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.edit_driftscan_window.Ui_DriftscanWindow.retranslateUi" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.edit_driftscan_window.Ui_DriftscanWindow.setupUi">
+<span class="sig-name descname"><span class="pre">setupUi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">DriftscanWindow</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/edit_driftscan_window.html#Ui_DriftscanWindow.setupUi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.edit_driftscan_window.Ui_DriftscanWindow.setupUi" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="src-gui-mainguilogic-module">
+<h2>src.gui.mainGuiLogic module<a class="headerlink" href="#src-gui-mainguilogic-module" title="Link to this heading"></a></h2>
+</section>
+<section id="module-src.gui.main_window">
+<span id="src-gui-main-window-module"></span><h2>src.gui.main_window module<a class="headerlink" href="#module-src.gui.main_window" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.gui.main_window.Ui_MainWindow">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.gui.main_window.</span></span><span class="sig-name descname"><span class="pre">Ui_MainWindow</span></span><a class="reference internal" href="../_modules/src/gui/main_window.html#Ui_MainWindow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.main_window.Ui_MainWindow" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.main_window.Ui_MainWindow.retranslateUi">
+<span class="sig-name descname"><span class="pre">retranslateUi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MainWindow</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/main_window.html#Ui_MainWindow.retranslateUi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.main_window.Ui_MainWindow.retranslateUi" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.main_window.Ui_MainWindow.setupUi">
+<span class="sig-name descname"><span class="pre">setupUi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">MainWindow</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/main_window.html#Ui_MainWindow.setupUi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.main_window.Ui_MainWindow.setupUi" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.gui.secondaryCanvasManager">
+<span id="src-gui-secondarycanvasmanager-module"></span><h2>src.gui.secondaryCanvasManager module<a class="headerlink" href="#module-src.gui.secondaryCanvasManager" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.gui.secondaryCanvasManager.SecondaryCanvasManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.gui.secondaryCanvasManager.</span></span><span class="sig-name descname"><span class="pre">SecondaryCanvasManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hgt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/secondaryCanvasManager.html#SecondaryCanvasManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.secondaryCanvasManager.SecondaryCanvasManager" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">FigureCanvasQTAgg</span></code></p>
+<p>Manages the plot canvas for the GUI.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.secondaryCanvasManager.SecondaryCanvasManager.clear_canvas">
+<span class="sig-name descname"><span class="pre">clear_canvas</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/secondaryCanvasManager.html#SecondaryCanvasManager.clear_canvas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.secondaryCanvasManager.SecondaryCanvasManager.clear_canvas" title="Link to this definition"></a></dt>
+<dd><p>Clear the figure on the Canvas.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.secondaryCanvasManager.SecondaryCanvasManager.clear_figure">
+<span class="sig-name descname"><span class="pre">clear_figure</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/secondaryCanvasManager.html#SecondaryCanvasManager.clear_figure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.secondaryCanvasManager.SecondaryCanvasManager.clear_figure" title="Link to this definition"></a></dt>
+<dd><p>Clear the current figure of the given axis.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.secondaryCanvasManager.SecondaryCanvasManager.delete_canvas">
+<span class="sig-name descname"><span class="pre">delete_canvas</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/secondaryCanvasManager.html#SecondaryCanvasManager.delete_canvas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.secondaryCanvasManager.SecondaryCanvasManager.delete_canvas" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.secondaryCanvasManager.SecondaryCanvasManager.init_canvas">
+<span class="sig-name descname"><span class="pre">init_canvas</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/secondaryCanvasManager.html#SecondaryCanvasManager.init_canvas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.secondaryCanvasManager.SecondaryCanvasManager.init_canvas" title="Link to this definition"></a></dt>
+<dd><p>Initiate layout for the canvases.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.secondaryCanvasManager.SecondaryCanvasManager.plot_figure">
+<span class="sig-name descname"><span class="pre">plot_figure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/secondaryCanvasManager.html#SecondaryCanvasManager.plot_figure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.secondaryCanvasManager.SecondaryCanvasManager.plot_figure" title="Link to this definition"></a></dt>
+<dd><p>Create a figure.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.secondaryCanvasManager.SecondaryCanvasManager.reset_lists">
+<span class="sig-name descname"><span class="pre">reset_lists</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/secondaryCanvasManager.html#SecondaryCanvasManager.reset_lists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.secondaryCanvasManager.SecondaryCanvasManager.reset_lists" title="Link to this definition"></a></dt>
+<dd><p>Setup/reset lists to store data for the click_index and fit_points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>click_index</strong> – the indeces of the points clicked on the figure.</p></li>
+<li><p><strong>fit_points</strong> – the values of the click_index</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.gui.secondaryCanvasManager.SecondaryCanvasManager.set_labels">
+<span class="sig-name descname"><span class="pre">set_labels</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/secondaryCanvasManager.html#SecondaryCanvasManager.set_labels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.secondaryCanvasManager.SecondaryCanvasManager.set_labels" title="Link to this definition"></a></dt>
+<dd><p>Set labels for basic plot.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.gui.secondaryCanvasManager.fxn">
+<span class="sig-prename descclassname"><span class="pre">src.gui.secondaryCanvasManager.</span></span><span class="sig-name descname"><span class="pre">fxn</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/gui/secondaryCanvasManager.html#fxn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.gui.secondaryCanvasManager.fxn" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
 <section id="module-src.gui">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.gui" title="Link to this heading"></a></h2>
 </section>

@@ -15,6 +15,7 @@ import bisect
 # with warnings.catch_warnings(action="ignore"):
 #     fxn()
 
+
 def clean_rfi(x, y, log=""):
     """
         Clean the RFI in the data using iterative rms cuts. 
@@ -361,6 +362,73 @@ def spline(x, y, anchor_points=9, order=3,log=""):
             spline_fit=y
 
     return spline_fit#,anchor_points_pos
+
+def spline_fit(x, y, anchor_points=9, order=3):
+    '''
+        Given a set of data points (x,y) determine a smooth spline
+        approximation of degree k on the interval x[0] <= x <= x[n]
+
+        Args:
+            x (array): 1D array of data representing the x-axis
+            y (array): 1D array of data representing the y-axis
+            anchor_points (int): the number of anchor points in the data
+            order (int): polynomial order to fit, preferrably a cubic spline
+        Return:
+            spline_fit (array): Spline of the data
+    '''
+
+    nx=[]
+    ny=[]
+    # remove nan values
+    for i in range(len(x)):
+        #print(i,y[i],type(y[i]))
+        if y[i] == np.nan or str(y[i]) =="nan":
+            #print(i,y[i])
+            pass
+        else:
+            nx.append(x[i])
+            ny.append(y[i])
+
+    scanLen = len(nx)
+    if scanLen <= anchor_points*2:
+        print("Too few points to interpolate, consider entering lower knot points")
+        print("spline not set")
+        spline_fit=[]
+    else:
+        #anchor_points=7
+        anchor_points_intervals = scanLen/anchor_points  # intervals where anchor points will be placed
+        anchor_points_pos = [] # list to hold positions where anchor_points will be placed olong the array
+        anchor_points_counter = 0 # position counter or locator 
+
+        # create a list of the positions where the anchor_points will be located
+        #anchor_points=10
+        for i in range(anchor_points-1):
+            anchor_points_counter = anchor_points_counter + anchor_points_intervals
+            anchor_points_pos.append(int(anchor_points_counter))
+
+        # interpolate the data
+        # create linearly spaced data points
+        x1 = np.linspace(1, scanLen, scanLen)
+        x2 = np.array((anchor_points_pos), int)	# create array of anchor_points positions
+        
+        try:
+            tck = interpolate.splrep(x1, ny, k=order, task=-1,
+                                    t=x2)  # interpolate, k=5 is max
+            spline_fit = interpolate.splev(x1, tck, der=0)
+        except:
+            print("Failed to interpolate, Error on input data,too few points, min required = 9")
+            spline_fit=ny
+
+        #print(len(x),len(spline_fit))
+        #print(spline_fit)
+    #     pl.plot(x,y,'k.')
+    #     pl.plot(nx,spline_fit,'r')
+    #    # pl.plot(nx[anchor_points_pos],spline_fit[anchor_points_pos],'r.')
+    #     pl.show()
+    #     pl.close()
+    #     print('closed')
+    #     sys.exit()
+    return nx,spline_fit#,anchor_points_pos
 
 def gauss(x, *p):
         """
@@ -1162,6 +1230,51 @@ def calc_residual_and_rms(x, y, log, order=1):
 
     return model, res, rms, coeffs
 
+def calc_residual_and_rms_fit(x,y,order=1):
+    """Calculate the residual and rms from data
+    
+        Args:
+            x (array): 1d array
+            data representing the x-axis
+            y (array): 1d array
+                data representing the y-axis
+            deg(int): degree of the polynomial
+
+        Return:
+            model (array): model of 
+            res (array):
+            rms (float):
+            coeff():
+        """
+    #TODO: remove redundant code
+    
+    nx=[]
+    ny=[]
+    # remove nan values
+    for i in range(len(x)):
+        #print(i,y[i],type(y[i]))
+        if y[i] == np.nan or str(y[i]) =="nan":
+            #print(i,y[i])
+            pass
+        else:
+            nx.append(x[i])
+            ny.append(y[i])
+
+    # fit the baseline and get best fit coeffecients
+    coeffs = poly_coeff(nx, ny, order)
+
+    print('coeffs: ',coeffs)
+
+    # get a model for the fit using the best fit coeffecients
+    model = np.polyval(coeffs, nx)
+
+    #print('model: ', model)
+
+    # Calculate the residual and rms
+    res, rms = calc_residual(ny, model)
+
+    return nx, model, res, rms, coeffs
+    
 def poly_coeff(x, y, deg):
     '''
         Calculate the polynomial coeffecients depending 
@@ -2939,3 +3052,88 @@ def get_base(localMinPositions, block_width, scan_len):
                             baserr.append(scan_len)
 
         return base, basel,baser,basell,baserr,lp,rp
+
+# GUI operation
+def get_base_pts(x, y, base_index_list):
+    """ Get baseline points from a list of 
+        indexes.
+    """
+
+    # Get data between the indexes selected
+    ind_list = sorted(base_index_list)
+
+    # get location of all points
+    xb_data = []
+    yb_data = []
+
+    if len(ind_list) == 2:
+        ind_1 = ind_list[0]
+        ind_2 = ind_list[1]
+        #print(i, i+1, ind_1, ind_2, len(ind_list))
+        xb_data = xb_data + list(x[ind_1:ind_2])
+        yb_data = yb_data + list(y[ind_1:ind_2])
+    else:
+        for i in range(len(ind_list)):
+            if i % 2 == 0 and i != 1:
+                ind_1 = ind_list[i]
+                ind_2 = ind_list[i+1]
+                #print(i, i+1, ind_1, ind_2, len(ind_list))
+                xb_data = xb_data + list(x[ind_1:ind_2])
+                yb_data = yb_data + list(y[ind_1:ind_2])
+
+    return xb_data, yb_data
+
+def filter_scans(x, window_len=10, window='flat'):
+    """
+        smooth the data using a window with requested size.
+    
+        This method is based on the convolution of a scaled window with the signal.
+        The signal is prepared by introducing reflected copies of the signal 
+        (with the window size) in both ends so that transient parts are minimized
+        in the begining and end part of the output signal.
+        
+        Args:
+            x: the input signal 
+            window_len: the dimension of the smoothing window; should be an odd integer
+            window: the type of window from 'flat', 'hanning', 'hamming', 'bartlett', 
+                'blackman' flat window will produce a moving average smoothing.
+
+        Returns:
+            the smoothed signal
+    """
+
+    if x.ndim != 1:
+        raise (ValueError, "smooth only accepts 1 dimension arrays.")
+
+    if x.size < window_len:
+        raise (ValueError, "Input vector needs to be bigger than window size.")
+
+    if window_len < 3:
+        return x
+
+    if not window in ['flat', 'hanning', 'hamming', 'bartlett', 'blackman']:
+        raise (
+            ValueError, "Window is one of 'flat', 'hanning', 'hamming', 'bartlett', 'blackman'")
+
+    s = np.r_[x[window_len-1:0:-1], x, x[-2:-window_len-1:-1]]
+
+    if window == 'flat':  # moving average
+        w = np.ones(window_len, 'd')
+    else:
+        w = eval('np.'+window+'(window_len)')
+
+    y = np.convolve(w/w.sum(), s, mode='valid')
+    return y
+
+def fit_poly_peak(xp, yp, order,log):
+    """
+        Fit the peak and estimate the errors.
+    """
+
+    peakCoeffs = poly_coeff(xp, yp, order)
+    peakModel = np.polyval(peakCoeffs, xp)
+
+    # Calculate the residual and rms of the peak fit
+    peakRes, peakRms = calc_residual(peakModel, yp,log)
+    return peakRes, peakRms, peakModel
+

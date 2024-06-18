@@ -479,6 +479,45 @@ order polynomials.</p>
 </dd></dl>
 
 </section>
+<section id="module-src.common.dialog_app">
+<span id="src-common-dialog-app-module"></span><h2>src.common.dialog_app module<a class="headerlink" href="#module-src.common.dialog_app" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.common.dialog_app.App">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.common.dialog_app.</span></span><span class="sig-name descname"><span class="pre">App</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/dialog_app.html#App"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.dialog_app.App" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
+<p>Dialog box application to get file/folder path.
+Had to use this because tkinter was crashing on my mac.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.common.dialog_app.App.get_file_path">
+<span class="sig-name descname"><span class="pre">get_file_path</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/dialog_app.html#App.get_file_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.dialog_app.App.get_file_path" title="Link to this definition"></a></dt>
+<dd><p>Get file path using the file open dialog.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path to the requested file.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>file_path (str)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.common.dialog_app.App.get_folder_path">
+<span class="sig-name descname"><span class="pre">get_folder_path</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/dialog_app.html#App.get_folder_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.dialog_app.App.get_folder_path" title="Link to this definition"></a></dt>
+<dd><p>Get directory path using the directory open dialog.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The path to the directory requested.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>folder_path (str)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="module-src.common.driftScanAttributes">
 <span id="src-common-driftscanattributes-module"></span><h2>src.common.driftScanAttributes module<a class="headerlink" href="#module-src.common.driftScanAttributes" title="Link to this heading"></a></h2>
 <dl class="py class">
@@ -940,6 +979,9 @@ and prepare it for analysis.</p>
 </dd></dl>
 
 </section>
+<section id="src-common-file-handler-module">
+<h2>src.common.file_handler module<a class="headerlink" href="#src-common-file-handler-module" title="Link to this heading"></a></h2>
+</section>
 <section id="module-src.common.fitting">
 <span id="src-common-fitting-module"></span><h2>src.common.fitting module<a class="headerlink" href="#module-src.common.fitting" title="Link to this heading"></a></h2>
 <dl class="py function">
@@ -1125,6 +1167,29 @@ signal.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="src.common.fitting.filter_scans">
+<span class="sig-prename descclassname"><span class="pre">src.common.fitting.</span></span><span class="sig-name descname"><span class="pre">filter_scans</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_len</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'flat'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/fitting.html#filter_scans"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.fitting.filter_scans" title="Link to this definition"></a></dt>
+<dd><p>smooth the data using a window with requested size.</p>
+<p>This method is based on the convolution of a scaled window with the signal.
+The signal is prepared by introducing reflected copies of the signal
+(with the window size) in both ends so that transient parts are minimized
+in the begining and end part of the output signal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – the input signal</p></li>
+<li><p><strong>window_len</strong> – the dimension of the smoothing window; should be an odd integer</p></li>
+<li><p><strong>window</strong> – the type of window from ‘flat’, ‘hanning’, ‘hamming’, ‘bartlett’,
+‘blackman’ flat window will produce a moving average smoothing.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the smoothed signal</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="src.common.fitting.fit_beam">
 <span class="sig-prename descclassname"><span class="pre">src.common.fitting.</span></span><span class="sig-name descname"><span class="pre">fit_beam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fnbw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">saveTag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitTheoretical</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">autoFit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/fitting.html#fit_beam"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.fitting.fit_beam" title="Link to this definition"></a></dt>
 <dd><p>Fit single beam data.</p>
@@ -1149,6 +1214,12 @@ signal.</p>
 <dt class="sig sig-object py" id="src.common.fitting.fit_dual_beam">
 <span class="sig-prename descclassname"><span class="pre">src.common.fitting.</span></span><span class="sig-name descname"><span class="pre">fit_dual_beam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hpbw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fnbw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">saveTo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/fitting.html#fit_dual_beam"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.fitting.fit_dual_beam" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.common.fitting.fit_poly_peak">
+<span class="sig-prename descclassname"><span class="pre">src.common.fitting.</span></span><span class="sig-name descname"><span class="pre">fit_poly_peak</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/fitting.html#fit_poly_peak"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.fitting.fit_poly_peak" title="Link to this definition"></a></dt>
+<dd><p>Fit the peak and estimate the errors.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.common.fitting.gauss">
@@ -1492,6 +1563,125 @@ https://www.mdpi.com/68484</p>
 <dt class="sig sig-object py" id="src.common.msgConfiguration.print_start">
 <span class="sig-prename descclassname"><span class="pre">src.common.msgConfiguration.</span></span><span class="sig-name descname"><span class="pre">print_start</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/msgConfiguration.html#print_start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.msgConfiguration.print_start" title="Link to this definition"></a></dt>
 <dd><p>Prints program banner.</p>
+</dd></dl>
+
+</section>
+<section id="module-src.common.observation">
+<span id="src-common-observation-module"></span><h2>src.common.observation module<a class="headerlink" href="#module-src.common.observation" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.common.observation.Observation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.common.observation.</span></span><span class="sig-name descname"><span class="pre">Observation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">FILEPATH</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theoFit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">autoFit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/observation.html#Observation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.observation.Observation" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Observation object containing the observation data of the observation.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.common.observation.Observation.FILEPATH">
+<span class="sig-name descname"><span class="pre">FILEPATH</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.common.observation.Observation.FILEPATH" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.common.observation.Observation.HDULENGTH">
+<span class="sig-name descname"><span class="pre">HDULENGTH</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.common.observation.Observation.HDULENGTH" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.common.observation.Observation.HDULIST">
+<span class="sig-name descname"><span class="pre">HDULIST</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.common.observation.Observation.HDULIST" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.common.observation.Observation.INFOHEADER">
+<span class="sig-name descname"><span class="pre">INFOHEADER</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.common.observation.Observation.INFOHEADER" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.common.observation.Observation.autoFit">
+<span class="sig-name descname"><span class="pre">autoFit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.common.observation.Observation.autoFit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.common.observation.Observation.create_final_plot_directory">
+<span class="sig-name descname"><span class="pre">create_final_plot_directory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/observation.html#Observation.create_final_plot_directory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.observation.Observation.create_final_plot_directory" title="Link to this definition"></a></dt>
+<dd><p>Create directory where final plots will be saved. The function takes
+the source name and the frequency in MHz and creates a directory
+with the source name and the frequency in MHz. The directory is
+created if it does not already exist.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>src</strong> (<em>str</em>) – source name</p></li>
+<li><p><strong>freq</strong> (<em>float</em>) – frequency in MHz</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.common.observation.Observation.get_data">
+<span class="sig-name descname"><span class="pre">get_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/observation.html#Observation.get_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.observation.Observation.get_data" title="Link to this definition"></a></dt>
+<dd><p>Get data from fits file hdu</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.common.observation.Observation.get_data_only">
+<span class="sig-name descname"><span class="pre">get_data_only</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/observation.html#Observation.get_data_only"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.observation.Observation.get_data_only" title="Link to this definition"></a></dt>
+<dd><p>Get data from fits file hdu. This is for the quick file view.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.common.observation.Observation.get_hdu_info">
+<span class="sig-name descname"><span class="pre">get_hdu_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hduindex</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/src/common/observation.html#Observation.get_hdu_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.observation.Observation.get_hdu_info" title="Link to this definition"></a></dt>
+<dd><p>Get information from individual hdu</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>hduindex</strong> (<em>int</em>) – index of hdu to get info from</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.common.observation.Observation.log">
+<span class="sig-name descname"><span class="pre">log</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">object</span></em><a class="headerlink" href="#src.common.observation.Observation.log" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.common.observation.Observation.read_data_from_hdu_lists">
+<span class="sig-name descname"><span class="pre">read_data_from_hdu_lists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hduindex</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/observation.html#Observation.read_data_from_hdu_lists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.observation.Observation.read_data_from_hdu_lists" title="Link to this definition"></a></dt>
+<dd><p>Read data from fits file hdu.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>hduindex</strong> (<em>int</em>) – index of hdu to read data from</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.common.observation.Observation.set_key_value_pairs">
+<span class="sig-name descname"><span class="pre">set_key_value_pairs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desc1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desc2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indexKey</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/observation.html#Observation.set_key_value_pairs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.observation.Observation.set_key_value_pairs" title="Link to this definition"></a></dt>
+<dd><p>Set key/value pairs for keys that may be missing from the dictionary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key1</strong> (<em>_type_</em>) – missing key</p></li>
+<li><p><strong>desc1</strong> (<em>_type_</em>) – description of missing key</p></li>
+<li><p><strong>key2</strong> (<em>_type_</em>) – reference key</p></li>
+<li><p><strong>desc2</strong> (<em>_type_</em>) – description of reference key</p></li>
+<li><p><strong>indexKey</strong> (<em>_type_</em>) – index key</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.common.observation.Observation.theoFit">
+<span class="sig-name descname"><span class="pre">theoFit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.common.observation.Observation.theoFit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 </section>
