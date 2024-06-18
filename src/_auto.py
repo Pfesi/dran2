@@ -56,6 +56,8 @@ class Observation:
                 self.HDULENGTH=len(self.HDULIST)
                 self.INFOHEADER = f.info
 
+                # print(self.HDULIST.info())
+
                 # set values to dictionary
                 msg_wrapper("debug",self.log.debug,f"Setting FILEPATH, HDULIST, HDULENGTH and INFOHEADER to internal dict")
                 self.__dict__["HDULIST"]={'value':self.HDULIST, 'description':"Header data unit for observing file"}
@@ -78,19 +80,31 @@ class Observation:
             desc2 (_type_): description of reference key
             indexKey (_type_): index key
         """
+
+        # print(self.__dict__.keys())
+        # print(keys)
+        # sys.exit()
+
         if key1 in keys:
             pass
         else:
             keys=self.__dict__.keys()
-            pos = list(keys).index(indexKey)
-            items = list(self.__dict__.items())
-            items.insert(pos+1, (key2, {'value':np.nan, 'description': desc2}))
-            items.insert(pos+1, (key1, {'value':np.nan, 'description': desc1}))
-            self.__dict__=dict(items)
-            # print(f'No {key1}')
-            msg=f'No {key1}'
-            msg_wrapper("debug",self.log.debug,msg)
-        return
+            # print(key1,key2,indexKey)
+            # print(keys)
+            # try:
+            if indexKey not in keys:
+                msg_wrapper("debug",self.log.debug,f'No Key found for {indexKey}')
+                return
+            else:
+                pos = list(keys).index(indexKey)
+                items = list(self.__dict__.items())
+                items.insert(pos+1, (key2, {'value':np.nan, 'description': desc2}))
+                items.insert(pos+1, (key1, {'value':np.nan, 'description': desc1}))
+                self.__dict__=dict(items)
+                # print(f'No {key1}')
+                msg=f'No {key1}'
+                msg_wrapper("debug",self.log.debug,msg)
+                return
 
     def get_data_only(self,qv='no'):
         """ Get data from fits file hdu. This is for the quick file view.
@@ -99,7 +113,7 @@ class Observation:
         msg_wrapper("debug",self.log.debug,f"Getting data from fits file hdulist")
         msg_wrapper("debug",self.log.debug,f"Create dict object to store read parameters")
         self.__dict__['CARDS']={} #{'value':[], 'description':"Placeholder for hdu card titles or names"} # holds hdu card titles or names
-
+        # sys.exit()
         # print(self.__dict__)
         
         CURDATETIME = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -120,7 +134,11 @@ class Observation:
             self.read_data_from_hdu_lists(index)
 
         keys=self.__dict__.keys()
-        self.set_key_value_pairs('HZPERK1', 'HZPERK1', 'HZKERR1', '[Hz/K] Counter cal error','TCAL2',keys)
+        try:
+            self.set_key_value_pairs('HZPERK1', 'HZPERK1', 'HZKERR1', '[Hz/K] Counter cal error','TCAL2',keys)
+        except:
+            self.__dict__[f'TCAL2'] = {'value':np.nan,'description':'[Hz/K] Counter cal error'}
+
         self.set_key_value_pairs('HZPERK2', 'HZPERK2', 'HZKERR2', '[Hz/K] Counter cal error','HZKERR1',keys)
         self.set_key_value_pairs('TSYS1', 'TSYS1 [K]', 'TSYSERR1', '[K] System temperature','HZKERR2',keys)
         self.set_key_value_pairs('TSYS2', 'TSYS2[K]', 'TSYSERR2', '[K] System temperature','TSYSERR1',keys)
@@ -168,7 +186,7 @@ class Observation:
         self.__dict__['CARDS']={} #{'value':[], 'description':"Placeholder for hdu card titles or names"} # holds hdu card titles or names
 
         # print(self.__dict__)
-        
+      
         CURDATETIME = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         msg_wrapper("info",self.log.info,f"Date and time of data processing: {CURDATETIME}")
         self.__dict__["CURDATETIME"]={'value':CURDATETIME, 'description':"Current date and time of the data processing"}
@@ -183,6 +201,8 @@ class Observation:
                 print(f'\nFile is a symlink: {self.FILEPATH}. Stopped processing')
             return
         
+        # print(self.HDULIST.info())
+        # sys.exit()
         for index in range(hdulen):
             self.read_data_from_hdu_lists(index)
 
@@ -193,48 +213,7 @@ class Observation:
         self.set_key_value_pairs('HZPERK2', 'HZPERK2', 'HZKERR2', '[Hz/K] Counter cal error','HZKERR1',keys)
         self.set_key_value_pairs('TSYS1', 'TSYS1 [K]', 'TSYSERR1', '[K] System temperature','HZKERR2',keys)
         self.set_key_value_pairs('TSYS2', 'TSYS2[K]', 'TSYSERR2', '[K] System temperature','TSYSERR1',keys)
-        # if 'HZPERK1' in keys:
-        #     pass
-        # else:
-        #     keys=self.__dict__.keys()
-        #     pos = list(keys).index('TCAL2')
-        #     items = list(self.__dict__.items())
-        #     items.insert(pos+1, ('HZKERR1', {'value':np.nan, 'descritpion': 'HZKERR1'}))
-        #     items.insert(pos+1, ('HZPERK1', {'value':np.nan, 'descritpion': 'HZPERK1'}))
-        #     self.__dict__=dict(items)
-        
-        # if 'HZPERK2' in keys:
-        #     pass
-        # else:
-        #     keys=self.__dict__.keys()
-        #     pos = list(keys).index('HZKERR1')
-        #     items = list(self.__dict__.items())
-        #     items.insert(pos+1, ('HZKERR2', {'value':np.nan, 'descritpion': 'HZKERR2'}))
-        #     items.insert(pos+1, ('HZPERK2', {'value':np.nan, 'descritpion': 'HZPERK2'}))
-        #     self.__dict__=dict(items)
-        #     print(' no hzperk2')
-        
-        # if 'TSYS1' in keys:
-        #     pass
-        # else:
-        #     keys=self.__dict__.keys()
-        #     pos = list(keys).index('HZKERR2')
-        #     items = list(self.__dict__.items())
-        #     items.insert(pos+1, ('TSYSERR1', {'value':np.nan, 'descritpion': 'TSYSERR1 [K]'}))
-        #     items.insert(pos+1, ('TSYS1', {'value':np.nan, 'descritpion': 'TSYS1 [K]'}))
-        #     self.__dict__=dict(items)
-
-        # if 'TSYS2' in keys:
-        #     pass
-        # else:
-        #     keys=self.__dict__.keys()
-        #     pos = list(keys).index('TSYSERR1')
-        #     items = list(self.__dict__.items())
-        #     items.insert(pos+1, ('TSYSERR2', {'value':np.nan, 'descritpion': 'TSYSERR2 [K]'}))
-        #     items.insert(pos+1, ('TSYS2', {'value':np.nan, 'descritpion': 'TSYS12[K]'}))
-        #     self.__dict__=dict(items)
-        #     print('no tsys2')
-
+    
         
         # add other important bits
         # ----------------------------------
@@ -243,8 +222,12 @@ class Observation:
         # use hdu frontend to determine path to data processing
         frontend = self.__dict__['FRONTEND']['value']
         src = self.__dict__['OBJECT']['value']
-        freq = self.__dict__['CENTFREQ']['value']
 
+        try:
+            freq = self.__dict__['CENTFREQ']['value']
+        except:
+            freq=np.nan
+            sys.exit()
         # create_current_scan_directory()
         self.create_final_plot_directory(src,freq)
         
@@ -295,7 +278,7 @@ class Observation:
         self.__dict__['CARDS'][f'{hduindex}'] = hduIndexName
         cols=list(hdu) # columns from hdu lists
 
-        # print(hduIndexName)
+        # print(hduIndexName,self.HDULENGTH['value'],hduindex)
         # sys.exit()
         msg_wrapper("debug",self.log.debug,f"Getting observing parameters from {hduIndexName} HEADER")
 
@@ -303,8 +286,22 @@ class Observation:
         # TODO: Decide on which data you want to save in the database
         # go through each column and only save relevant ones
         # print(cols)
+        # sys.exit()
         for column in cols:
-            # print(column)
+            # if 'TCAL1' in column or 'TCAL2' in column or 'FREQ' in column:
+            #     print(column,hdu[column])
+
+            if 'Chart' not in hduIndexName and hduindex == self.HDULENGTH['value']-1:
+                if 'TCAL1' in column or 'FREQ' in column or 'TCAL2' in column or 'HZ' in column:
+                    # print('here')
+                    # print('--->---',column)
+                    try:
+                        self.__dict__[f'{column}']['value']
+                    except:
+                        self.__dict__[f'{column}'] = {'value':hdu[column],'description':hdu.comments[column]}
+
+            # print('- ',column,hdu[column])
+            # print(column,hdu[column])
             if 'COMMENT' in column or 'SIMPLE' in column or 'BITPIX' in column or 'NAXIS' in column\
                 or 'EXTEND' in column or 'SIMULATE' in column or 'START' in column or 'STOP' in column\
                 or 'SCANS' in column or 'TTYPE' in column or  'TFORM' in column or 'TUNIT' in column \
@@ -318,13 +315,12 @@ class Observation:
                 if 'BANDWDTH' in column or 'INSTRUME' in column or  'INSTFLAG' in column\
                     or 'CENTFREQ' in column or 'SCANDIST' in column or 'SCANTIME' in column:
                     if '_ZC' in hduIndexName:
-
+                        print('*** ',column)
                         self.__dict__[f'{column}'] = {'value':hdu[column],'description':hdu.comments[column]}
                         msg_wrapper("debug",self.log.debug,f"{column}: {str(self.__dict__[f'{column}'])}")
 
                 elif 'FRONTEND' in column:
                     if '_CAL' in hduIndexName:
-
                         self.__dict__[f'{column}'] = {'value':hdu[column],'description':hdu.comments[column]}
                         msg_wrapper("debug",self.log.debug,f"{column}: {str(self.__dict__[f'{column}'])}")
                 
@@ -365,6 +361,19 @@ class Observation:
                                 self.__dict__[f'{column}'] = {'value':hdu[column],'description':hdu.comments[column]}
                                 msg_wrapper("debug",self.log.debug,f"{column}: {str(self.__dict__[f'{column}'])} - couldn't find this value in chart so may cause problems down the line")
 
+                        # if 'Chart' not in hduIndexName and hduindex == self.HDULENGTH['value']-1:
+                        #     print('here')
+                        #     print('--->---',column)
+                            # try:
+                            #     self.__dict__['CENTFREQ']['value']
+                            # except:
+
+
+
+                            #     # self.__dict__[f'CENTFREQ'] = {'value':hdu[column],'description':hdu.comments[column]}
+                            #     msg_wrapper("debug",self.log.debug,f"{column}: {str(self.__dict__[f'{column}'])}")
+                            # sys.exit()
+
                 elif column=='DATE':
                     date=hdu[column].split('T')
                     self.__dict__[f'{column}'] = {'value':hdu[column],'description':hdu.comments[column]}
@@ -379,8 +388,6 @@ class Observation:
                     self.__dict__[f'{column}'] = {'value':hdu[column],'description':hdu.comments[column]}
                     
                     msg_wrapper("debug",self.log.debug,f"{column}: {str(self.__dict__[f'{column}'])}")
-
-        # sys.exit()
 
     def create_final_plot_directory(self, src: str,freq: float):
         """

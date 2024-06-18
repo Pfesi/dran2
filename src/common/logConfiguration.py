@@ -15,7 +15,7 @@ from config import logfile
 # =========================================================================== #
 
 # Setup logger object
-logger = logging.getLogger('root')
+logger = logging.getLogger('PIL')#.setLevel(logging.WARNING)
 
 def configure_logging(toggle="off"):
     """Setup the logging configuration.
@@ -61,7 +61,7 @@ def configure_console_logger(toggle="off"):
     handler2 = logging.StreamHandler(sys.stdout)
 
     # Configure message logging level to INFO by default
-    if toggle != "off":
+    if toggle == "off":
         handler2.setLevel(logging.INFO)
     else:
         handler2.setLevel(logging.DEBUG)

@@ -18,7 +18,7 @@ Program structure
 
 * **Command-Line Interface (CLI)**: Designed for automated and semi-automated processing of drift scan data. The CLI streamlines the reduction and analysis of large batches of drift scan files.
 
-* **Graphical User Interface (GUI)**: (planned for future release) Provides a user-friendly environment ideal for interactive exploration and analysis of individual files. The GUI allows for data inspection, fitting, and basic analysis of time series data produced by the CLI.
+* **Graphical User Interface (GUI)**: Provides a user-friendly environment ideal for interactive exploration and analysis of individual files. The GUI allows for data inspection, fitting, and basic analysis of time series data produced by the CLI.
 
 
 
@@ -31,7 +31,7 @@ The list of required Python packages can be found in the included requirements.t
 Installation 
 -------------
 
-DRAN is conveniently available for installation through the [PYPI package manager](https://pypi.org) using the following command:
+DRAN is conveniently available for installation through the [PYPI package manager](https://pypi.org/project/dran2/) using the following command:
 
 ``` 
   $ pip install dran2
@@ -53,11 +53,11 @@ DRAN offers two ways to specify input data:
 
 ```
 Example: 
-$ dran -f /path/to/single_file.fits
+$ dran-auto -f /path/to/single_file.fits
 ```
 ```
 Example (batch processing): 
-$ dran -f /path/to/data_directory/
+$ dran-auto -f /path/to/data_directory/
 ```
 
 2. Interactive Selection (GUI only):  The graphical user interface (GUI) allows users to interactively browse and select individual FITS files for processing.
@@ -85,14 +85,20 @@ Use the -f option followed by the path to your data to process a single file or 
 
 * To process a single file:
 ```
-$ dran -f /path/to/your/file.fits
+$ dran-auto -f /path/to/your/file.fits
 ```
 
 * To process all FITS files in a directory (batch processing):
 
 ```
-$ dran -f /path/to/your/data/directory/
+$ dran-auto -f /path/to/your/data/directory/
 ```
+
+* To run the GUI
+```
+$ dran-gui 
+```
+
 
 3. Additional options:
 
@@ -122,7 +128,3 @@ Having trouble with DRAN? Have questions about the software or features? We enco
 * Report Issues: Encounter any bugs or unexpected behavior? Please [OPEN AN ISSUE](https://github.com/Pfesi/dran2/issues) on the GitHub repository.
 * Share your thoughts: We value your feedback! Feel free to use the GitHub issue tracker to suggest improvements or request new features.
 
-
-Author contacts
----------------
-Alernatively, you can email the author on pfesi24@gmail.com

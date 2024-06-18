@@ -3728,17 +3728,13 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
                                 pass
 
                             if type(txt).__name__ != "str":
-                                    # print('in')
-                                    # print(filter)
-                                    # print(option)
-                                    # print(txt,type(txt))
-                                    # print(df[option])
+                                    
                                     txt=float(txt)
                                     df[option] = df[option].astype(float)
 
                                     if filter == ">":
                                         ndf = df[df[option] > txt]
-                                        print(len(ndf))#,option,txt ,df[option])
+                                        print(len(ndf))
 
                                     elif filter == ">=":
                                         ndf = df[df[option] >= txt]
@@ -3767,9 +3763,7 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
                                         ndf['plot_tag']=ndf['FILENAME'].apply(lambda x:x[:18])
 
                                         plots=list(ndf['plot_tag'])
-                                        # print(ndf[['plot_tag',option]])
-                                        # sys.exit()
-
+                                        
                                         # print stats
                                         print("\n--- Basic stats ---\n")
                                         print("Min: ", ndf[option].min())
