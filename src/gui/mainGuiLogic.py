@@ -3506,6 +3506,1077 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
             self.Canvas.draw()
             
     
+    # PLOTVIEWER OPERATIONS
+    def open_db_path(self):
+        # Open a database
+
+        self.write("Opening DB",'info')
+        self.dbFilePath = self.open_file_name_dialog("*.db")
+        if self.dbFilePath == None:
+            self.write("You need to select a file to open",'info')
+            self.write("Please select a file",'info')
+            pass
+        else:
+
+            # free all else
+            free=True
+            self.plot_ui.btnDelete.setEnabled(free)
+            self.plot_ui.btnRefreshPlotList.setEnabled(free)
+            self.plot_ui.btnShow.setEnabled(free)
+            self.plot_ui.comboBox.setEnabled(free)
+            self.plot_ui.comboBoxFilter.setEnabled(free)
+            self.plot_ui.comboBoxOptions.setEnabled(free)
+            self.plot_ui.txtBoxEnd.setEnabled(free)
+            self.plot_ui.txtBoxStart.setEnabled(free)
+
+            # open db and get tables
+            self.db = SQLiteDB(self.dbFilePath, log=self.log)
+            self.db.create_db()
+            self.tables = list(set(sorted(self.db.get_table_names(self.dbFilePath))))
+
+            print('T2 :',self.tables)
+
+            self.plot_ui.comboBox.clear()     
+            self.plot_ui.comboBox.clear()      
+            self.plot_ui.comboBox.addItems(self.tables)
+ 
+    def on_combo_changed(self):
+
+        print("\nChanged obs. to: ", self.plot_ui.comboBox.currentText())
+
+        # get data from db
+        # check folder name against table name
+        folderName=self.plot_ui.comboBox.currentText()
+
+        # get column names from db and put them in combobox
+        colInd, colNames, colType = self.db.get_all_table_coloumns(folderName)
+
+        plotCols=[]
+        for name in colNames:
+            #or 'OBS' in name 
+            # if 'OBSTIME' in name or 'SOURCE' in name or 'CUR' in name or 'NOM' in name or 'TUDE' in name \
+            #     or 'BW' in name or 'FREQ' in name or 'FILE' in name or 'OBJ' in name or 'id' == name or \
+            #         'RAD' in name or 'TYPE' in name or 'PRO' in name or 'TELE' in name or 'UPGR' in name \
+            #             or 'INST' in name or 'SCAN' in name:
+                
+            if 'id' in name  or 'LOGFREQ' in name or 'CURDATETIME' in name or \
+                'FILE' in name or 'OBSD' in name \
+                    or 'MJD' in name or 'OBS' in name or 'OBJ' in name or 'id' == name \
+                        or 'RAD' in name or 'TYPE' in name or 'PRO' in name or 'TELE' in\
+                              name or 'UPGR' in name  or 'INST' in name or \
+                                'SCANDIR' in name or 'SRC' in name or 'COORDSYS' in name or 'LONGITUD' in name \
+                                    or 'LATITUDE' in name  or 'POINTING' in name \
+                                       or 'DICHROIC' in name \
+                                            or 'PHASECAL' in name or 'HPBW' in name or 'FNBW' in name or 'SNBW' in name\
+                                                or 'FRONTEND' in name or 'BASE' in name: 
+                pass
+            else:
+                plotCols.append(name)
+
+        # self.plot_ui.comboBoxOptions.clear()
+        self.plot_ui.comboBoxOptions.clear()
+        self.plot_ui.comboBoxOptions.clear()
+        self.plot_ui.comboBoxOptions.addItems(plotCols)
+
+        # self.plot_ui.comboBoxFilter.clear()
+        self.plot_ui.comboBoxFilter.clear()
+        self.plot_ui.comboBoxFilter.clear()
+        self.plot_ui.comboBoxFilter.addItems(['','>','>=','=','<','<=','between'])
+
+    def on_filter_changed(self):
+        if self.plot_ui.comboBoxFilter.currentText()=="between":
+            print(self.plot_ui.comboBoxFilter.currentText())
+            #Add second filter
+            self.toggle_range_filter('on')
+            self.plot_ui.txtBoxFilter.setVisible(False)
+        else:
+            print(self.plot_ui.comboBoxFilter.currentText())
+            # remove second filter
+            self.toggle_range_filter('off')
+            self.plot_ui.txtBoxFilter.setVisible(True)
+
+    def toggle_range_filter(self,filter):
+        
+        if filter=='off':
+            toggle=False
+        elif filter=="on":
+            toggle=True
+
+        self.plot_ui.LblRangeFilter.setVisible(toggle)
+        self.plot_ui.LblStart.setVisible(toggle)
+        self.plot_ui.LblStop.setVisible(toggle)
+        self.plot_ui.LblFormat.setVisible(toggle)
+        self.plot_ui.txtBoxEnd.setVisible(toggle)
+        self.plot_ui.txtBoxStart.setVisible(toggle)
+
+    def add_items_to_combobox(self):
+
+        """Refresh the list of folders containing plots to be displayed. """
+        
+        # self.db.close_db()
+
+        # open db and get tables
+        self.db = SQLiteDB(self.dbFilePath, log=self.log)
+        self.db.create_db()
+        tables = sorted(self.db.get_table_names(self.dbFilePath))
+
+        self.plot_ui.comboBox.clear()
+        self.plot_ui.comboBox.clear()
+            
+        self.plot_ui.comboBoxOptions.clear()
+        self.plot_ui.comboBoxOptions.clear()
+
+        self.plot_ui.comboBoxFilter.clear()
+        self.plot_ui.comboBoxFilter.clear()
+
+        # self.plot_ui.comboBox.clear()
+        self.plot_ui.comboBox.addItems(tables)
+
+    def get_data_from_db(self, folderName):
+        db = SQLiteDB(self.dbFilePath, log=self.log)
+        db.create_db()
+        tableNames = sorted(db.get_table_names(self.dbFilePath))
+        colInd, colNames, colType = db.get_all_table_coloumns(folderName)
+        rows = self.db.get_rows_of_cols(folderName,colNames)
+                        
+        # create dataframe
+        df = pd.DataFrame(list(rows), columns = colNames)
+        
+        return df ,db
+    
+    def show_plot_browser(self):
+        """ 
+        Open a webrowser containg the plots to be displayed. 
+        """
+        
+        # Run checks first
+        option=self.plot_ui.comboBoxOptions.currentText()
+        filter=self.plot_ui.comboBoxFilter.currentText()
+        
+        if filter !="between":
+
+            # Get params
+            txt=self.plot_ui.txtBoxFilter.text()
+            print(f"\nShowing plots where {option} {filter} {txt}")
+
+            if txt is not None or isinstance(txt, str):
+                if option=="":
+                    print("Need to choose an option")
+                else:
+                    if filter=="":
+                        print("Please make a valid selection")
+                    else:
+                        if txt=="":
+                            # show everything
+                            print("no value added, should show all pics, but wont")
+                        else:
+                            # Get data from the database
+                            # check folder name against table name
+                            folderName=self.plot_ui.comboBox.currentText()
+                            
+                            print('Folder name: ',folderName)
+                            print('Path to file: ',self.dbFilePath)
+
+                            # get data from database
+                            df,db = self.get_data_from_db(folderName)
+
+                            if option == 'OBSDATE':
+                                print('Showing overall stats')
+                                print(f'min: {df[option].iloc[0]}')
+                                print(f'max: {df[option].iloc[-1]}')
+                                try:
+                                    print(f'mean: {df[option].mean()}')
+                                    print(f'std: {df[option].std()}')
+                                except Exception as e:
+                                    print(e)
+                                print("*"*30,"\n")
+                            else:
+                                # print(df[option].apply(fx))
+                                df[option]=df[option].astype(float) #.apply(fx)
+                                # df[option]=df[option].apply(fx)
+                                print("\n","*"*30)
+                                try:
+                                    print('Showing basic stats for selection')
+                                    print(f'DATE start: {df["OBSDATE"].iloc[0]}')
+                                    print(f'DATE end: {df["OBSDATE"].iloc[-1]}')
+                                    print(f'MJD start: {df["MJD"].iloc[0]:.1f}')
+                                    print(f'MJD end: {df["MJD"].iloc[-1]:.1f}')
+                                    print(f'min: {df[option].dropna().min():.3f}')
+                                    print(f'max: {df[option].dropna().max():.3f}')
+                                    print(f'mean: {df[option].dropna().mean():.3f}')
+                                    print(f'std: {df[option].dropna().std():.3f}')
+                                    print(f'3sigma upper limit: {df[option].mean() + (df[option].mean()*df[option].std()):.3f}')
+                                    print(f'3sigma lower limit: {df[option].mean() - (df[option].mean()*df[option].std()):.3f}')
+                                except:
+                                    print('Showing overall stats')
+                                    print(f'DATE start: {df["OBSDATE"].iloc[0]}')
+                                    print(f'DATE end: {df["OBSDATE"].iloc[-1]}')
+                                    print(f'MJD start: {df["MJD"].iloc[0]:.1f}')
+                                    print(f'MJD end: {df["MJD"].iloc[-1]:.1f}')
+                                    print(f'min: {df[option].dropna().min():.3f}')
+                                    print(f'max: {df[option].dropna().max():.3f}')
+                                    print(f'mean: {df[option].dropna().mean():.3f}')
+                                    print(f'std: {df[option].dropna().std():.3f}')
+                                print("*"*30,"\n")
+
+                            # print(df[option])
+
+                            # sys.exit()
+                            try:
+                                txt=float(txt)
+                            except ValueError:
+                                pass
+
+                            if type(txt).__name__ != "str":
+                                    # print('in')
+                                    # print(filter)
+                                    # print(option)
+                                    # print(txt,type(txt))
+                                    # print(df[option])
+                                    txt=float(txt)
+                                    df[option] = df[option].astype(float)
+
+                                    if filter == ">":
+                                        ndf = df[df[option] > txt]
+                                        print(len(ndf))#,option,txt ,df[option])
+
+                                    elif filter == ">=":
+                                        ndf = df[df[option] >= txt]
+                                        print(len(ndf))
+
+                                    elif filter == "<":
+                                        ndf = df[df[option] < txt]
+                                        print(len(ndf))
+
+                                    elif filter == "<=":
+                                        ndf = df[df[option] <= txt]
+                                        print(len(ndf))
+
+                                    elif filter == "=":
+                                        ndf = df[df[option] == txt]
+                                        print(len(ndf))
+                            
+                                    else:
+                                        ndf=df
+
+                                    #
+                                    print(len(df),len(ndf),option,txt)
+
+                                    if len(ndf) > 0:
+                                        #print(ndf['FILENAME'])
+                                        ndf['plot_tag']=ndf['FILENAME'].apply(lambda x:x[:18])
+
+                                        plots=list(ndf['plot_tag'])
+                                        # print(ndf[['plot_tag',option]])
+                                        # sys.exit()
+
+                                        # print stats
+                                        print("\n--- Basic stats ---\n")
+                                        print("Min: ", ndf[option].min())
+                                        print("Max: ", ndf[option].max())
+                                        print("Mean: ", ndf[option].mean())
+                                        print("Median: ", ndf[option].median())
+                                        print("-"*20,"\n")
+
+                                        # get plot folder and plot to browser
+                                        imgDir = "plots/"
+                                        ls=os.listdir(imgDir)
+                                     
+                                        fln=(folderName.split("_")[0]).upper()
+                                        print(sorted(ls),fln)
+                                       
+                                        msg_wrapper("info", self.log.debug,"Plotting folder "+folderName)
+
+                                        try:
+                                            src=(ndf["OBJECT"].iloc[-1])#.replace(" ","")
+                                        except:
+                                            src=(ndf["OBJECT"].iloc[0])#.replace(" ","")
+
+                                        # src=s#src.replace("-","_")
+                                        if folderName.startswith('_'):
+                                            folderName=folderName[1:]
+                                
+                                        fp=folderName.split('_')
+
+                                        try:
+                                            freq=int((ndf["CENTFREQ"].iloc[-1]))
+                                        except:
+                                            print('Struggling to find frequency - raise an issue on github ')
+                                            sys.exit()
+
+                                        # if src !=fp[0]: 
+                                        #     imgPath=f'plots/{src}/{src}_{fp[1]}/'
+                                        # else:
+                                        imgPath=f'plots/{src}/{freq}/'
+                                        
+                                        # imgPath=imgPath.strip()
+                                        imgPath=imgPath.replace(' ','')
+                                        imgPath=imgPath.replace('','')
+
+                                        # print(imgPath)
+                                        # sys.exit()
+
+                                        # imgPath=imgPath.replace('m','-')
+                                        imageNames = sorted(os.listdir(imgPath))
+                                        images=[]
+
+                                        if ".DS_Store" in imageNames:
+                                            imageNames.remove(".DS_Store")
+
+                                        # # get images for current point
+                                        for i in range(len(plots)):
+                                            print(imgPath,imageNames[i])
+                                            for j in range(len(imageNames)):
+                                                if plots[i] in imageNames[j]: #[:18]:
+                                                    if "SL" in option and "HPS_LCP" in imageNames[j]:
+                                                            #print(imageNames[i],plots[j])
+                                                        images.append(imgPath+imageNames[j])
+                                                    elif "SR" in option and "HPS_RCP" in imageNames[j]:
+                                                            #print(imageNames[i],plots[j])
+                                                        images.append(imgPath+imageNames[j])
+                                                    elif "NL" in option and "HPN_LCP" in imageNames[j]:
+                                                            #print(imageNames[i],plots[j])
+                                                        images.append(imgPath+imageNames[j])
+                                                    elif "NR" in option and "HPN_RCP" in imageNames[j]:
+                                                            #print(imageNames[i],plots[j])
+                                                        images.append(imgPath+imageNames[j])
+                                                    elif  "OL" in option and "ON_LCP" in imageNames[j]:
+                                                            #print(imageNames[i],plots[j])
+                                                        images.append(imgPath+imageNames[j])
+                                                    elif "OR" in option and "ON_RCP" in imageNames[j]:
+                                                            #print(imageNames[i],plots[j])
+                                                        images.append(imgPath+imageNames[j])
+                                                    else:
+                                                        images.append(imgPath+imageNames[i])
+                                                
+
+                                        htmlstart = '<html> <head>\
+                                                <meta charset = "utf-8" >\
+                                                <meta name = "viewport" content = "width=device-width, initial-scale=1" > <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous"> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script> <style> img {border: 3px solid  # ddd; /* Gray border */border-radius: 5px;  /* Rounded border */padding: 5px; /* Some padding */width: 400px; /* Set a small width */}/* Add a hover effect (blue shadow) */img:hover {box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);}</style> \
+                                                <title>Plots</title>\
+                                                </head>\
+                                                <div class="container-fluid"> \
+                                                    <div class="row">\
+                                                        <hr>\
+                                                            <h1> Plotting folder '+folderName.upper() + '</h1> <p>'
+                                                    
+                                        htmlmid=''
+
+                                        imageOptions=[]
+                                        
+
+                                        if "OL" in option or "SL" in option or "NL" in option:
+                                            for img in images:
+                                                if "LCP" in img:
+                                                    imageOptions.append(img)
+                                            images=imageOptions
+
+                                        elif "OR" in option or "SR" in option or "NR" in option:
+                                            for img in images:
+                                                if "RCP" in img:
+                                                    imageOptions.append(img)
+                                            images=imageOptions
+
+                                        else:
+                                            images=images
+
+                                        images=set(sorted(images))
+                                        images=list(images)
+
+                                        print()
+                                        for img in images:
+                                            print(f'Showing: {img}')
+
+                                        # sys.exit()
+                                        # add images to html page
+                                        for i in range(len(images)):
+                                            #print(images.split("/")[1],images.split("/")[2])
+                                            pathtoimg = images[i]
+                                            img = '<small class="card-title">'+images[i].split("/")[3]+'</small><br/>\
+                                                    <a target="_blank" href="'+pathtoimg + \
+                                                    '"><img src="'+pathtoimg + \
+                                                    '" class="card-img-top" alt="image goes here"></a>'
+                                            imglink ='<div class = "card" style = "width: 13rem;" >\
+                                                        '+img+'\
+                                                            </div>'
+                                            htmlmid=htmlmid+imglink
+
+                                        htmlmid=htmlmid+'</p></div>'
+                                        htmlend = '</div></html>'
+                                        html = htmlstart+htmlmid+htmlend
+
+                                        # create the html file
+                                        path = os.path.abspath('temp.html')
+                                        url = 'file://' + path
+
+                                        with open(path, 'w') as f:
+                                            f.write(html)
+                                        webbrowser.open(url)
+                                    else:
+                                        html = '<html> <head>\
+                                                <meta charset = "utf-8" >\
+                                                <meta name = "viewport" content = "width=device-width, initial-scale=1" > <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous"> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script> <style> img {border: 2px solid  # ddd; /* Gray border */border-radius: 4px;  /* Rounded border */padding: 5px; /* Some padding */width: 400px; /* Set a small width */}/* Add a hover effect (blue shadow) */img:hover {box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);}</style> \
+                                                <title>Plots</title>\
+                                                </head>\
+                                                <div class="container-fluid"> \
+                                                    <div class="row">\
+                                                        <hr>\
+                                                            <h1> Plotting folder '+folderName.upper() + '''</h1> 
+                                                            <p> No data to show</p>
+                                                    </div>
+                                                </div>
+                                                </html>
+                                        '''
+                                        # create the html file
+                                        path = os.path.abspath('temp.html')
+                                        url = 'file://' + path
+
+                                        with open(path, 'w') as f:
+                                            f.write(html)
+                                        webbrowser.open(url)
+                                        
+                                        print("No data to show")
+                            else:
+
+                                # if txt=="OBSDATE":
+                                print(f"{txt} filter not implemented yet\n")                  
+            else:
+                print('Invalid entry for filter')
+
+        elif filter =="between":
+            print("\nFilter by: ", option)
+            print('Key: ', filter)
+            # get params
+            text1=self.plot_ui.txtBoxStart.text()
+            text2=self.plot_ui.txtBoxEnd.text()
+
+            print(f'Values: {text1}, {text2}')
+
+            if option=="":
+                print("Need to choose an option")
+
+            else:
+                if filter=="":
+                    print("Plotting everything")
+                else:
+                    if text1=="" and text2=="":
+                        # show everything
+                        print("no value added, showing all images")
+                    else:
+                        # run filter
+                        #print("All checked")
+
+                        # get data from db
+                        # check folder name against table name
+                        plotFolderName=self.plot_ui.comboBox.currentText()
+                        folderName=plotFolderName.lower().replace(".","_")
+
+                        print(folderName,self.tables)
+                        if folderName in self.tables:
+                            print("\n",folderName, " found")
+                            #target=folderName
+                            db=""
+
+                            # get column names from db and put them in combobox
+                            self.colInd, self.colName, self.colType = self.db.get_all_table_coloumns(folderName)
+
+                            rows = self.db.get_rows(folderName)
+
+                            # create dataframe
+                            df = pd.DataFrame(list(rows), columns = self.colName)
+                            # df = df[(df['OBSDATE']>="2008-01-01") & (df['OBSDATE']<="2018-12-31")]
+       
+
+                            try:
+                                txt1=float(text1)
+                            except:
+                                print("\nOnly integers or floats accepted\n")
+                                txt1=""
+
+                            try:
+                                txt2=float(text2)
+                            except:
+                                print("\nOnly integers or floats accepted\n")
+                                txt2=""
+
+                            print(f'start: {txt1}, end: {txt2}\n')
+                            print(f'start: {type(txt1)}, end: {type(txt2)}\n')
+                            print(f'start: {text1}, end: {text2}\n')
+
+                            if type(txt1).__name__ != "str" and type(txt2).__name__ != "str":
+                               
+                                df[option] = df[option].astype(float)
+                                ndf = df[(df[option] >= txt1)& (df[option] <= txt2)]
+                                print(len(ndf))
+
+                            elif type(txt1).__name__ == "str" and type(txt2).__name__ != "str":
+                               
+                                df[option] = df[option].astype(float)
+                                ndf = df[(df[option] <= txt2)]
+                                print(len(ndf))
+
+                            elif type(txt1).__name__ != "str" and type(txt2).__name__ == "str":
+                               
+                                df[option] = df[option].astype(float)
+                                ndf = df[(df[option] >= txt1)]
+                                print(len(ndf))
+
+                            elif type(txt1).__name__ == "str" and type(txt2).__name__ == "str":
+                                print(option)
+                                if option == 'OBSDATE':
+                                    df["OBSDATE"] = pd.to_datetime(df["OBSDATE"], format="%Y-%m-%d")
+                                    # T2=datetime.strptime(text2, '%Y-%m-%d')
+                                    # print(T2)
+
+                                    # print(txt1)
+                                    if text1=="" and text2!="":
+                                        try:
+                                            T2=datetime.strptime(text2, '%Y-%m-%d')
+                                        except:
+                                            print ('Invalid date format, please use "yyyy-mm-dd"')
+                                            sys.exit()
+                                        df = df[df[option] <= T2]
+
+                                    elif text1!="" and text2=="": 
+                                        try:
+                                            T1=datetime.strptime(text1, '%Y-%m-%d')
+                                        except:
+                                            print ('Invalid date format, please use "yyyy-mm-dd"')
+                                            sys.exit()
+                                        df = df[df[option] >= T1]
+
+                                    elif text1!="" and text2!="":
+                                        try:
+                                            T1=datetime.strptime(text1, '%Y-%m-%d')
+                                        except:
+                                            print ('Invalid date format, please use "yyyy-mm-dd"')
+                                            sys.exit()
+                                        try:
+                                            T2=datetime.strptime(text2, '%Y-%m-%d')
+                                        except:
+                                            print ('Invalid date format, please use "yyyy-mm-dd"')
+                                            sys.exit()
+
+                                        df = df[(df[option] >= T1)& (df[option] <= T2)]
+
+                                    else:
+                                        print()
+                                        print ('Invalid date formats, please use "yyyy-mm-dd" for start and end dates')
+                                        sys.exit()
+                                else:
+                                    print('showing everything may freeze yyour machine')
+                                    try:
+                                        df = df[(df[option] >= txt1)& (df[option] <= txt2)]
+                                    except:
+                                        print('Invalid entry/entries, check values correspond to table entries')
+                                        sys.exit()
+    
+                            else:
+                                print("Failed to find working solution")
+                                sys.exit()
+
+                            if len(ndf) > 0:
+                                    # ndf=df
+                                    #print(ndf['FILENAME'])
+                                    ndf['plot_tag']=ndf['FILENAME'].apply(lambda x:x[:18])
+
+                                    plots=list(ndf['plot_tag'])
+                                    #print(ndf[['plot_tag',option]])
+
+                                    # print stats
+                                    print("\n--- Basic stats ---\n")
+                                    print("Min: ", ndf[option].min())
+                                    print("Max: ", ndf[option].max())
+                                    print("Mean: ", ndf[option].mean())
+                                    print("Median: ", ndf[option].median())
+                                    print("-"*20,"\n")
+
+                                    # get plot folder and plot to browser
+                                    imgDir = "plots/"
+
+                                    msg_wrapper("debug", self.log.debug,"Plotting folder "+plotFolderName)
+
+                                    ls=os.listdir(imgDir)
+
+                                    for fn in ls:
+                                        fn=fn.strip()
+                                            
+                                        if ".DS_Store" in fn:
+                                            pass
+                                        else:
+                                            f=fn.replace(".","_")
+                                                # f=f.replace("-","_")
+                                                
+                                                #print(fn,type(f),f,folderName,len(fn),len(folderName))
+                                
+                                            if f.lower()== folderName.lower():
+                                                print(">>",f,folderName)
+                                                folderName=fn
+                                                break
+
+                                        # fld=(folder.replace(".","_")).lower()
+                                        # if fld==plotFolderName:
+                                        #     plotFolderName=folder
+                                            # print(f'{folder} = {fld} = {plotFolderName}')
+
+                                    if "_"==folderName[0]:
+                                            foldName=folderName[1:]
+                                    else:
+                                            foldName=folderName
+
+                                    
+                                    src=(ndf["OBJECT"].iloc[0]).replace(" ","")
+                                    s=f"{src}_{foldName.upper().split('_')[-1]}"
+                                    imgPath=f'plots/{src}/{s}/'
+                                    dr = os.listdir(imgPath)
+                                    imageNames=sorted(dr)
+                                    images=[]
+
+                                    if ".DS_Store" in imageNames:
+                                        imageNames.remove(".DS_Store")
+
+                                    print(imageNames,'\n')
+                                    # print(plots)
+                                    # sys.exit()
+
+                                    # # get images for current point
+                                    for i in range(len(plots)):
+                                        for j in range(len(imageNames)):
+                                            if plots[i] in imageNames[j]: #[:18]:
+                                                if "SL" in option and "HPS_LCP" in imageNames[j]:
+                                                        #print(imageNames[i],plots[j])
+                                                    images.append(imgPath+imageNames[j])
+                                                elif "SR" in option and "HPS_RCP" in imageNames[j]:
+                                                        #print(imageNames[i],plots[j])
+                                                    images.append(imgPath+imageNames[j])
+                                                elif "NL" in option and "HPN_LCP" in imageNames[j]:
+                                                        #print(imageNames[i],plots[j])
+                                                    images.append(imgPath+imageNames[j])
+                                                elif "NR" in option and "HPN_RCP" in imageNames[j]:
+                                                        #print(imageNames[i],plots[j])
+                                                    images.append(imgPath+imageNames[j])
+                                                elif  "OL" in option and "ON_LCP" in imageNames[j]:
+                                                        #print(imageNames[i],plots[j])
+                                                    images.append(imgPath+imageNames[j])
+                                                elif "OR" in option and "ON_RCP" in imageNames[j]:
+                                                        #print(imageNames[i],plots[j])
+                                                    images.append(imgPath+imageNames[j])
+                                                else:
+                                                    images.append(imgPath+imageNames[i])
+                                            
+                                    #print(images)
+
+                                    # html link
+                                    htmlstart = '<html> <head>\
+                                            <meta charset = "utf-8" >\
+                                            <meta name = "viewport" content = "width=device-width, initial-scale=1" > <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous"> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script> <style> img {border: 2px solid  # ddd; /* Gray border */border-radius: 4px;  /* Rounded border */padding: 5px; /* Some padding */width: 400px; /* Set a small width */}/* Add a hover effect (blue shadow) */img:hover {box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);}</style> \
+                                            <title>Plots</title>\
+                                            </head>\
+                                            <div class="container-fluid"> \
+                                                <div class="row">\
+                                                    <hr>\
+                                                        <h1> Plotting folder '+foldName.upper()  + '</h1> <p>'
+                                                
+                                    htmlmid=''
+
+                                    imageOptions=[]
+                                        
+
+                                    if "OL" in option or "SL" in option or "NL" in option:
+                                            for img in images:
+                                                if "LCP" in img:
+                                                    imageOptions.append(img)
+                                            images=imageOptions
+
+                                    elif "OR" in option or "SR" in option or "NR" in option:
+                                            for img in images:
+                                                if "RCP" in img:
+                                                    imageOptions.append(img)
+                                            images=imageOptions
+
+                                    else:
+                                            images=images
+
+                                    # add images to html page
+                                    for i in range(len(images)):
+                                        # print(images.split("/")[1],images.split("/")[2])
+                                        # print(images[i])
+                                        pathtoimg = images[i]
+                                        img = '<small class="card-title">'+images[i].split("/")[3]+'</small><br/>\
+                                                <a target="_blank" href="'+pathtoimg + \
+                                                '"><img src="'+pathtoimg + \
+                                                '" class="card-img-top" alt="image goes here"></a>'
+                                        imglink ='<div class = "card" style = "width: 10rem;" >\
+                                                    '+img+'\
+                                                        </div>'
+                                        htmlmid=htmlmid+imglink
+
+                                    htmlmid=htmlmid+'</p></div>'
+                                    htmlend = '</div></html>'
+                                    html = htmlstart+htmlmid+htmlend
+
+                                    # create the html file
+                                    path = os.path.abspath('temp.html')
+                                    url = 'file://' + path
+
+                                    with open(path, 'w') as f:
+                                        f.write(html)
+                                    webbrowser.open(url)
+                                
+                            else:
+                                html = '<html> <head>\
+                                                <meta charset = "utf-8" >\
+                                                <meta name = "viewport" content = "width=device-width, initial-scale=1" > <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous"> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script> <style> img {border: 2px solid  # ddd; /* Gray border */border-radius: 4px;  /* Rounded border */padding: 5px; /* Some padding */width: 400px; /* Set a small width */}/* Add a hover effect (blue shadow) */img:hover {box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);}</style> \
+                                                <title>Plots</title>\
+                                                </head>\
+                                                <div class="container-fluid"> \
+                                                    <div class="row">\
+                                                        <hr>\
+                                                            <h1> Plotting folder '+folderName.upper() + '''</h1> 
+                                                            <p> No data to show</p>
+                                                    </div>
+                                                </div>
+                                                </html>
+                                        '''
+                                        # create the html file
+                                path = os.path.abspath('temp.html')
+                                url = 'file://' + path
+
+                                with open(path, 'w') as f:
+                                            f.write(html)
+                                webbrowser.open(url)
+                                        
+                                print("No data to show")
+                        else:
+                            print(f"\n{folderName} not found in {self.tables}\n")
+ 
+        else:
+            print("\nFilter by: ", option)
+            print('Key: ', filter)
+            print('Min: ', self.plot_ui.txtBoxStart.text())
+            print('Max: ', self.plot_ui.txtBoxEnd.text())
+
+    def delete_obs(self):
+        ''' Delete an observation. '''
+
+        option=self.plot_ui.comboBoxOptions.currentText()
+        filter=self.plot_ui.comboBoxFilter.currentText()
+        txt=self.plot_ui.txtBoxFilter.text()
+        
+        print(f'\noption: {option}, filter: {filter}, text: {txt}\n')
+
+        try:
+            txt=float(txt)
+        except:
+            pass
+
+        # print('-'* 5, txt)
+        
+        if txt!=None and type(txt).__name__ !='str':
+                print('in txt')
+                if option == "":
+                    print("Choose an option")
+                else:
+                    if filter is not None and txt is not None:
+
+                        # check folder name against table name
+                        folderName=self.plot_ui.comboBox.currentText() 
+
+                        print('opt: ',option,", filt: ",filter,', table: ',folderName)
+
+                        # sys.exit()
+                        
+                        df,db = self.get_data_from_db(folderName)
+                        # df = df[(df['OBSDATE']>="2008-01-01") & (df['OBSDATE']<="2018-12-31")]
+
+                        txt=float(txt)
+                        if type(txt).__name__ != "str":
+
+                                    #txt=float(txt)
+                                    df[option] = df[option].astype(float)
+
+                                    if filter == ">":
+                                        ndf = df[df[option] > txt]
+                                        print(len(ndf))#,option,txt ,df[option])
+
+                                    elif filter == ">=":
+                                        ndf = df[df[option] >= txt]
+                                        print(len(ndf))
+
+                                    elif filter == "<":
+                                        ndf = df[df[option] < txt]
+                                        print(len(ndf))
+
+                                    elif filter == "<=":
+                                        ndf = df[df[option] <= txt]
+                                        print(len(ndf))
+
+                                    elif filter == "=":
+                                        ndf = df[df[option] == txt]
+                                        print(len(ndf))
+                            
+                                    else:
+                                        ndf=df
+
+                        cols=list(ndf.columns)
+                        files=list(ndf.FILENAME)
+
+                        print(f'cols: {len(cols)}, files: {len(files)}')
+                        # print(cols)
+                        
+                        # sys.exit()
+
+                        if "FLUXTOT" in cols:
+                            for j in files:
+                                stmt=f"UPDATE '{folderName}' SET "
+
+                                if "OL" in option:
+                                    ols=[]
+                                    for i in cols:
+                                        if 'OL' in i or 'NL' in i or 'SL' in i:
+                                            ols.append(i)
+                                            # print(ols)
+
+                                    for k in ols:
+                                        stmt=stmt+f"{k}='{np.nan}', "
+                                # elif "OR" in option:
+                                #         ols=[i for i in cols if 'OR' in i]
+                                #         print(ols)
+
+                                #         for k in ols:
+                                #             stmt=stmt+f"{k}='{np.nan}', "
+
+                                # for col in cols:
+                                    print(stmt)
+                                    sys.exit()
+                                else:
+                                    # if "SL" in option:
+                                    #     ols=[]
+                                    #     for i in cols:
+                                    #         if 'SL' in i:
+                                    #             ols.append(i)
+                                    #     for k in ols:
+                                    stmt=stmt+f"{option}='{np.nan}', "
+
+                                print()
+                                stmt=stmt[:-2]+f" WHERE FILENAME='{j}'; \n"
+
+                                print(stmt)
+                                db.c.execute(stmt)
+                                db.commit_changes()
+                                print('done')
+                            # sys.exit()
+                        else:
+                            for j in files:
+                                stmt=f"UPDATE '{folderName}' SET "
+
+                                # print(option)
+                                # sys.exit()
+
+                                # if "DTA" in option:
+                                #     s = option.replace("D",'')
+                                #     print(s,option)
+                                #     sys.exit()
+                                
+                                if "OL" in option:
+                                    ols=[i for i in cols if 'OL' in i]
+                                    print(ols)
+
+                                    for k in ols:
+                                        if "FLAG" in k:
+                                            stmt=stmt+f"{k}=200, TSYS1='{np.nan}', "
+                                        else:
+                                            stmt=stmt+f"{k}='{np.nan}', "
+
+                                elif "OR" in option:
+                                    #if "OL" in option:
+                                    ors=[i for i in cols if 'OR' in i]
+                                    print(ors)
+
+                                    for k in ors:
+                                        if "FLAG" in k:
+                                            stmt=stmt+f"{k}=200,  TSYS2='{np.nan}', "
+                                        else:
+                                            stmt=stmt+f"{k}='{np.nan}', "
+                                else:
+                                    print('else')
+                                    sys.exit()
+                                    for col in cols:
+                                        if 'SL' in col or 'SR' in col or  'OL' in col or  'OR' in col or  'NL' in col or  'NR' in col :
+                                            if "FLAG" in col:
+                                                stmt=stmt+f"{col}=200, "
+                                            else:
+                                                stmt=stmt+f"{col}='{np.nan}', TSYS1='{np.nan}', TSYS2='{np.nan}', "
+                                        else:
+                                            pass
+                                        #or  'OBSTIME' in col or 'MJD' in col or  'OBJECT' in col or  'OBJECTTYPE' in col or  'CENTFREQ' in col or  'LOGFREQ' in col or  'FOCUS' in col or  'TILT' in col or  'HA' in col or  'ZA' in col or  'RADIOMETER' in col or  'BANDWDTH' in col or  'TCAL1' in col or 'TCAL2' in col or  'NOMTSYS' in col or 'TSYS1', 'TSYSERR1', 'TSYS2', 'TSYSERR2', 'TAMBIENT', 'PRESSURE', 'HUMIDITY', 'WINDSPD', 'HPBW', 'FNBW', 'ELEVATION', 'LONGITUDE', 'LATITUDE', 'SCANTYPE', 'BEAMTYPE', 'OBSERVER', 'OBSLOCAL', 'PROJNAME', 'PROPOSAL', 'TELESCOPE', 'UPGRADE', 'INSTFLAG', 'SCANDIST', 'SCANTIME', 'PWV', 'SVP', 'AVP', 'DPT', 'WVD', 'MEAN_ATMOS_CORRECTION', 'TAU10', 'TAU15', 'TBATMOS10', 'TBATMOS15', 'SLTA', 'SLDTA', 'SLS2N', 'SLTAPEAKLOC', 'SLFLAG', 'SLRMSB', 'SLRMSA', 'SLBSLOPE', 'SLBSRMS', 'NLTA', 'NLDTA', 'NLS2N', 'NLTAPEAKLOC', 'NLFLAG', 'NLRMSB', 'NLRMSA', 'NLBSLOPE', 'NLBSRMS', 'OLTA', 'OLDTA', 'OLPC', 'COLTA', 'COLDTA', 'OLS2N', 'OLTAPEAKLOC', 'OLFLAG', 'OLRMSB', 'OLRMSA', 'OLBSLOPE', 'OLBSRMS', 'SRTA', 'SRDTA', 'SRS2N', 'SRTAPEAKLOC', 'SRFLAG', 'SRRMSB', 'SRRMSA', 'SRBSLOPE', 'SRBSRMS', 'NRTA', 'NRDTA', 'NRS2N', 'NRTAPEAKLOC', 'NRFLAG', 'NRRMSB', 'NRRMSA', 'NRBSLOPE', 'NRBSRMS', 'ORTA', 'ORDTA', 'ORPC', 'CORTA', 'CORDTA', 'ORS2N', 'ORTAPEAKLOC', 'ORFLAG', 'ORRMSB', 'ORRMSA', 'ORBSLOPE', 'ORBSRMS'
+
+                                stmt=stmt[:-2]+f" WHERE FILENAME='{j}'; \n"
+
+                                print(f'*** {stmt}')
+                                # sys.exit()
+                                db.c.execute(stmt)
+                                db.commit_changes()
+                                print('done')
+                
+                    else:
+                        pass
+
+        elif filter=='between':
+
+            text1=self.plot_ui.txtBoxStart.text()
+            text2=self.plot_ui.txtBoxEnd.text()
+
+            # check folder name against table name
+            folderName=self.plot_ui.comboBox.currentText() 
+
+            print('opt: ',option,", filt: ",filter,', table: ',folderName)
+
+            # db = SQLiteDB(databaseName=self.dbFilePath, log=self.log)
+            # db.create_db()
+            tableNames = sorted(self.db.get_table_names(self.dbFilePath))
+            colInd, colNames, colType = self.db.get_all_table_coloumns(folderName)
+            rows = self.db.get_rows_of_cols(folderName,colNames)
+                        
+            #print(folderName,colNames)
+
+            # create dataframe
+            df = pd.DataFrame(list(rows), columns = colNames)
+            df = df[(df['OBSDATE']>="2008-01-01") & (df['OBSDATE']<="2018-12-31")]
+
+            if folderName in self.tables: 
+
+                try:
+                    txt1=float(text1)
+                except:
+                    # print("\nOnly integers or floats accepted\n")
+                    txt1=""
+
+                try:
+                    txt2=float(text2)
+                except:
+                    # print("\nOnly integers or floats accepted\n")
+                    txt2=""
+
+                print(f'start: {txt1}, end: {txt2}\n')
+
+                if type(txt1).__name__ != "str" and type(txt2).__name__ != "str":      
+                    df[option] = df[option].astype(float)
+                    df = df[(df[option] >= txt1)& (df[option] <= txt2)]
+                    # print(len(df))
+
+                elif type(txt1).__name__ == "str" and type(txt2).__name__ != "str":           
+                    df[option] = df[option].astype(float)
+                    df = df[(df[option] <= txt2)]
+                    # print(len(df))
+
+                elif type(txt1).__name__ != "str" and type(txt2).__name__ == "str":         
+                    df[option] = df[option].astype(float)
+                    df = df[(df[option] >= txt1)]
+                    # print(len(df))
+
+                elif type(txt1).__name__ == "str" and type(txt2).__name__ == "str":
+                    
+                    if option == 'OBSDATE':
+                        if text1=="" and text2!="":
+                            try:
+                                T2=datetime.strptime(text2, '%Y-%m-%d')
+                            except:
+                                print ('Invalid date format, please use "yyyy-mm-dd"')
+                                sys.exit()
+                            df = df[df[option] <= T2]
+
+                        elif text1!="" and text2=="": 
+                            try:
+                                T1=datetime.strptime(text1, '%Y-%m-%d')
+                            except:
+                                print ('Invalid date format, please use "yyyy-mm-dd"')
+                                sys.exit()
+                            df = df[df[option] >= T1]
+
+                        elif text1!="" and text2!="":
+                            try:
+                                T1=datetime.strptime(text1, '%Y-%m-%d')
+                            except:
+                                print ('Invalid date format, please use "yyyy-mm-dd"')
+                                sys.exit()
+                            try:
+                                T2=datetime.strptime(text2, '%Y-%m-%d')
+                            except:
+                                print ('Invalid date format, please use "yyyy-mm-dd"')
+                                sys.exit()
+                            df = df[(df[option] >= T1)& (df[option] <= T2)]
+                        else:
+                            print ('Invalid date formats, please use "yyyy-mm-dd" for start and end dates')
+                            sys.exit()
+                    else:
+                        print('showing everything may freeze yyour machine')
+                        try:
+                            df = df[(df[option] >= text1)& (df[option] <= text2)]
+                        except:
+                            print('Invalid entry/entries, check values correspond to table entries')
+                            sys.exit()
+
+                else:
+                    print("Failed to find working solution")
+                    sys.exit()
+
+                cols=list(df.columns)
+                files=list(df.FILENAME)
+
+                print(f'cols: {len(cols)}, files: {len(files)}')
+                
+                for j in files:
+                    stmt=f"UPDATE {folderName} SET "
+                    if "OL" in option:
+                        ols=[i for i in cols if 'OL' in i]
+                        print(ols)
+
+                        for k in ols:
+                            if "FLAG" in k:
+                                stmt=stmt+f"{k}=200, "
+                            else:
+                                stmt=stmt+f"{k}='{np.nan}', "
+
+                    elif "OR" in option:
+                        #if "OL" in option:
+                        ors=[i for i in cols if 'OR' in i]
+                        print(ors)
+
+                        for k in ors:
+                            if "FLAG" in k:
+                                stmt=stmt+f"{k}=200, "
+                            else:
+                                stmt=stmt+f"{k}='{np.nan}', "
+                    else:
+                        for col in cols:
+                            if 'SL' in col or 'SR' in col or  'OL' in col or  'OR' in col or  'NL' in col or  'NR' in col :
+                                if "FLAG" in col:
+                                    stmt=stmt+f"{col}=200, "
+                                else:
+                                    stmt=stmt+f"{col}='{np.nan}', "
+                            else:
+                                pass
+                                    #or  'OBSTIME' in col or 'MJD' in col or  'OBJECT' in col or  'OBJECTTYPE' in col or  'CENTFREQ' in col or  'LOGFREQ' in col or  'FOCUS' in col or  'TILT' in col or  'HA' in col or  'ZA' in col or  'RADIOMETER' in col or  'BANDWDTH' in col or  'TCAL1' in col or 'TCAL2' in col or  'NOMTSYS' in col or 'TSYS1', 'TSYSERR1', 'TSYS2', 'TSYSERR2', 'TAMBIENT', 'PRESSURE', 'HUMIDITY', 'WINDSPD', 'HPBW', 'FNBW', 'ELEVATION', 'LONGITUDE', 'LATITUDE', 'SCANTYPE', 'BEAMTYPE', 'OBSERVER', 'OBSLOCAL', 'PROJNAME', 'PROPOSAL', 'TELESCOPE', 'UPGRADE', 'INSTFLAG', 'SCANDIST', 'SCANTIME', 'PWV', 'SVP', 'AVP', 'DPT', 'WVD', 'MEAN_ATMOS_CORRECTION', 'TAU10', 'TAU15', 'TBATMOS10', 'TBATMOS15', 'SLTA', 'SLDTA', 'SLS2N', 'SLTAPEAKLOC', 'SLFLAG', 'SLRMSB', 'SLRMSA', 'SLBSLOPE', 'SLBSRMS', 'NLTA', 'NLDTA', 'NLS2N', 'NLTAPEAKLOC', 'NLFLAG', 'NLRMSB', 'NLRMSA', 'NLBSLOPE', 'NLBSRMS', 'OLTA', 'OLDTA', 'OLPC', 'COLTA', 'COLDTA', 'OLS2N', 'OLTAPEAKLOC', 'OLFLAG', 'OLRMSB', 'OLRMSA', 'OLBSLOPE', 'OLBSRMS', 'SRTA', 'SRDTA', 'SRS2N', 'SRTAPEAKLOC', 'SRFLAG', 'SRRMSB', 'SRRMSA', 'SRBSLOPE', 'SRBSRMS', 'NRTA', 'NRDTA', 'NRS2N', 'NRTAPEAKLOC', 'NRFLAG', 'NRRMSB', 'NRRMSA', 'NRBSLOPE', 'NRBSRMS', 'ORTA', 'ORDTA', 'ORPC', 'CORTA', 'CORDTA', 'ORS2N', 'ORTAPEAKLOC', 'ORFLAG', 'ORRMSB', 'ORRMSA', 'ORBSLOPE', 'ORBSRMS'
+
+                    stmt=stmt[:-2]+f" WHERE FILENAME='{j}'; \n"
+
+                    print(stmt)
+                    # db.c.execute(stmt)
+                    # db.commit_changes()
+
+                    sys.exit()
+
+            else:
+                print(f"\n{folderName} not found in {self.tables}\n")
+
+        else:
+            print("No valid entries detected for filter")
+            #pass
+
+    
+
+
 
 
     # checked end ----------
