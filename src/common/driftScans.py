@@ -72,7 +72,7 @@ class DriftScans(DriftScanAttributes):
                 # print('+---+',f'{tag}{key}',key, tag, myDict[f'{tag}{key}'])
             else:
                 myDict[f'{tag}{key}']=val
-                # print('+--+',f'{tag}{key}',key, tag, myDict[f'{tag}{key}'])
+                # print('+-/-+',f'{tag}{key}',key, tag, myDict[f'{tag}{key}'])
 
     def fill_in_missing_data_sb(self, myDict,tag=''):
         """ Fill in the missing data from the observing file"""
@@ -85,7 +85,7 @@ class DriftScans(DriftScanAttributes):
 
     def fill_in_missing_data_db_common(self, myDict,tag=''):
         """ Fill in the missing data from the observing file"""
-        keys=['RMSB','RMSA','BRMS','SLOPE',
+        keys=['RMSB','RMSA','BRMS','SLOPE','WINDSPD',
             'MIDOFFSET','BASELEFT','BASERIGHT','COORDSYS']
         for key in keys:
             self.try_test(key,myDict,tag)
@@ -381,9 +381,10 @@ class DriftScans(DriftScanAttributes):
             # '03.5D' or "06.0D"
 
             # Get driftscan data
+            # print(self.__dict__)
             data=DriftScanData(self.__dict__)
-            for k,v in data.__dict__.items():
-                print('---',k,v)
+            # for k,v in data.__dict__.items():
+                # print('---',k,v)
 
             hpnOffset=self.getScanData('HPN_OFFSET') #self.__dict__['HPN_OFFSET']['value']
             lcpHpnScan=self.getScanData('HPN_TA_LCP') #self.__dict__['HPN_TA_LCP']['value']
@@ -427,9 +428,9 @@ class DriftScans(DriftScanAttributes):
                         tg=tag[-1]
                     
                     myTag=f'{tg}L'
-                    print(myTag,f'A{myTag}',f'B{myTag}')
-                    print(processedLCPData.__dict__.keys())
-                    print(processedRCPData.__dict__.keys())
+                    # print(myTag,f'A{myTag}',f'B{myTag}')
+                    # print(processedLCPData.__dict__.keys())
+                    # print(processedRCPData.__dict__.keys())
                     # sys.exit()
                     
                     self.fill_in_missing_data_db_common(processedLCPData.__dict__,myTag)
@@ -457,6 +458,8 @@ class DriftScans(DriftScanAttributes):
             pols=['lcp','rcp']
             beams=['A','B']
 
+            # print(myDict)
+            # sys.exit()
             # for beam in beams:
             for pol in pols:
                 for tag in tags:
@@ -528,13 +531,18 @@ class DriftScans(DriftScanAttributes):
                                         # print(f'{tg}{pol[0]}{div}SLOPE'.upper(),t[0])
 
                                         # coeff=t #.split()
+                                        # print(t)
                                         try:
                                             if len(t)==0:
                                                 tableData[f'{beams[0]}{tg}{pol[0]}{div}BASELocs'.upper()] = np.nan
+                                                tableData[f'{tg}{pol[0]}{div}SLOPE'.upper()]=np.nan
+                                                # print(f'### {tg}{pol[0]}{div}SLOPE'.upper())
                                             else:
                                                 tableData[f'{tg}{pol[0]}{div}SLOPE'.upper()]=t[0]
+                                                # print(f'xxx {tg}{pol[0]}{div}SLOPE'.upper())
                                         except:
                                             tableData[f'{tg}{pol[0]}{div}SLOPE'.upper()]=np.nan
+                                            # print(f'--- {tg}{pol[0]}{div}SLOPE'.upper())
                                         # dbInfo[f'{c[i]}intercept']=float(coeff[1])
                                     elif 'baseLocsLeft' in s:
                                         # print(f'{beams[0]}{tg}{pol[0]}{div}BASELeft'.upper(), f'{t[0]};{t[-1]}')
@@ -594,9 +602,14 @@ class DriftScans(DriftScanAttributes):
                         tableData[f'{beam}CORTAERR']=taErr
                         break
 
-            # Calibrate the data
+            # # Calibrate the data
             # for k,v in tableData.items():
-            #     print('* ',k,': ',v)
+            #     # print('* ',k,': ',v)
+            #     # if 'SLOPE' in k:
+            #     #     print(k)
+            #         print('* ',k,': ',v)
+            #     #     sys.exit()
+            # sys.exit()
 
             tableData['SRC']=tableData['OBJECT'].replace(' ','')
             freq=int(tableData['CENTFREQ'])
@@ -687,53 +700,56 @@ class DriftScans(DriftScanAttributes):
             cnt=1
             # print(cnt)
             # plt.title(f'Plot of {self.__dict__['FILENAME']}')
-            print(len(scans))
-            if frontend != '13.0S' and frontend != "18.0S":
-                for i in range(len(scans)):
-                    # print(i)
-                    
-                    if i%3==0:
-                        # print('--',i,i+1,i+2)
-                        plt.subplot(3,2,cnt)
-                        plt.ylabel('Ta [K]')
-                        plt.xlabel('Offset [deg]')
-                        plt.title(f'{scans[i+1]} - scan of {fileName}')
-                        # plt.title(f'{scans[i+1]}')
-                        plt.plot(dataScans[i],dataScans[i+1])
-                        print(dataScans[i+1])
+            # print(len(scans))
+            
+            if qv!='no':
+                if frontend != '13.0S' and frontend != "18.0S":
+                    for i in range(len(scans)):
+                        # print(i)
+                        
+                        if i%3==0:
+                            # print('--',i,i+1,i+2)
+                            plt.subplot(3,2,cnt)
+                            plt.ylabel('Ta [K]')
+                            plt.xlabel('Offset [deg]')
+                            plt.title(f'{scans[i+1]} - scan of {fileName}')
+                            # plt.title(f'{scans[i+1]}')
+                            plt.plot(dataScans[i],dataScans[i+1])
+                            print(dataScans[i+1])
 
-                        plt.subplot(3,2,cnt+1)
-                        plt.ylabel('Ta [K]')
-                        plt.xlabel('Offset [deg]')
-                        # plt.title(f'{scans[i+2]}')
-                        plt.title(f'{scans[i+2]} - scan of {fileName}')
-                        plt.plot(dataScans[i],dataScans[i+2])
-                        cnt=cnt+2
+                            plt.subplot(3,2,cnt+1)
+                            plt.ylabel('Ta [K]')
+                            plt.xlabel('Offset [deg]')
+                            # plt.title(f'{scans[i+2]}')
+                            plt.title(f'{scans[i+2]} - scan of {fileName}')
+                            plt.plot(dataScans[i],dataScans[i+2])
+                            cnt=cnt+2
                         
                         # print('--',cnt)
-            else:
-                cnt=1
-                for i in range(len(scans)):
-                    if cnt<=2:
-                        # print(i+1)
-                        plt.subplot(1,2,cnt)
-                        plt.ylabel('Ta [K]')
-                        plt.xlabel('Offset [deg]')
-                        plt.title(f'{scans[i+1]} - scan of {fileName}')
-                        # plt.title(f'{scans[i+1]}')
-                        plt.plot(dataScans[0],dataScans[i+1])
-                        # print(dataScans[i+1])
-                    cnt=cnt+1
+                else:
+                    cnt=1
+                    for i in range(len(scans)):
+                        if cnt<=2:
+                            # print(i+1)
+                            plt.subplot(1,2,cnt)
+                            plt.ylabel('Ta [K]')
+                            plt.xlabel('Offset [deg]')
+                            plt.title(f'{scans[i+1]} - scan of {fileName}')
+                            # plt.title(f'{scans[i+1]}')
+                            plt.plot(dataScans[0],dataScans[i+1])
+                            # print(dataScans[i+1])
+                        cnt=cnt+1
 
-            plt.tight_layout()
+                plt.tight_layout()
             if qv=='yes':
                 plt.savefig(f'quickview_{src}_{int(frq)}-{fileName}.png')
+                msg_wrapper("info",self.log.info,f'Quickview file saved to: quickview_{src}_{int(frq)}-{fileName}.png')
+         
             else:
                 pass
             # plt.show()
             plt.close()
-            msg_wrapper("info",self.log.info,f'Quickview file saved to: quickview_{src}_{int(frq)}-{fileName}.png')
-         
+            
         elif 'D' in frontend: 
             # '03.5D' or "06.0D"
 
@@ -741,7 +757,7 @@ class DriftScans(DriftScanAttributes):
             data=DriftScanData(self.__dict__)
             # for k,v in data.__dict__.items():
             #     # print('---',k,v)
-
+            
             hpnOffset=self.getScanData('HPN_OFFSET') #self.__dict__['HPN_OFFSET']['value']
             lcpHpnScan=self.getScanData('HPN_TA_LCP') #self.__dict__['HPN_TA_LCP']['value']
             rcpHpnScan=self.getScanData('HPN_TA_RCP') #self.__dict__['HPN_TA_RCP']['value']
@@ -788,12 +804,15 @@ class DriftScans(DriftScanAttributes):
                     
                     # print('--',cnt)
 
-            plt.tight_layout()
-            plt.savefig(f'quickview_{src}_{int(frq)}-{fileName}.png')
-            # plt.show()
-            plt.close()
-            msg_wrapper("info",self.log.info,f'Quickview file saved to: quickview_{src}_{int(frq)}-{fileName}.png')
-         
+            if qv=='no':
+                plt.close()
+            else:
+                plt.tight_layout()
+                plt.savefig(f'quickview_{src}_{int(frq)}-{fileName}.png')
+                # plt.show()
+                plt.close()
+                msg_wrapper("info",self.log.info,f'Quickview file saved to: quickview_{src}_{int(frq)}-{fileName}.png')
+            
         else:
             print(f"Unknown source frontend value : {self.__dict__[frontend]['value']}. Contact author to have it included.")
             sys.exit()

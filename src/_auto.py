@@ -12,6 +12,7 @@ from datetime import datetime
 import argparse
 from config import __version__, __DBNAME__
 import pandas as pd
+import sqlite3
 
 # Module imports
 # --------------------------------------------------------------------------- #
@@ -23,393 +24,422 @@ from common.miscellaneousFunctions import set_dict_item, create_current_scan_dir
 from common.logConfiguration import configure_logging
 from common.msgConfiguration import msg_wrapper, load_prog
 from common.sqlite_db import SQLiteDB
+from common.observation import Observation
 # =========================================================================== #
 
-@dataclass
-class Observation:
-    """
-        Observation object containing the observation data of the observation.
-    """
+def generate_table_name(files, folderPath,log):
+    """Use a random fits file to get the source name and 
+    frequency so you can generate a table name"""
 
-    # -- Observation parameters
-    FILEPATH: str   # path to observing file
-    theoFit: str    # theoretical fit implemented y/n
-    autoFit:str     # automated fit implemented y/n
-    log:object      # logger
+    # check file is not a symlink
+    for file in files:
 
-    # -- Observation parameters not initialized when class called
-    HDULIST: str = field(init=False)        # list of HDU objects
-    HDULENGTH: str = field(init=False)      # length of HDULIST
-    INFOHEADER: str = field(init=False)     # summarizes the content of the opened FITS file
-
-    def __post_init__(self):
-        """ Open file and get file info. 
-        """
-
-        # TODO: remember to include the value and description for these items when you're done
-        
-        try:
-            msg_wrapper("info",self.log.info,f"Opening file {self.FILEPATH}")
-
-            with open_file(self.FILEPATH) as f:
-                self.HDULIST = f
-                self.HDULENGTH=len(self.HDULIST)
-                self.INFOHEADER = f.info
-
-                # print(self.HDULIST.info())
-
-                # set values to dictionary
-                msg_wrapper("debug",self.log.debug,f"Setting FILEPATH, HDULIST, HDULENGTH and INFOHEADER to internal dict")
-                self.__dict__["HDULIST"]={'value':self.HDULIST, 'description':"Header data unit for observing file"}
-                self.__dict__["HDULENGTH"]={'value':self.HDULENGTH, 'description':"Number of HDUs in observing file"}
-                self.__dict__["INFOHEADER"]={'value':self.INFOHEADER, 'description':"Information header for observing file"}
-                self.__dict__["FILEPATH"]={'value':self.FILEPATH, 'description':"Path to file or filename"}
-        except Exception as e:
-            # TODO:  put in proper file exception handling
-            # see context manager
-            return f'{self.FILEPATH} is corrupt'
-
-    def set_key_value_pairs(self, key1, desc1, key2, desc2,indexKey,keys):
-        """
-        Set key/value pairs for keys that may be missing from the dictionary
-
-        Args:
-            key1 (_type_): missing key
-            desc1 (_type_): description of missing key
-            key2 (_type_): reference key
-            desc2 (_type_): description of reference key
-            indexKey (_type_): index key
-        """
-
-        # print(self.__dict__.keys())
-        # print(keys)
-        # sys.exit()
-
-        if key1 in keys:
-            pass
+        # try and sneak into first file and check frequency
+        pathToFile = os.path.join(folderPath,file)
+        isSymlink=os.path.islink(f'{pathToFile}')
+        if not isSymlink:
+            print(f'Processing file: {pathToFile}')
+            
+            obs=Observation(FILEPATH=pathToFile, theoFit='',autoFit='',log=log)
+            obs.get_data_only()
+            freq=int(obs.__dict__['CENTFREQ']['value'])
+            src=obs.__dict__['OBJECT']['value']
+            del obs  
+            break
         else:
-            keys=self.__dict__.keys()
-            # print(key1,key2,indexKey)
-            # print(keys)
-            # try:
-            if indexKey not in keys:
-                msg_wrapper("debug",self.log.debug,f'No Key found for {indexKey}')
-                return
-            else:
-                pos = list(keys).index(indexKey)
-                items = list(self.__dict__.items())
-                items.insert(pos+1, (key2, {'value':np.nan, 'description': desc2}))
-                items.insert(pos+1, (key1, {'value':np.nan, 'description': desc1}))
-                self.__dict__=dict(items)
-                # print(f'No {key1}')
-                msg=f'No {key1}'
-                msg_wrapper("debug",self.log.debug,msg)
-                return
-
-    def get_data_only(self,qv='no'):
-        """ Get data from fits file hdu. This is for the quick file view.
-        """
-
-        msg_wrapper("debug",self.log.debug,f"Getting data from fits file hdulist")
-        msg_wrapper("debug",self.log.debug,f"Create dict object to store read parameters")
-        self.__dict__['CARDS']={} #{'value':[], 'description':"Placeholder for hdu card titles or names"} # holds hdu card titles or names
-        # sys.exit()
-        # print(self.__dict__)
-        
-        CURDATETIME = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        msg_wrapper("info",self.log.info,f"Date and time of data processing: {CURDATETIME}")
-        self.__dict__["CURDATETIME"]={'value':CURDATETIME, 'description':"Current date and time of the data processing"}
-
-        msg_wrapper("debug",self.log.debug,f"Looping over each HDU object in hdulist")
-
-        try:
-            hdulen=self.HDULENGTH['value']
-        except:
-            with open('faultyFiles.txt','a') as f:
-                f.write(f'{self.FILEPATH}\n')
-                print(f'\nFile is a symlink: {self.FILEPATH}. Stopped processing')
-            return
-        
-        for index in range(hdulen):
-            self.read_data_from_hdu_lists(index)
-
-        keys=self.__dict__.keys()
-        try:
-            self.set_key_value_pairs('HZPERK1', 'HZPERK1', 'HZKERR1', '[Hz/K] Counter cal error','TCAL2',keys)
-        except:
-            self.__dict__[f'TCAL2'] = {'value':np.nan,'description':'[Hz/K] Counter cal error'}
-
-        self.set_key_value_pairs('HZPERK2', 'HZPERK2', 'HZKERR2', '[Hz/K] Counter cal error','HZKERR1',keys)
-        self.set_key_value_pairs('TSYS1', 'TSYS1 [K]', 'TSYSERR1', '[K] System temperature','HZKERR2',keys)
-        self.set_key_value_pairs('TSYS2', 'TSYS2[K]', 'TSYSERR2', '[K] System temperature','TSYSERR1',keys)
-        
-        # add other important bits
-        # ----------------------------------
-
-        # get drift scans
-        # use hdu frontend to determine path to data processing
-        frontend = self.__dict__['FRONTEND']['value']
-        src = self.__dict__['OBJECT']['value']
-        freq = self.__dict__['CENTFREQ']['value']
-
-        # create_current_scan_directory()
-        self.create_final_plot_directory(src,freq)
-        
-        if 'S' in (frontend):
-            if '13.0S' in frontend or '18.0S' in frontend:
-                set_dict_item(self.__dict__,'BEAMTYPE',ScanType.SBW.name, 'wide single beam drift scan')
-            elif '02.5S' in frontend or '04.5S' in frontend or '01.3S' in frontend:
-                set_dict_item(self.__dict__,'BEAMTYPE',ScanType.SBN.name, 'narrow single beam drift scan')
-            else:
-                print(f'Unknown beam type :{frontend} - contact author to have it included\n')
-                sys.exit()
-
-            # get driftscan data from file
-            driftScans=DriftScans(self.__dict__)
-            driftScans.process_data_only(qv) # process the data
-            del driftScans # release from memory
-
-        elif 'D' in (frontend):
-            set_dict_item(self.__dict__,'BEAMTYPE',ScanType.DB.name, 'dual beam drift scan')
-
-            # get driftscan data from file
-            driftScans=DriftScans(self.__dict__)
-            driftScans.process_data_only(qv) # process the data
-            del driftScans # release from memory
-
-    def get_data(self):
-        """ Get data from fits file hdu
-        """
-
-        msg_wrapper("debug",self.log.debug,f"Getting data from fits file hdulist")
-        msg_wrapper("debug",self.log.debug,f"Create dict object to store read parameters")
-        self.__dict__['CARDS']={} #{'value':[], 'description':"Placeholder for hdu card titles or names"} # holds hdu card titles or names
-
-        # print(self.__dict__)
-      
-        CURDATETIME = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        msg_wrapper("info",self.log.info,f"Date and time of data processing: {CURDATETIME}")
-        self.__dict__["CURDATETIME"]={'value':CURDATETIME, 'description':"Current date and time of the data processing"}
-
-        msg_wrapper("debug",self.log.debug,f"Looping over each HDU object in hdulist")
-
-        try:
-            hdulen=self.HDULENGTH['value']
-        except:
-            with open('faultyFiles.txt','a') as f:
-                f.write(f'{self.FILEPATH}\n')
-                print(f'\nFile is a symlink: {self.FILEPATH}. Stopped processing')
-            return
-        
-        # print(self.HDULIST.info())
-        # sys.exit()
-        for index in range(hdulen):
-            self.read_data_from_hdu_lists(index)
-
-        keys=self.__dict__.keys()
-        # print(keys)
-        # sys.exit()
-        self.set_key_value_pairs('HZPERK1', 'HZPERK1', 'HZKERR1', '[Hz/K] Counter cal error','TCAL2',keys)
-        self.set_key_value_pairs('HZPERK2', 'HZPERK2', 'HZKERR2', '[Hz/K] Counter cal error','HZKERR1',keys)
-        self.set_key_value_pairs('TSYS1', 'TSYS1 [K]', 'TSYSERR1', '[K] System temperature','HZKERR2',keys)
-        self.set_key_value_pairs('TSYS2', 'TSYS2[K]', 'TSYSERR2', '[K] System temperature','TSYSERR1',keys)
-    
-        
-        # add other important bits
-        # ----------------------------------
-
-        # get drift scans
-        # use hdu frontend to determine path to data processing
-        frontend = self.__dict__['FRONTEND']['value']
-        src = self.__dict__['OBJECT']['value']
-
-        try:
-            freq = self.__dict__['CENTFREQ']['value']
-        except:
-            freq=np.nan
-            sys.exit()
-        # create_current_scan_directory()
-        self.create_final_plot_directory(src,freq)
-        
-        if 'S' in (frontend):
-            if '13.0S' in frontend or '18.0S' in frontend:
-                set_dict_item(self.__dict__,'BEAMTYPE',ScanType.SBW.name, 'wide single beam drift scan')
-            elif '02.5S' in frontend or '04.5S' in frontend or '01.3S' in frontend:
-                set_dict_item(self.__dict__,'BEAMTYPE',ScanType.SBN.name, 'narrow single beam drift scan')
-            else:
-                print(f'Unknown beam type :{frontend} - contact author to have it included\n')
-                sys.exit()
-
-            # get driftscan data from file
-            driftScans=DriftScans(self.__dict__)
-            driftScans.process_data() # process the data
-            del driftScans # release from memory
-
-        elif 'D' in (frontend):
-            set_dict_item(self.__dict__,'BEAMTYPE',ScanType.DB.name, 'dual beam drift scan')
-
-            # get driftscan data from file
-            driftScans=DriftScans(self.__dict__)
-            driftScans.process_data() # process the data
-            del driftScans # release from memory
-
-    def get_hdu_info(self, hduindex: int) -> None:
-        """Get information from individual hdu
-        
-            Args:
-                hduindex (int): index of hdu to get info from
-            Returns:
-                None
-        """
-
-        msg_wrapper("debug",self.log.debug,f"Getting hdulist info for index {hduindex}")
-        return (self.HDULIST['value'])[hduindex].header
-    
-    def read_data_from_hdu_lists(self, hduindex:int):
-        """ Read data from fits file hdu. 
-
-            Args:
-                hduindex (int): index of hdu to read data from
-        """
-
-        # read data from all hdu lists
-        hdu=self.get_hdu_info(hduindex)
-        hduIndexName=self.HDULIST['value'][hduindex].name
-        self.__dict__['CARDS'][f'{hduindex}'] = hduIndexName
-        cols=list(hdu) # columns from hdu lists
-
-        # print(hduIndexName,self.HDULENGTH['value'],hduindex)
-        # sys.exit()
-        msg_wrapper("debug",self.log.debug,f"Getting observing parameters from {hduIndexName} HEADER")
-
-
-        # TODO: Decide on which data you want to save in the database
-        # go through each column and only save relevant ones
-        # print(cols)
-        # sys.exit()
-        for column in cols:
-            # if 'TCAL1' in column or 'TCAL2' in column or 'FREQ' in column:
-            #     print(column,hdu[column])
-
-            if 'Chart' not in hduIndexName and hduindex == self.HDULENGTH['value']-1:
-                if 'TCAL1' in column or 'FREQ' in column or 'TCAL2' in column or 'HZ' in column:
-                    # print('here')
-                    # print('--->---',column)
-                    try:
-                        self.__dict__[f'{column}']['value']
-                    except:
-                        self.__dict__[f'{column}'] = {'value':hdu[column],'description':hdu.comments[column]}
-
-            # print('- ',column,hdu[column])
-            # print(column,hdu[column])
-            if 'COMMENT' in column or 'SIMPLE' in column or 'BITPIX' in column or 'NAXIS' in column\
-                or 'EXTEND' in column or 'SIMULATE' in column or 'START' in column or 'STOP' in column\
-                or 'SCANS' in column or 'TTYPE' in column or  'TFORM' in column or 'TUNIT' in column \
-                or 'TDISP' in column or 'PCOUNT' in column or 'GCOUNT' in column or 'TFIELDS' in column\
-                or column=='SCAN' or 'XT' in column or 'TCALDAT' in column or 'SCANANGL' in column\
-                or 'TCALFRQ' in column or 'HZZER' in column or 'SCANTYPE' in column or 'STEPSEQ' in column\
-                or 'TCALSIG' in column:
-                # self.__dict__[f'{column}_{hduindex}'] = {'value':hdu[column],'description':hdu.comments[column]}
-                pass
-            else:
-                if 'BANDWDTH' in column or 'INSTRUME' in column or  'INSTFLAG' in column\
-                    or 'CENTFREQ' in column or 'SCANDIST' in column or 'SCANTIME' in column:
-                    if '_ZC' in hduIndexName:
-                        print('*** ',column)
-                        self.__dict__[f'{column}'] = {'value':hdu[column],'description':hdu.comments[column]}
-                        msg_wrapper("debug",self.log.debug,f"{column}: {str(self.__dict__[f'{column}'])}")
-
-                elif 'FRONTEND' in column:
-                    if '_CAL' in hduIndexName:
-                        self.__dict__[f'{column}'] = {'value':hdu[column],'description':hdu.comments[column]}
-                        msg_wrapper("debug",self.log.debug,f"{column}: {str(self.__dict__[f'{column}'])}")
-                
-                elif 'TCAL' in column or 'HZPERK' in column or 'HZKERR' in column:
-                    # print('------',column)
-                    try:
-                        msg=f"{self.__dict__['FRONTEND']}, {hduIndexName}"
-                        msg_wrapper("debug",self.log.debug,msg)
-                    except:
-                        self.__dict__['FRONTEND'] = {'value':hdu['FRONTEND'],'description':hdu.comments['FRONTEND']}
-
-                    if 'D' in self.__dict__['FRONTEND']['value'] and '_CAL' in hduIndexName:
-                        if '_CAL' in hduIndexName:
-                            # print(column)#,hdu.columns())
-                            # use low noise diode
-                            try:
-                                msg_wrapper("debug",self.log.debug,f"Using low noise diode for {self.__dict__['CENTFREQ']}")
-                            except:
-                                pass
-                            self.__dict__[column] = {'value':hdu[column],'description':hdu.comments[column]}
-                            msg_wrapper("debug",self.log.debug,f"{column}: {str(self.__dict__[f'{column}'])}")
-                        else:
-                            pass
-                    elif 'S'  in self.__dict__['FRONTEND']['value'] :
-                        # print('---',hduIndexName)
-                        if 'Chart' in hduIndexName:
-                        
-                            # use high noise diode
-                            try:
-                                msg_wrapper("debug",self.log.debug,f"Using high noise diode for {self.__dict__['CENTFREQ']}")
-                            except:
-                                pass
-                            self.__dict__[f'{column}'] = {'value':hdu[column],'description':hdu.comments[column]}
-                            msg_wrapper("debug",self.log.debug,f"{column}: {str(self.__dict__[f'{column}'])}")
-                        else:
-                            if '04.5' in self.__dict__['FRONTEND']['value'] and '_CAL' in hduIndexName:
-                                # print('******',hduIndexName,self.__dict__['FRONTEND']['value'])
-                                self.__dict__[f'{column}'] = {'value':hdu[column],'description':hdu.comments[column]}
-                                msg_wrapper("debug",self.log.debug,f"{column}: {str(self.__dict__[f'{column}'])} - couldn't find this value in chart so may cause problems down the line")
-
-                        # if 'Chart' not in hduIndexName and hduindex == self.HDULENGTH['value']-1:
-                        #     print('here')
-                        #     print('--->---',column)
-                            # try:
-                            #     self.__dict__['CENTFREQ']['value']
-                            # except:
-
-
-
-                            #     # self.__dict__[f'CENTFREQ'] = {'value':hdu[column],'description':hdu.comments[column]}
-                            #     msg_wrapper("debug",self.log.debug,f"{column}: {str(self.__dict__[f'{column}'])}")
-                            # sys.exit()
-
-                elif column=='DATE':
-                    date=hdu[column].split('T')
-                    self.__dict__[f'{column}'] = {'value':hdu[column],'description':hdu.comments[column]}
-                    self.__dict__['OBSDATE'] = {'value':date[0],'description':'Date of source observation, file creation date'}
-                    self.__dict__['OBSTIME'] = {'value':date[1],'description':'Time of source observation'}
-                    self.__dict__['OBSDATETIME'] = {'value':' '.join(date),'description':'Datetime of source observation'}
-                    msg_wrapper("debug",self.log.debug,f"{column}: {str(self.__dict__[f'{column}'])}")
-
-                else:
-                    # data.append(f'{hduindex}_{column}')
-                    # print(column,' - ',hdu[column]," : ",hdu.comments[column], hduIndexName)
-                    self.__dict__[f'{column}'] = {'value':hdu[column],'description':hdu.comments[column]}
-                    
-                    msg_wrapper("debug",self.log.debug,f"{column}: {str(self.__dict__[f'{column}'])}")
-
-    def create_final_plot_directory(self, src: str,freq: float):
-        """
-        Create directory where final plots will be saved. The function takes 
-        the source name and the frequency in MHz and creates a directory 
-        with the source name and the frequency in MHz. The directory is 
-        created if it does not already exist.
-
-        Args:
-            src (str): source name
-            freq (float): frequency in MHz
-        
-        Returns:
-            None
-        """
-
-        self.plotDir=(f'plots/{src}/{int(freq)}').replace(' ','')
-        msg_wrapper("info",self.log.debug,f"Creating directory to store processed plots: {self.plotDir}")
-        try:
-            os.makedirs(self.plotDir)
-        except:
             pass
+
+    # use freq and src name to create table
+    table=f'{src}_{freq}'.replace(' ','')
+    print(f'\n>>>> Working on table: {table}\n')
+
+    return src, freq, table, pathToFile
+    
+# @dataclass
+# class Observation:
+#     """
+#         Observation object containing the observation data of the observation.
+#     """
+
+#     # -- Observation parameters
+#     FILEPATH: str   # path to observing file
+#     theoFit: str    # theoretical fit implemented y/n
+#     autoFit:str     # automated fit implemented y/n
+#     log:object      # logger
+
+#     # -- Observation parameters not initialized when class called
+#     HDULIST: str = field(init=False)        # list of HDU objects
+#     HDULENGTH: str = field(init=False)      # length of HDULIST
+#     INFOHEADER: str = field(init=False)     # summarizes the content of the opened FITS file
+
+#     def __post_init__(self):
+#         """ Open file and get file info. 
+#         """
+
+#         # TODO: remember to include the value and description for these items when you're done
+        
+#         try:
+#             msg_wrapper("info",self.log.info,f"Opening file {self.FILEPATH}")
+
+#             with open_file(self.FILEPATH) as f:
+#                 self.HDULIST = f
+#                 self.HDULENGTH=len(self.HDULIST)
+#                 self.INFOHEADER = f.info
+
+#                 # print(self.HDULIST.info())
+
+#                 # set values to dictionary
+#                 msg_wrapper("debug",self.log.debug,f"Setting FILEPATH, HDULIST, HDULENGTH and INFOHEADER to internal dict")
+#                 self.__dict__["HDULIST"]={'value':self.HDULIST, 'description':"Header data unit for observing file"}
+#                 self.__dict__["HDULENGTH"]={'value':self.HDULENGTH, 'description':"Number of HDUs in observing file"}
+#                 self.__dict__["INFOHEADER"]={'value':self.INFOHEADER, 'description':"Information header for observing file"}
+#                 self.__dict__["FILEPATH"]={'value':self.FILEPATH, 'description':"Path to file or filename"}
+#         except Exception as e:
+#             # TODO:  put in proper file exception handling
+#             # see context manager
+#             return f'{self.FILEPATH} is corrupt'
+
+#     def set_key_value_pairs(self, key1, desc1, key2, desc2,indexKey,keys):
+#         """
+#         Set key/value pairs for keys that may be missing from the dictionary
+
+#         Args:
+#             key1 (_type_): missing key
+#             desc1 (_type_): description of missing key
+#             key2 (_type_): reference key
+#             desc2 (_type_): description of reference key
+#             indexKey (_type_): index key
+#         """
+
+#         # print(self.__dict__.keys())
+#         # print(keys)
+#         # sys.exit()
+
+#         if key1 in keys:
+#             pass
+#         else:
+#             keys=self.__dict__.keys()
+#             # print(key1,key2,indexKey)
+#             # print(keys)
+#             # try:
+#             if indexKey not in keys:
+#                 msg_wrapper("debug",self.log.debug,f'No Key found for {indexKey}')
+#                 return
+#             else:
+#                 pos = list(keys).index(indexKey)
+#                 items = list(self.__dict__.items())
+#                 items.insert(pos+1, (key2, {'value':np.nan, 'description': desc2}))
+#                 items.insert(pos+1, (key1, {'value':np.nan, 'description': desc1}))
+#                 self.__dict__=dict(items)
+#                 # print(f'No {key1}')
+#                 msg=f'No {key1}'
+#                 msg_wrapper("debug",self.log.debug,msg)
+#                 return
+
+#     # def get_data_only(self,qv='no'):
+#     #     """ Get data from fits file hdu. This is for the quick file view.
+#     #     """
+
+#     #     msg_wrapper("debug",self.log.debug,f"Getting data from fits file hdulist")
+#     #     msg_wrapper("debug",self.log.debug,f"Create dict object to store read parameters")
+#     #     self.__dict__['CARDS']={} #{'value':[], 'description':"Placeholder for hdu card titles or names"} # holds hdu card titles or names
+#     #     # sys.exit()
+#     #     # print(self.__dict__)
+        
+#     #     CURDATETIME = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+#     #     msg_wrapper("info",self.log.info,f"Date and time of data processing: {CURDATETIME}")
+#     #     self.__dict__["CURDATETIME"]={'value':CURDATETIME, 'description':"Current date and time of the data processing"}
+
+#     #     msg_wrapper("debug",self.log.debug,f"Looping over each HDU object in hdulist")
+
+#     #     try:
+#     #         hdulen=self.HDULENGTH['value']
+#     #     except:
+#     #         with open('faultyFiles.txt','a') as f:
+#     #             f.write(f'{self.FILEPATH}\n')
+#     #             print(f'\nFile is a symlink: {self.FILEPATH}. Stopped processing')
+#     #         return
+        
+#     #     for index in range(hdulen):
+#     #         self.read_data_from_hdu_lists(index)
+
+#     #     keys=self.__dict__.keys()
+#     #     try:
+#     #         self.set_key_value_pairs('HZPERK1', 'HZPERK1', 'HZKERR1', '[Hz/K] Counter cal error','TCAL2',keys)
+#     #     except:
+#     #         self.__dict__[f'TCAL2'] = {'value':np.nan,'description':'[Hz/K] Counter cal error'}
+
+#     #     self.set_key_value_pairs('HZPERK2', 'HZPERK2', 'HZKERR2', '[Hz/K] Counter cal error','HZKERR1',keys)
+#     #     self.set_key_value_pairs('TSYS1', 'TSYS1 [K]', 'TSYSERR1', '[K] System temperature','HZKERR2',keys)
+#     #     self.set_key_value_pairs('TSYS2', 'TSYS2[K]', 'TSYSERR2', '[K] System temperature','TSYSERR1',keys)
+        
+#     #     # add other important bits
+#     #     # ----------------------------------
+
+#     #     # get drift scans
+#     #     # use hdu frontend to determine path to data processing
+#     #     frontend = self.__dict__['FRONTEND']['value']
+#     #     src = self.__dict__['OBJECT']['value']
+#     #     freq = self.__dict__['CENTFREQ']['value']
+
+#     #     # create_current_scan_directory()
+#     #     self.create_final_plot_directory(src,freq)
+        
+#     #     if 'S' in (frontend):
+#     #         if '13.0S' in frontend or '18.0S' in frontend:
+#     #             set_dict_item(self.__dict__,'BEAMTYPE',ScanType.SBW.name, 'wide single beam drift scan')
+#     #         elif '02.5S' in frontend or '04.5S' in frontend or '01.3S' in frontend:
+#     #             set_dict_item(self.__dict__,'BEAMTYPE',ScanType.SBN.name, 'narrow single beam drift scan')
+#     #         else:
+#     #             print(f'Unknown beam type :{frontend} - contact author to have it included\n')
+#     #             sys.exit()
+
+#     #         # get driftscan data from file
+#     #         driftScans=DriftScans(self.__dict__)
+#     #         driftScans.process_data_only(qv) # process the data
+#     #         del driftScans # release from memory
+
+#     #     elif 'D' in (frontend):
+#     #         set_dict_item(self.__dict__,'BEAMTYPE',ScanType.DB.name, 'dual beam drift scan')
+
+#     #         # get driftscan data from file
+#     #         driftScans=DriftScans(self.__dict__)
+#     #         driftScans.process_data_only(qv) # process the data
+#     #         del driftScans # release from memory
+
+#     def get_data(self):
+#         """ Get data from fits file hdu
+#         """
+
+#         msg_wrapper("debug",self.log.debug,f"Getting data from fits file hdulist")
+#         msg_wrapper("debug",self.log.debug,f"Create dict object to store read parameters")
+#         self.__dict__['CARDS']={} #{'value':[], 'description':"Placeholder for hdu card titles or names"} # holds hdu card titles or names
+
+#         # print(self.__dict__)
+      
+#         CURDATETIME = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+#         msg_wrapper("info",self.log.info,f"Date and time of data processing: {CURDATETIME}")
+#         self.__dict__["CURDATETIME"]={'value':CURDATETIME, 'description':"Current date and time of the data processing"}
+
+#         msg_wrapper("debug",self.log.debug,f"Looping over each HDU object in hdulist")
+
+#         try:
+#             hdulen=self.HDULENGTH['value']
+#         except:
+#             with open('faultyFiles.txt','a') as f:
+#                 f.write(f'{self.FILEPATH}\n')
+#                 print(f'\nFile is a symlink: {self.FILEPATH}. Stopped processing')
+#             return
+        
+#         # print(self.HDULIST.info())
+#         # sys.exit()
+#         for index in range(hdulen):
+#             self.read_data_from_hdu_lists(index)
+
+#         keys=self.__dict__.keys()
+#         # print(keys)
+#         # sys.exit()
+#         self.set_key_value_pairs('HZPERK1', 'HZPERK1', 'HZKERR1', '[Hz/K] Counter cal error','TCAL2',keys)
+#         self.set_key_value_pairs('HZPERK2', 'HZPERK2', 'HZKERR2', '[Hz/K] Counter cal error','HZKERR1',keys)
+#         self.set_key_value_pairs('TSYS1', 'TSYS1 [K]', 'TSYSERR1', '[K] System temperature','HZKERR2',keys)
+#         self.set_key_value_pairs('TSYS2', 'TSYS2[K]', 'TSYSERR2', '[K] System temperature','TSYSERR1',keys)
+    
+#         # add other important bits
+#         # ----------------------------------
+
+#         # get drift scans
+#         # use hdu frontend to determine path to data processing
+#         frontend = self.__dict__['FRONTEND']['value']
+#         src = self.__dict__['OBJECT']['value']
+#         try:
+#             freq = self.__dict__['CENTFREQ']['value']
+#         except:
+#             freq=np.nan
+#             sys.exit()
+
+#         # create_current_scan_directory()
+#         self.create_final_plot_directory(src,freq)
+        
+#         if 'S' in (frontend):
+#             if '13.0S' in frontend or '18.0S' in frontend:
+#                 set_dict_item(self.__dict__,'BEAMTYPE',ScanType.SBW.name, 'wide single beam drift scan')
+#             elif '02.5S' in frontend or '04.5S' in frontend or '01.3S' in frontend:
+#                 set_dict_item(self.__dict__,'BEAMTYPE',ScanType.SBN.name, 'narrow single beam drift scan')
+#             else:
+#                 print(f'Unknown beam type :{frontend} - contact author to have it included\n')
+#                 sys.exit()
+
+#             # get driftscan data from file
+#             driftScans=DriftScans(self.__dict__)
+#             driftScans.process_data() # process the data
+#             del driftScans # release from memory
+
+#         elif 'D' in (frontend):
+#             set_dict_item(self.__dict__,'BEAMTYPE',ScanType.DB.name, 'dual beam drift scan')
+
+#             # sys.exit()
+#             # get driftscan data from file
+#             driftScans=DriftScans(self.__dict__)
+#             driftScans.process_data() # process the data
+#             del driftScans # release from memory
+
+#     def get_hdu_info(self, hduindex: int) -> None:
+#         """Get information from individual hdu
+        
+#             Args:
+#                 hduindex (int): index of hdu to get info from
+#             Returns:
+#                 None
+#         """
+
+#         msg_wrapper("debug",self.log.debug,f"Getting hdulist info for index {hduindex}")
+#         return (self.HDULIST['value'])[hduindex].header
+    
+#     def read_data_from_hdu_lists(self, hduindex:int):
+#         """ Read data from fits file hdu. 
+
+#             Args:
+#                 hduindex (int): index of hdu to read data from
+#         """
+
+#         # read data from all hdu lists
+#         hdu=self.get_hdu_info(hduindex)
+#         hduIndexName=self.HDULIST['value'][hduindex].name
+#         self.__dict__['CARDS'][f'{hduindex}'] = hduIndexName
+#         cols=list(hdu) # columns from hdu lists
+
+#         # print(hduIndexName,self.HDULENGTH['value'],hduindex)
+#         # sys.exit()
+#         msg_wrapper("debug",self.log.debug,f"Getting observing parameters from {hduIndexName} HEADER")
+
+
+#         # TODO: Decide on which data you want to save in the database
+#         # go through each column and only save relevant ones
+#         # print(cols)
+#         # sys.exit()
+#         for column in cols:
+#             # if 'TCAL1' in column or 'TCAL2' in column or 'FREQ' in column:
+#             #     print(column,hdu[column])
+
+#             if 'Chart' not in hduIndexName and hduindex == self.HDULENGTH['value']-1:
+#                 if 'TCAL1' in column or 'FREQ' in column or 'TCAL2' in column or 'HZ' in column:
+#                     # print('here')
+#                     # print('--->---',column)
+#                     try:
+#                         self.__dict__[f'{column}']['value']
+#                     except:
+#                         self.__dict__[f'{column}'] = {'value':hdu[column],'description':hdu.comments[column]}
+
+#             # print('- ',column,hdu[column])
+#             # print(column,hdu[column])
+#             if 'COMMENT' in column or 'SIMPLE' in column or 'BITPIX' in column or 'NAXIS' in column\
+#                 or 'EXTEND' in column or 'SIMULATE' in column or 'START' in column or 'STOP' in column\
+#                 or 'SCANS' in column or 'TTYPE' in column or  'TFORM' in column or 'TUNIT' in column \
+#                 or 'TDISP' in column or 'PCOUNT' in column or 'GCOUNT' in column or 'TFIELDS' in column\
+#                 or column=='SCAN' or 'XT' in column or 'TCALDAT' in column or 'SCANANGL' in column\
+#                 or 'TCALFRQ' in column or 'HZZER' in column or 'SCANTYPE' in column or 'STEPSEQ' in column\
+#                 or 'TCALSIG' in column or 'HAPOINTC' in column or 'DEPOINTC' in column:
+#                 # self.__dict__[f'{column}_{hduindex}'] = {'value':hdu[column],'description':hdu.comments[column]}
+#                 pass
+#             else:
+#                 if 'BANDWDTH' in column or 'INSTRUME' in column or  'INSTFLAG' in column\
+#                     or 'CENTFREQ' in column or 'SCANDIST' in column or 'SCANTIME' in column:
+#                     if '_ZC' in hduIndexName:
+#                         print('*** ',column)
+#                         self.__dict__[f'{column}'] = {'value':hdu[column],'description':hdu.comments[column]}
+#                         msg_wrapper("debug",self.log.debug,f"{column}: {str(self.__dict__[f'{column}'])}")
+
+#                 elif 'FRONTEND' in column:
+#                     if '_CAL' in hduIndexName:
+#                         self.__dict__[f'{column}'] = {'value':hdu[column],'description':hdu.comments[column]}
+#                         msg_wrapper("debug",self.log.debug,f"{column}: {str(self.__dict__[f'{column}'])}")
+                
+#                 elif 'TCAL' in column or 'HZPERK' in column or 'HZKERR' in column:
+#                     # print('------',column)
+#                     try:
+#                         msg=f"{self.__dict__['FRONTEND']}, {hduIndexName}"
+#                         msg_wrapper("debug",self.log.debug,msg)
+#                     except:
+#                         self.__dict__['FRONTEND'] = {'value':hdu['FRONTEND'],'description':hdu.comments['FRONTEND']}
+
+#                     if 'D' in self.__dict__['FRONTEND']['value'] and '_CAL' in hduIndexName:
+#                         if '_CAL' in hduIndexName:
+#                             # print(column)#,hdu.columns())
+#                             # use low noise diode
+#                             try:
+#                                 msg_wrapper("debug",self.log.debug,f"Using low noise diode for {self.__dict__['CENTFREQ']}")
+#                             except:
+#                                 pass
+#                             self.__dict__[column] = {'value':hdu[column],'description':hdu.comments[column]}
+#                             msg_wrapper("debug",self.log.debug,f"{column}: {str(self.__dict__[f'{column}'])}")
+#                         else:
+#                             pass
+#                     elif 'S'  in self.__dict__['FRONTEND']['value'] :
+#                         # print('---',hduIndexName)
+#                         if 'Chart' in hduIndexName:
+                        
+#                             # use high noise diode
+#                             try:
+#                                 msg_wrapper("debug",self.log.debug,f"Using high noise diode for {self.__dict__['CENTFREQ']}")
+#                             except:
+#                                 pass
+#                             self.__dict__[f'{column}'] = {'value':hdu[column],'description':hdu.comments[column]}
+#                             msg_wrapper("debug",self.log.debug,f"{column}: {str(self.__dict__[f'{column}'])}")
+#                         else:
+#                             if '04.5' in self.__dict__['FRONTEND']['value'] and '_CAL' in hduIndexName:
+#                                 # print('******',hduIndexName,self.__dict__['FRONTEND']['value'])
+#                                 self.__dict__[f'{column}'] = {'value':hdu[column],'description':hdu.comments[column]}
+#                                 msg_wrapper("debug",self.log.debug,f"{column}: {str(self.__dict__[f'{column}'])} - couldn't find this value in chart so may cause problems down the line")
+
+#                         # if 'Chart' not in hduIndexName and hduindex == self.HDULENGTH['value']-1:
+#                         #     print('here')
+#                         #     print('--->---',column)
+#                             # try:
+#                             #     self.__dict__['CENTFREQ']['value']
+#                             # except:
+
+
+
+#                             #     # self.__dict__[f'CENTFREQ'] = {'value':hdu[column],'description':hdu.comments[column]}
+#                             #     msg_wrapper("debug",self.log.debug,f"{column}: {str(self.__dict__[f'{column}'])}")
+#                             # sys.exit()
+
+#                 elif column=='DATE':
+#                     date=hdu[column].split('T')
+#                     self.__dict__[f'{column}'] = {'value':hdu[column],'description':hdu.comments[column]}
+#                     self.__dict__['OBSDATE'] = {'value':date[0],'description':'Date of source observation, file creation date'}
+#                     self.__dict__['OBSTIME'] = {'value':date[1],'description':'Time of source observation'}
+#                     self.__dict__['OBSDATETIME'] = {'value':' '.join(date),'description':'Datetime of source observation'}
+#                     msg_wrapper("debug",self.log.debug,f"{column}: {str(self.__dict__[f'{column}'])}")
+
+#                 else:
+#                     # data.append(f'{hduindex}_{column}')
+#                     # print(column,' - ',hdu[column]," : ",hdu.comments[column], hduIndexName)
+#                     self.__dict__[f'{column}'] = {'value':hdu[column],'description':hdu.comments[column]}
+                    
+#                     msg_wrapper("debug",self.log.debug,f"{column}: {str(self.__dict__[f'{column}'])}")
+
+#     def create_final_plot_directory(self, src: str,freq: float):
+#         """
+#         Create directory where final plots will be saved. The function takes 
+#         the source name and the frequency in MHz and creates a directory 
+#         with the source name and the frequency in MHz. The directory is 
+#         created if it does not already exist.
+
+#         Args:
+#             src (str): source name
+#             freq (float): frequency in MHz
+        
+#         Returns:
+#             None
+#         """
+
+#         self.plotDir=(f'plots/{src}/{int(freq)}').replace(' ','')
+#         msg_wrapper("info",self.log.debug,f"Creating directory to store processed plots: {self.plotDir}")
+#         try:
+#             os.makedirs(self.plotDir)
+#         except:
+#             pass
 
 def run(args):
     """
@@ -515,72 +545,182 @@ def run(args):
 
             if readFile:
 
+                print(f'\nWorking on folder: {args.f}')
+                print('*'*50)
+
                 # check if file has been processed already
-                db = SQLiteDB(__DBNAME__,log)
-                db.create_db()
-                tables=db.get_table_names(__DBNAME__)
-                db.close_db()
+                pathToFile=args.f
+                fileName: str = args.f.split('/')[-1]
+                freq: int = args.f.split('/')[-2]
+                src: str = (args.f.split('/')[-3]).upper()
 
-                print(f'There are {len(tables)} tables in {__DBNAME__}')
+                assert pathToFile.endswith('.fits'), f'The program requires a fits file to work, got: {fileName}'
                 
-                # check source not in database already
-                fileName=src[-1]
-                freq=int(src[-2])
-                srcName=src[-3]
-                tbname=f'{srcName}_{freq}'.upper()
-                tbname=set_table_name(tbname,log)
+                table=f'{src}_{freq}'
 
-                if len(tables)==0 or tbname not in tables:
-                    # check file is not a symlink
-                    lnk=os.path.islink(f'{args.f}')
-                    # print(lnk)
-                    if lnk==True:
-                        # faultyFiles=[]
-                        with open('faultyFiles.txt','a') as f:
-                            f.write(f'{args.f}\n')
-                            print(f'\nFile is a symlink: {args.f}. Stopped processing')
+                # check if table exists in database
+                cnx = sqlite3.connect(__DBNAME__)
+                dbTables= pd.read_sql_query("SELECT name FROM sqlite_schema WHERE type='table'", cnx)
+                tables=list(dbTables['name'])
+
+                if table in tables:
+                    tableData = pd.read_sql_query(f"SELECT * FROM {table}", cnx)
+                    tableFilenames=sorted(list(tableData['FILENAME']))
+                    if fileName in tableFilenames:
+                        print(f'Already processed: {fileName}')
+                        sys.exit()
                     else:
-                        print('Reading new file')
-                        obs=Observation(FILEPATH=args.f, theoFit='',autoFit='',log=log)
-                        obs.get_data()
-                        del obs 
-                
-                # sys.exit()
-                elif tbname in tables:
-                    # check file is not a symlink
-                    lnk=os.path.islink(f'{args.f}')
+                        print(f'Processing file: {pathToFile}')
 
-                    if lnk==True:
-                        # faultyFiles=[]
-                        with open('faultyFiles.txt','a') as f:
-                            f.write(f'{args.f}\n')
-                            print(f'\nFile is a symlink: {args.f}. Stopped processing')
-                    else:
-                        # Check if file in table
-                        db=SQLiteDB(__DBNAME__,log)
-                        db.create_db()
-                        col_inds, colNames, col_types=db.get_all_table_coloumns(tbname)
-                        rows=db.get_rows(tbname)
-                        db.close_db()
-
-                        # Create datframe
-                        df=pd.DataFrame(rows,columns=colNames)
-                        files=list(df['FILENAME'])
-                        if fileName in files:
-                            print('File already in database')
-                            pass
-                        else:
-                            print(f'Processing file: {fileName}')
-                            obs=Observation(FILEPATH=args.f, theoFit='',autoFit='',log=log)
+                        # check if symlink
+                        isSymlink=os.path.islink(f'{pathToFile}')
+                        if not isSymlink:
+                            obs=Observation(FILEPATH=pathToFile, theoFit='',autoFit='',log=log)
                             obs.get_data()
-                            del obs     
-                
+                            del obs  
+                            sys.exit()
+                        else:
+                            print(f'File is a symlink: {args.f}. Stopped processing')
                 else:
-                    print('Whats going on here')
-                    sys.exit()
+                    # check if symlink
+                        isSymlink=os.path.islink(f'{pathToFile}')
+                        if not isSymlink:
+                            print(f'Processing file: {pathToFile}')
+                            obs=Observation(FILEPATH=pathToFile, theoFit='',autoFit='',log=log)
+                            obs.get_data()
+                            del obs  
+                            sys.exit()
+                        else:
+                            print(f'File is a symlink: {args.f}. Stopped processing')
                     
             elif readFolder and args.f != "../":
                 
+                # Ok! we're reading from a folder
+                # 1. Check if there are existing files in the folder
+
+                print(f'\nWorking on folder: {args.f}')
+                print('*'*50)
+
+                # search for files
+                files = sorted(os.listdir(args.f))
+
+                if len(files)>0:
+                    src, freq, table, pathToFile = generate_table_name(files, args.f,log)
+                    # print(src, freq, table, pathToFile)
+
+                    # check if table exists in database
+                    cnx = sqlite3.connect(__DBNAME__)
+                    dbTables= pd.read_sql_query("SELECT name FROM sqlite_schema WHERE type='table'", cnx)
+                    tables=list(dbTables['name'])
+
+                    if len(tables)==0:
+                        print('>>>> No tables found')
+                        print(f'\n>>>> Creating table {table}')
+
+                        for file in files:
+                            pathToFile = os.path.join(args.f,file)
+                            isSymlink=os.path.islink(f'{pathToFile}')
+
+                            if not isSymlink:
+
+                                # print(f'\nPath to  file: {pathToFile}')
+                                print(f'Processing file: {pathToFile}')
+                                obs=Observation(FILEPATH=pathToFile, theoFit='',autoFit='',log=log)
+                                obs.get_data_only()
+                                freq=int(obs.__dict__['CENTFREQ']['value'])
+                                src=obs.__dict__['OBJECT']['value']
+                                table=f'{src}_{freq}'.replace(' ','')
+                                tablePath=table.replace('_','/')
+
+                                if tablePath not in pathToFile.upper():
+                                    # move file to appropriate folder
+                                    print('\n',tablePath)
+                                    print(pathToFile,'\n')
+
+                                    frq=pathToFile.split('/')[-2]
+                                    newpath=pathToFile.replace(frq,str(freq))
+                                    newpathFolder = '/'.join(newpath.split('/')[:-1])
+
+                                    try:
+                                        os.makedirs(newpathFolder)
+                                        print('Crated new directory: ',newpathFolder)
+                                    except:
+                                        print(f"Cant create {newpathFolder}, already exists")
+
+                                    try:    
+                                        os.system(f'mv {pathToFile} {newpath}')
+                                    except:
+                                        print(f'mv {pathToFile} to {newpath}')
+
+                                    # process data at new path
+                                    obs=Observation(FILEPATH=newpath, theoFit='',autoFit='',log=log)
+                                    obs.get_data()
+                                    del obs 
+                                    # sys.exit()
+
+                                else:
+                                    print('now were talking')
+                                    print(table, tablePath)
+                                    sys.exit()
+
+                            else:
+                                pass
+
+                    else:
+                        if table in tables:
+                            tableData = pd.read_sql_query(f"SELECT * FROM {table}", cnx)
+                            tableFilenames=sorted(list(tableData['FILENAME']))
+
+                            lista=set(files)
+                            listb=set(tableFilenames)
+                            newFiles = [x for x in lista if x not in listb]
+
+                            # print(temp3)#,lista^listb)
+                            # print(len(lista),len(listb),len(temp3))
+                            # print(tableFilenames in temp3, files in temp3)
+
+                            if len(newFiles) ==0:
+                                print(f'No new files in {args.f}')
+                                print('No new files to process')
+                                # sys.exit()
+                            else:
+                                print(f'Found {len(newFiles)} new files:')
+                                for file in newFiles:
+                                    pathToFile = os.path.join(args.f,file)
+                                    isSymlink=os.path.islink(f'{pathToFile}')
+
+                                    if not isSymlink:
+                                        print(f'Processing file: {pathToFile}')
+                                        obs=Observation(FILEPATH=pathToFile, theoFit='',autoFit='',log=log)
+                                        obs.get_data()
+                                        del obs
+
+                                    else:
+                                        print(f'File is a symlink: {args.f}/{file}. Stopped processing')
+                        else:
+                            # new table
+                            print(f'No existing table {table}')
+                            print(f'Creating table {table}')
+
+                            for file in files:
+                                pathToFile = os.path.join(args.f,file)
+                                isSymlink=os.path.islink(f'{pathToFile}')
+
+                                if not isSymlink:
+
+                                    print(f'Processing file: {pathToFile}')
+                                    obs=Observation(FILEPATH=pathToFile, theoFit='',autoFit='',log=log)
+                                    obs.get_data()
+                                    del obs
+
+                                else:
+                                    print(f'File is a symlink: {args.f}/{file}. Stopped processing')
+                        
+                else:
+                    print('no files found')
+                    sys.exit()
+                # print(files)
+                sys.exit()
                 # check if file ends with frequency
                 if src[-1]=='':
                     src=src[:-1]
@@ -616,11 +756,15 @@ def run(args):
                         # Check if file in table
                         db=SQLiteDB(__DBNAME__,log)
                         db.create_db()
-                        tables=db.get_table_names(__DBNAME__)
+                        tables=sorted(db.get_table_names(__DBNAME__))
                         db.close_db()
 
-                        print(f'There are {len(tables)} tables in {__DBNAME__}')
-                
+                        print(f'There are {len(tables)} tables in {__DBNAME__}\n')
+                        print('='*50,'\n')
+                        # print(table)
+                        # print(tables)
+                        # sys.exit()
+
                         if table in tables:
 
                             print('Already created tables', table)
@@ -686,12 +830,14 @@ def run(args):
                                             obs.get_data()
                                             del obs  
                                             # sys.exit()
-
                             
                         else:
                             print('We have a new source table')
                             files=os.listdir(args.f)
-
+                            # print(tables)
+                            # print(table)
+                            # print(files)
+                            # sys.exit()
                             if len(files) == 0:
                                 print(f'No files to process')
                             else:
@@ -715,6 +861,60 @@ def run(args):
                                 if len(newFilesToProcess) == 0:
                                     print(f'No files to process')
                                 else:
+
+                                    print(f'No table {table} found in {__DBNAME__}')
+                                    print('Checking for incorrect table name')
+
+                                    for t in tables:
+                                        if '8400' in table:# or '8440' in table:
+                                            print(table)
+                                            # sys.exit()
+                                            for fqs in ['8280','8440']:
+                                                tb=table.replace('8400',fqs)
+                                                for st in tables:
+                                                    if tb == st:
+                                                        print(st,' found misnamed folder')
+                                                        print(tb,st,'\n')
+                                                        sys.exit()
+                                                        cnx = sqlite3.connect(__DBNAME__)
+                                                        tdf = pd.read_sql_query(f"SELECT * FROM {st}", cnx)
+                                                        fns=sorted(list(tdf['FILENAME']))
+                                                        nf=list(set(newFilesToProcess) - set(fns))
+                                                        # print(len(nf))
+
+                                                        if len(nf)==0:
+                                                            print('No new files to process')
+                                                        else:
+                                                            print(f'Processing {len(nf)} new files from {len(newFilesToProcess)}')
+                                                            # sys.exit()
+                                                            for fn in nf:
+                                                                # pathToFile=os.path.join(folder,fn)
+                                                                v=tdf['FILEPATH'].iloc[0].split('/')
+                                                                pathToFile='/'.join(v[:-1])+'/'+fn
+                                                                # print(v,pathToFile)
+                                                                # sys.exit()
+
+                                                                # check file is not a symlink
+                                                                lnk=os.path.islink(f'{pathToFile}')
+                                                                if lnk==True:
+                                                                    # faultyFiles=[]
+                                                                    with open('faultyFiles.txt','a') as f:
+                                                                        f.write(f'{pathToFile}\n')
+                                                                        print(f'\nFile is a symlink: {pathToFile}. Stopped processing')
+                                                                else:
+                                                                    print(f'Processing file: {pathToFile}')
+                                                                    obs=Observation(FILEPATH=pathToFile, theoFit='',autoFit='',log=log)
+                                                                    obs.get_data()
+                                                                    del obs  
+                                                                    # sys.exit()
+                                                        # break
+                                                    else:
+                                                        pass
+                                        else:
+                                            sys.exit()
+                                        # sys.exit()
+
+                                    sys.exit()
                                     for fn in newFilesToProcess:
                                         pathToFile=os.path.join(args.f,fn)
 
@@ -746,7 +946,7 @@ def run(args):
                     alldirs=fast_scandir(args.f)
                     if len(alldirs)>0:
                         for folder in alldirs:
-                            print('\n',folder)
+                            print(f'\n*** Working on Folder: {folder}\n')
 
                             # split path into subdirectories
                             src=(folder).split('/')
@@ -785,10 +985,13 @@ def run(args):
                                 filesFromTable=list(df['FILENAME'])
                             
                                 newFiles=list(set(filesFromTable)^set(allFiles))
+
+
+
                                 if len(newFiles)==0:
                                     print('No new files to process')
                                 else:
-                                    print(f'Processing {len(newFiles)} new files')
+                                    print(f'-- Processing {len(newFiles)} new files')
                                     
                                     # check if files are faulty
                                     with open('faultyFiles.txt','r') as f:
@@ -800,7 +1003,7 @@ def run(args):
                                             faultyFiles.append(fl)
 
                                     # get list of files in A that are not in B
-                                    newFilesToProcess=list(set(newFiles) - set(faultyFiles))
+                                    newFilesToProcess=sorted(list(set(newFiles) - set(faultyFiles)))
                                     
                                     # print(newFilesToProcess)
                                     print(f'Processing {len(newFilesToProcess)} new files')
@@ -808,6 +1011,23 @@ def run(args):
                                     if len(newFilesToProcess) == 0:
                                         print(f'No files to process')
                                     else:
+
+                                        # check if files in database
+                                        cnx = sqlite3.connect(__DBNAME__)
+                                        caldbTables = pd.read_sql_query("SELECT name FROM sqlite_schema WHERE type='table'", cnx)
+                                        calTables=sorted([c for c in list(caldbTables['name']) if 'sqlite_sequence' not in c])
+                                        # tdf = pd.read_sql_query(f"SELECT * FROM {table}", cnx)
+                                        # df=df.sort_values('FILENAME')
+
+                                        found=False
+                                        for t in calTables:
+                                            if t==table:
+                                                found=True
+                                                break
+
+                                        print(f'found: {found}')
+
+                                        sys.exit()
                                         for fn in newFilesToProcess:
                                             pathToFile=os.path.join(folder,fn)
 
@@ -820,47 +1040,243 @@ def run(args):
                                                     print(f'\nFile is a symlink: {pathToFile}. Stopped processing')
                                             else:
                                                 print(f'Processing file: {pathToFile}')
+
                                                 obs=Observation(FILEPATH=pathToFile, theoFit='',autoFit='',log=log)
                                                 obs.get_data()
                                                 del obs  
                             
                             else:
+
+                                # print('here')
+                                # sys.exit()
+
                                 if len(allFiles)>0:
 
                                     # check if files are faulty
-                                    with open('faultyFiles.txt','r') as f:
-                                        for line in f:
+                                    # with open('faultyFiles.txt','r') as f:
+                                    #     for line in f:
                                             
-                                            ln=line.split('\n')[0]
-                                            fl=ln.split('/')[-1]
-                                            faultyFiles.append(fl)
+                                    #         ln=line.split('\n')[0]
+                                    #         fl=ln.split('/')[-1]
+                                    #         faultyFiles.append(fl)
 
-                                    # get list of files in A that are not in B
-                                    newFilesToProcess=list(set(allFiles) - set(faultyFiles))
+                                    # # get list of files in A that are not in B
+                                    # newFilesToProcess=list(set(allFiles) - set(faultyFiles))
 
-                                    # print(newFilesToProcess)
-                                    print(f'Processing {len(newFilesToProcess)} new files')
+                                    # print(f'Processing {len(newFilesToProcess)} new files')
                                     
-                                    if len(newFilesToProcess) == 0:
-                                        print(f'No files to process')
-                                    else:
-                                        for fn in newFilesToProcess:
+                                    # if len(newFilesToProcess) == 0:
+                                    #     print(f'No files to process')
+                                    # else:
+                                        # print(newFilesToProcess)
+                                        # pass
 
-                                            pathToFile=os.path.join(folder,fn)
+                                    # def check_folder_in_database(self):
+                                        # check if files in database
+                                        # print(__DBNAME__)
+                                        cnx = sqlite3.connect(__DBNAME__)
+                                        dbTables = pd.read_sql_query("SELECT name FROM sqlite_schema WHERE type='table'", cnx)
+                                        tables=sorted([c for c in list(dbTables['name']) if 'sqlite_sequence' not in c])
+                                        # tdf = pd.read_sql_query(f"SELECT * FROM {table}", cnx)
+                                        # df=df.sort_values('FILENAME')
+                                
+                                        # print(calTables)
 
-                                            # check file is not a symlink
-                                            lnk=os.path.islink(f'{pathToFile}')
-                                            if lnk==True:
-                                                # faultyFiles=[]
-                                                with open('faultyFiles.txt','a') as f:
-                                                    f.write(f'{pathToFile}\n')
-                                                    print(f'\nFile is a symlink: {pathToFile}. Stopped processing')
+                                        # sys.exit()
+                                        found=False
+                                        for t in tables:
+                                            if t==table:
+                                                found=True
+                                                break
+                                        
+                                        # print(found)
+                                        # sys.exit()
+                                        if found==False:
+                                            print(f'No table {table} found in {__DBNAME__}')
+                                            print('Checking for correct table name')
+                                            # sys.exit()
+
+                                            
+                                            if len(tables)==0:
+                                                
+                                                for filen in allFiles:
+                                                    pathToFile=os.path.join(folder,filen)
+                                                    print(pathToFile)
+                                                    # sys.exit()
+
+                                                    print(f'Processing file: {pathToFile}')
+                                                    # obs=Observation(FILEPATH=pathToFile, theoFit='',autoFit='',log=log)
+                                                    # data=obs.get_data_only()
+                                                    # print(data)
+                                                    # del obs  
+                                                    sys.exit()
+                                                    
+                                                sys.exit()
                                             else:
-                                                print(f'Processing file: {pathToFile}')
-                                                obs=Observation(FILEPATH=pathToFile, theoFit='',autoFit='',log=log)
-                                                obs.get_data()
-                                                del obs  
-                                                # sys.exit()
+                                                sys.exit()
+                                            for t in calTables:
+                                                # print(t,table,t==table)
+                                                
+                                                if '8400' in table or '8440' in table:
+                                                    # print(table)
+                                                    for fqs in ['8280']:
+                                                        tb=table.replace('8400','8280')
+                                                        # name
+                                                        for st in calTables:
+                                                            if tb==st:
+                                                                print(st,' found misnamed folder')
+                                                                tdf = pd.read_sql_query(f"SELECT * FROM {st}", cnx)
+                                                                fns=sorted(list(tdf['FILENAME']))
+                                                                # print(fns)
+                                                                # print(newFilesToProcess)
+                                                                nf=list(set(newFilesToProcess) - set(fns))
+                                                                # sys.exit()
+                                                                if len(nf)==0:
+                                                                    print('No new files to process')
+                                                                else:
+                                                                    print(f'Processing {len(nf)} new files from {len(newFilesToProcess)}')
+                                                                    # sys.exit()
+                                                                    for fn in nf:
+                                                                        pathToFile=os.path.join(folder,fn)
+
+                                                                        # check file is not a symlink
+                                                                        lnk=os.path.islink(f'{pathToFile}')
+                                                                        if lnk==True:
+                                                                            # faultyFiles=[]
+                                                                            with open('faultyFiles.txt','a') as f:
+                                                                                f.write(f'{pathToFile}\n')
+                                                                                print(f'\nFile is a symlink: {pathToFile}. Stopped processing')
+                                                                        else:
+                                                                            print(f'Processing file: {pathToFile}')
+                                                                            obs=Observation(FILEPATH=pathToFile, theoFit='',autoFit='',log=log)
+                                                                            obs.get_data()
+                                                                            del obs  
+                                                                            # sys.exit()
+                                                                    break
+                                                            else:
+                                                                pass
+                                                elif '5000' in table or '5040' in table:
+                                                    # print(table)
+                                                    for fqs in ['4800']:
+                                                        tb=table.replace('5000',fqs)
+
+                                                        for st in calTables:
+                                                            if tb==st:
+                                                                print(st,' found misnamed folder')
+                                                                tdf = pd.read_sql_query(f"SELECT * FROM {st}", cnx)
+                                                                fns=sorted(list(tdf['FILENAME']))
+                                                                # print(fns)
+                                                                # print(newFilesToProcess)
+                                                                nf=list(set(newFilesToProcess) - set(fns))
+                                                                # sys.exit()
+                                                                if len(nf)==0:
+                                                                    print('No new files to process')
+                                                                else:
+                                                                    print(f'Processing {len(nf)} new files from {len(newFilesToProcess)}')
+                                                                    # sys.exit()
+                                                                    for fn in nf:
+                                                                        pathToFile=os.path.join(folder,fn)
+
+                                                                        # check file is not a symlink
+                                                                        lnk=os.path.islink(f'{pathToFile}')
+                                                                        if lnk==True:
+                                                                            # faultyFiles=[]
+                                                                            with open('faultyFiles.txt','a') as f:
+                                                                                f.write(f'{pathToFile}\n')
+                                                                                print(f'\nFile is a symlink: {pathToFile}. Stopped processing')
+                                                                        else:
+                                                                            print(f'Processing file: {pathToFile}')
+                                                                            obs=Observation(FILEPATH=pathToFile, theoFit='',autoFit='',log=log)
+                                                                            obs.get_data()
+                                                                            del obs  
+                                                                            sys.exit()
+                                                                    break
+                                                            else:
+                                                                pass
+                                                elif '22000' in table:
+                                                    # print(table)
+
+                                                    for fqs in ['22040']:
+                                                        tb=table.replace('22000',fqs)
+
+                                                        print('\n',table,tb )
+                                                        # sys.exit()
+                                                        for st in calTables:
+                                                            if tb==st:
+                                                                print(st,' found misnamed folder')
+                                                                tdf = pd.read_sql_query(f"SELECT * FROM {st}", cnx)
+                                                                fns=sorted(list(tdf['FILENAME']))
+                                                                # print(fns)
+                                                                # print(sorted(newFilesToProcess))
+                                                                nf=sorted(list(set(newFilesToProcess) - set(fns)))
+                                                                print(nf)
+                                                                # sys.exit()
+                                                                
+                                                                if len(nf)==0:
+                                                                    print('No new files to process')
+                                                                    break
+                                                                else:
+                                                                    print(f'Processing {len(nf)} new files from {len(newFilesToProcess)}')
+                                                                    sys.exit()
+                                                                    print('\n',table,tb,'\n')
+                                                                    print(fns,'\n')
+                                                                    print(nf)
+                                                                    # sys.exit()
+                                                                    for filen in nf:
+                                                                        pathToFile=os.path.join(folder,filen)
+                                                                        print(pathToFile)
+                                                                        # sys.exit()
+
+                                                                        # check file is not a symlink
+                                                                        lnk=os.path.islink(f'{pathToFile}')
+                                                                        if lnk==True:
+                                                                            # faultyFiles=[]
+                                                                            with open('faultyFiles.txt','a') as f:
+                                                                                f.write(f'{pathToFile}\n')
+                                                                                print(f'\nFile is a symlink: {pathToFile}. Stopped processing')
+                                                                        else:
+                                                                            print(f'Processing file: {pathToFile}')
+                                                                            obs=Observation(FILEPATH=pathToFile, theoFit='',autoFit='',log=log)
+                                                                            obs.get_data()
+                                                                            del obs  
+                                                                            sys.exit()
+                                                                    break
+                                                            else:
+                                                                pass
+
+                                                else:                     
+                                                    # sys.exit()
+                                                    pass
+
+                                        else:
+                                            # # print(caldbTables)
+                                            
+                                            for fn in newFilesToProcess:
+
+                                                pathToFile=os.path.join(folder,fn)
+
+                                                # check file is not a symlink
+                                                lnk=os.path.islink(f'{pathToFile}')
+                                                if lnk==True:
+                                                    # faultyFiles=[]
+                                                    with open('faultyFiles.txt','a') as f:
+                                                        f.write(f'{pathToFile}\n')
+                                                        print(f'\nFile is a symlink: {pathToFile}. Stopped processing')
+                                                else:
+                                                    # check if files already in database
+                                                    cnx = sqlite3.connect(__DBNAME__)
+                                                    tdf = pd.read_sql_query(f"SELECT * FROM {table}", cnx)
+                                                    # calTables=sorted([c for c in list(caldbTables['name']) if 'sqlite_sequence' not in c])
+                                                    ft=list(tdf['FILENAME'])
+
+                                                    if fn in ft:
+                                                        pass
+                                                    else:
+                                                        print(f'Processing file: {pathToFile}')
+                                                        obs=Observation(FILEPATH=pathToFile, theoFit='',autoFit='',log=log)
+                                                        obs.get_data()
+                                                        del obs  
+                                                        # sys.exit()
                                 else:
                                     print(f'No files to process in {folder}')
                     else:

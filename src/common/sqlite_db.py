@@ -10,9 +10,15 @@ import sys
 import sqlite3
 import numpy as np
 from dataclasses import dataclass
-from .msgConfiguration import msg_wrapper
-from .miscellaneousFunctions import set_table_name
+try:
+    from .msgConfiguration import msg_wrapper
+except:
+    from msgConfiguration import msg_wrapper
 
+try:
+    from .miscellaneousFunctions import set_table_name
+except:
+    from common.miscellaneousFunctions import set_table_name
 # Local imports
 # --------------------------------------------------------------------------- #
 @dataclass
@@ -38,7 +44,7 @@ class SQLiteDB:
     def commit_changes(self):
         """ Commit/save changes you have implemented to the database. """
         self.conn.commit()
-        print('Commited changes')
+        print('>>>> Commited changes')
 
     def create_table_stmt(self, data, tableName):
         """ Create table from dictionary. """
@@ -103,6 +109,7 @@ class SQLiteDB:
         dataListValues = list(data.values())
         dataListValueString = ""
 
+        # print(dataListKey)
         for i in range(len(data)):
             if i == 0:
                 dataListKeyString = dataListKeyString + dataListKey[i]
@@ -122,20 +129,59 @@ class SQLiteDB:
 
         try:
             self.create_db()
-        except Exception:
+        except Exception as e:
+            # print(e)
             pass
 
         #print('data: ',data)
 
         sqlStmt, values = self.insert_into_table_stmt_with_pk(data, tableName)
         # for i in range(len(values)):
-        #     print(sqlStmt)
+        # print(sqlStmt)
+        # print(values)
+
+        
         try:
             self.c.execute(sqlStmt, values)
+            self.commit_changes()
         except Exception as e:
-            print("issue: ", e)
 
-        self.commit_changes()
+            msg_wrapper('debug',self.log.debug,f"issue: {e}")
+
+            s=sqlStmt.split(' ')
+            v1=values[1]
+            v=values[1].upper()
+            s=(s[2]).replace('_','/')
+            # v=v[]
+            # print(s,v)
+            # print(s in v)
+            # print('/'.join((v1.split('/'))[:-3])+'/'+s)
+            newpath='/'.join((v1.split('/'))[:-3])+'/'+s
+
+            if s not in v:
+                try:
+                    os.makedirs(newpath)
+                    print('Crated new directory: ',newpath)
+                except:
+                    print(f"Cant create {newpath}, already exists")
+
+                try:
+                    os.system(f'mv {v1} {newpath}')
+                    print(f'moved {v1} to {newpath}')
+                    print('Moving on\n')
+                except:
+                    print(f'Can not move {v1} to {newpath}')
+                    print('Closing program')
+                    sys.exit()
+            # # if s in v:
+            # # print('\n',s, v,'\n')
+              
+            else:
+                print(f'File {s} already exists in the database')
+                # sys.exit()
+
+        # sys.exit()
+        
 
     def set_database_name(self, databaseName):
         """ Set the name of the database. """
@@ -162,13 +208,15 @@ class SQLiteDB:
         
         table_names = []
         sql_stmt = "SELECT name FROM sqlite_master WHERE type = 'table';"
-        
+        # print(sql_stmt)
+        # tables = self.c.execute(sql_stmt).fetchall()
         try:
             tables = self.c.execute(sql_stmt).fetchall()
         except sqlite3.OperationalError:
             print("Failed to fetch data from the server")
             sys.exit()
 
+        # print('Tables: ',tables)
         for i in range(len(tables)):
             if tables[i][0].startswith("data"):
                 table_names.append(tables[i][0])
@@ -272,6 +320,3 @@ class SQLiteDB:
     # def set_table_name(self,tableName):
     #     msg_wrapper("debug", self.log.debug, "Setting table name to: "+tableName)
     #     return tableName
-
-
-

@@ -9,13 +9,16 @@ import numpy as np
 import os
 # =========================================================================== #
 
-from .msgConfiguration import msg_wrapper
+try:
+    from .msgConfiguration import msg_wrapper
+except:
+    from msgConfiguration import msg_wrapper
 try:
     from ..config import logfile
 except:
     from config import logfile
     
-def set_dict_item(dictionary,key,value,description) -> None:
+def set_dict_item(dictionary: dict,key,value,description) -> None:
     """
     Set dictionary key, value and description
 
@@ -35,7 +38,7 @@ def delete_object(objectName) -> None:
     """
     del objectName
 
-def calc_log_freq(freq):
+def calc_log_freq(freq: float):
     """ Calculate the log(frequency) """
 
     # msg_wrapper("debug", self.log.debug, "Calculating log of frequency")
@@ -112,7 +115,7 @@ def sig_to_noise(signalPeak, noise,log):
     msg_wrapper("debug",log.debug,msg)
 
     sig2noise = signalPeak/np.std(noise)
-    #sig2noise = signalPeak/(max(noise)+abs(min(noise)))
+    #sig2noise = signalPeak/(max(noise)+abs(min(noise))) - if there is RFI in the noise, this doesn't work very well
     return sig2noise
 
 def delete_logs():

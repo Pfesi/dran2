@@ -92,7 +92,7 @@ class Observation:
             msg_wrapper("debug",self.log.debug,msg)
         return
 
-    def get_data_only(self):
+    def get_data_only(self,noqv=False):
         """ Get data from fits file hdu. This is for the quick file view.
         """
 
@@ -100,7 +100,7 @@ class Observation:
         msg_wrapper("debug",self.log.debug,f"Create dict object to store read parameters")
         self.__dict__['CARDS']={} #{'value':[], 'description':"Placeholder for hdu card titles or names"} # holds hdu card titles or names
 
-        # print(self.__dict__)
+        # 
         
         CURDATETIME = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         msg_wrapper("info",self.log.info,f"Date and time of data processing: {CURDATETIME}")
@@ -111,9 +111,7 @@ class Observation:
         try:
             hdulen=self.HDULENGTH['value']
         except:
-            with open('faultyFiles.txt','a') as f:
-                f.write(f'{self.FILEPATH}\n')
-                print(f'\nFile is a symlink: {self.FILEPATH}. Stopped processing')
+            msg_wrapper("debug",self.log.debug,f'File is a symlink: {self.FILEPATH}. Stopped processing')
             return
         
         for index in range(hdulen):
@@ -153,9 +151,10 @@ class Observation:
 
         elif 'D' in (frontend):
             set_dict_item(self.__dict__,'BEAMTYPE',ScanType.DB.name, 'dual beam drift scan')
-
+            # sys.exit()
             # get driftscan data from file
             driftScans=DriftScans(self.__dict__)
+            # sys.exit()
             driftScans.process_data_only() # process the data
             del driftScans # release from memory
 
@@ -167,7 +166,7 @@ class Observation:
         msg_wrapper("debug",self.log.debug,f"Create dict object to store read parameters")
         self.__dict__['CARDS']={} #{'value':[], 'description':"Placeholder for hdu card titles or names"} # holds hdu card titles or names
 
-        # print(self.__dict__)
+        # 
         
         CURDATETIME = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         msg_wrapper("info",self.log.info,f"Date and time of data processing: {CURDATETIME}")
@@ -220,7 +219,7 @@ class Observation:
 
         elif 'D' in (frontend):
             set_dict_item(self.__dict__,'BEAMTYPE',ScanType.DB.name, 'dual beam drift scan')
-
+            # sys.exit()
             # get driftscan data from file
             driftScans=DriftScans(self.__dict__)
             driftScans.process_data() # process the data

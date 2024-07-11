@@ -166,8 +166,17 @@ class DriftScanData(object):
 
         # ensure PWV and WVD do not go negative! 
         # calculate PWV values - copy from Mikes drift_fits2asc_HINDv16.c file
-        hum=self.__dict__['HUMIDITY']['value']
-        temp=self.__dict__['TAMBIENT']['value']
+        try:
+            hum=self.__dict__['HUMIDITY']['value']
+        except:
+            hum=np.nan
+            self.__dict__['HUMIDITY']={'value':hum,'description':'humidity'}
+
+        try:
+            temp=self.__dict__['TAMBIENT']['value']
+        except:
+            temp=np.nan
+            self.__dict__['TAMBIENT']={'value':temp,'description':'ambient temperature'}
 
         try:
             pwv = max(0.0, 4.39 * hum/100.0/temp * math.exp(26.23-5416/temp))

@@ -5,7 +5,7 @@ DRAN README
 
 Originally conceived as part of Dr. Pfesesani Van Zyl's Ph.D. project, **DRAN** is currently maintained by the author, a postdoctoral researcher at [SARAO (the South African Radio AStronomy Observatory](http://www.sarao.ac.za/).
 
-
+To get started with DRAN and read more on the full documentations of the program you can go to the DRAN [READTHEDOCS](https://dran2.readthedocs.io/en/latest/) page.
 
 Acknowledging DRAN
 -------------------

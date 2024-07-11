@@ -302,7 +302,8 @@ class DataProcessingFlowManager:
                             msg_wrapper("warning", self.log.warning, msg)
                             saveTo=f'{plotSavePath}/{self.plotName}_{self.srcTag}{ext}'
                             plot_no_fit(self.x, self.y, msg,"", saveTo, msg, xlabel="", ylabel="")
-                        
+                            # ret['s2na']=np.nan
+                            # ret['s2nb']=np.nan
                         elif np.isinf(ret['leftPeakFitErr']) or np.isinf(ret['rightPeakFitErr']):
                             msg = "Rms is +- inf"
                             self.flag = 14
@@ -339,13 +340,17 @@ class DataProcessingFlowManager:
                                 msg="Got a s2n < 3"
                                 self.flag = 15
                                 ret['flag']=self.flag
+                                # ret['s2na']=np.nan
+                                # ret['s2nb']=np.nan
                                 msg_wrapper("warning", self.log.warning, msg)
+
                             else:
                                 pass
                     else:
                         msg_wrapper("error", self.log.error,'No corrected data found')
                         ret['flag']=55 # check if this is valid
-                        ret['s2n']=np.nan
+                        ret['s2na']=np.nan
+                        ret['s2nb']=np.nan
                         saveTo=f'{plotSavePath}/{self.plotName}_{self.srcTag}{ext}'
                         plot_no_fit(self.x, self.y, "No corrected data found","", saveTo, 'No corrected data', xlabel="", ylabel="")
                         # sys.exit()
@@ -380,11 +385,6 @@ class DataProcessingFlowManager:
                                     "T$_{A}$ [K]"+f" = {ret['leftPeakFit']:.3f} +- {ret['leftPeakFitErr']:.3f}",\
                                     "T$_{A}$ [K]"+f" = {ret['rightPeakFit']:.3f} +- {ret['rightPeakFitErr']:.3f}",\
                                     saveTo,xlabel="",ylabel="")
-       
-                    
-
-                    # print('done')
-                    # sys.exit()
 
                 else:
                     print(f'Invalid frontend: {self.frontend}')

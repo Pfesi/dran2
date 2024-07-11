@@ -2,6 +2,7 @@ AUTHORS.rst
 LICENSE.txt
 README.md
 pyproject.toml
+reqs.txt
 src/__init__.py
 src/_auto.py
 src/_cli.py

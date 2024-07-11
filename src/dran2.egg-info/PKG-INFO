@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: dran2
-Version: 0.0.2
+Version: 0.0.6
 Summary: Data reduction and analysis of HartRAO 26m telescope drift scans
 Author-email: Pfesesani van Zyl <pfesi24@gmail.com>
 Maintainer-email: Pfesesani van Zyl <pfesi24@gmail.com>
@@ -20,11 +20,92 @@ Requires-Python: >=3.8
 Description-Content-Type: text/markdown
 License-File: LICENSE.txt
 License-File: AUTHORS.rst
-Provides-Extra: gui
-Requires-Dist: PyQt5; extra == "gui"
-Provides-Extra: cli
-Requires-Dist: rich; extra == "cli"
-Requires-Dist: click; extra == "cli"
+Requires-Dist: alabaster==0.7.16
+Requires-Dist: astropy==6.0.0
+Requires-Dist: astropy-iers-data==0.2024.3.4.0.30.17
+Requires-Dist: attrs==23.2.0
+Requires-Dist: Babel==2.14.0
+Requires-Dist: build==1.2.1
+Requires-Dist: cachetools==5.3.3
+Requires-Dist: cattrs==23.2.3
+Requires-Dist: certifi==2024.2.2
+Requires-Dist: chardet==5.2.0
+Requires-Dist: charset-normalizer==3.3.2
+Requires-Dist: click==8.1.7
+Requires-Dist: colorama==0.4.6
+Requires-Dist: contourpy==1.2.0
+Requires-Dist: cycler==0.12.1
+Requires-Dist: distlib==0.3.8
+Requires-Dist: docutils==0.20.1
+Requires-Dist: esbonio==0.16.4
+Requires-Dist: filelock==3.14.0
+Requires-Dist: fonttools==4.49.0
+Requires-Dist: idna==3.6
+Requires-Dist: imagesize==1.4.1
+Requires-Dist: importlib_metadata==7.1.0
+Requires-Dist: jaraco.classes==3.4.0
+Requires-Dist: jaraco.context==5.3.0
+Requires-Dist: jaraco.functools==4.0.1
+Requires-Dist: Jinja2==3.1.3
+Requires-Dist: joblib==1.3.2
+Requires-Dist: keyring==25.1.0
+Requires-Dist: kiwisolver==1.4.5
+Requires-Dist: lsprotocol==2023.0.1
+Requires-Dist: markdown-it-py==3.0.0
+Requires-Dist: MarkupSafe==2.1.5
+Requires-Dist: matplotlib==3.8.3
+Requires-Dist: mdurl==0.1.2
+Requires-Dist: memory-profiler==0.61.0
+Requires-Dist: more-itertools==10.2.0
+Requires-Dist: nh3==0.2.17
+Requires-Dist: numpy==1.26.4
+Requires-Dist: packaging==23.2
+Requires-Dist: pandas==2.2.2
+Requires-Dist: pillow==10.2.0
+Requires-Dist: pkginfo==1.10.0
+Requires-Dist: platformdirs==4.2.0
+Requires-Dist: pluggy==1.5.0
+Requires-Dist: psutil==5.9.8
+Requires-Dist: pyerfa==2.0.1.1
+Requires-Dist: pygls==1.3.1
+Requires-Dist: Pygments==2.17.2
+Requires-Dist: pyparsing==3.1.2
+Requires-Dist: pyproject-api==1.6.1
+Requires-Dist: pyproject_hooks==1.1.0
+Requires-Dist: PyQt5==5.15.10
+Requires-Dist: PyQt5-Qt5==5.15.12
+Requires-Dist: PyQt5-sip==12.13.0
+Requires-Dist: pyspellchecker==0.8.1
+Requires-Dist: python-dateutil==2.9.0.post0
+Requires-Dist: pytz==2024.1
+Requires-Dist: PyYAML==6.0.1
+Requires-Dist: readme_renderer==43.0
+Requires-Dist: requests==2.31.0
+Requires-Dist: requests-toolbelt==1.0.0
+Requires-Dist: rfc3986==2.0.0
+Requires-Dist: rich==13.7.1
+Requires-Dist: scikit-learn==1.4.1.post1
+Requires-Dist: scipy==1.12.0
+Requires-Dist: setuptools==68.2.2
+Requires-Dist: six==1.16.0
+Requires-Dist: snowballstemmer==2.2.0
+Requires-Dist: Sphinx==7.2.6
+Requires-Dist: sphinx-rtd-theme==2.0.0
+Requires-Dist: sphinxcontrib-applehelp==1.0.8
+Requires-Dist: sphinxcontrib-devhelp==1.0.6
+Requires-Dist: sphinxcontrib-htmlhelp==2.0.5
+Requires-Dist: sphinxcontrib-jquery==4.1
+Requires-Dist: sphinxcontrib-jsmath==1.0.1
+Requires-Dist: sphinxcontrib-qthelp==1.0.7
+Requires-Dist: sphinxcontrib-serializinghtml==1.1.10
+Requires-Dist: threadpoolctl==3.3.0
+Requires-Dist: tox==4.15.0
+Requires-Dist: twine==5.0.0
+Requires-Dist: tzdata==2024.1
+Requires-Dist: urllib3==2.2.1
+Requires-Dist: virtualenv==20.26.2
+Requires-Dist: wheel==0.41.2
+Requires-Dist: zipp==3.18.1
 
 DRAN README
 ===========
@@ -33,7 +114,7 @@ DRAN README
 
 Originally conceived as part of Dr. Pfesesani Van Zyl's Ph.D. project, **DRAN** is currently maintained by the author, a postdoctoral researcher at [SARAO (the South African Radio AStronomy Observatory](http://www.sarao.ac.za/).
 
-
+To get started with DRAN and read more on the full documentations of the program you can go to the DRAN [READTHEDOCS](https://dran2.readthedocs.io/en/latest/) page.
 
 Acknowledging DRAN
 -------------------

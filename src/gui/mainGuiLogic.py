@@ -1437,7 +1437,7 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
         self.time_ui.BtnSaveDB.clicked.connect(self.save_time_db)
         #self.time_ui.BtnFit.clicked.connect(self.fit_timeseries)
 
-    def plot_cols(self,col=""):
+    def plot_cols(self,col="",xcol="",ycol="",yerr=""):
         """ Plot database columns. """
 
         self.db = SQLiteDB(dbPath=self.dbFile, log=self.log)
@@ -1476,9 +1476,14 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
         self.df["OBSDATE"]=pd.to_datetime(self.df["OBSDATE"],format="%Y-%m-%d")
 
         # get col names
-        xCol = self.time_ui.comboBoxColsX.currentText()
-        yCol = self.time_ui.comboBoxColsY.currentText()
-        yErr = self.time_ui.comboBoxColsYerr.currentText()
+        if xcol!="" and ycol!="" and yerr!="":
+            xCol=xcol
+            yCol=ycol
+            yErr=yerr
+        else:
+            xCol = self.time_ui.comboBoxColsX.currentText()
+            yCol = self.time_ui.comboBoxColsY.currentText()
+            yErr = self.time_ui.comboBoxColsYerr.currentText()
 
         # print('yCol: ', yErr)
 
@@ -1494,14 +1499,16 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
             if yErr=="None":
                 yerr=np.zeros(len(self.df))
             else:
+                yerr=self.df[yErr]
 
                 # print(self.df[yErr])
-                self.df[yErr][self.df[yErr] < 0] = np.nan
+                # self.df[yErr][self.df[yErr] < 0] = np.nan
                 # print(self.df[yErr])
                 # sys.exit()
-                yerr=self.df[yErr]
-                # condition : When True, yield x, otherwise yield y.
-                yerr=np.where(yerr<0, np.nan, yerr)
+                # yerr=self.df[yErr].astype(float)
+                # # condition : When True, yield x, otherwise yield y.
+                # yerr=np.where(yerr<0, np.nan, yerr)
+                # self.df[yErr][self.df[yErr] < 0] = np.nan
 
             # print(self.df['OBSDATE'])
             t=self.df[self.df[xCol].isnull()]
@@ -1531,7 +1538,7 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
             self.df[xCol].fillna(value=0, inplace=True)
             self.df[xCol].fillna(value=pd.NaT, inplace=True)
 
-            self.df[yCol].fillna(value=np.nan, inplace=True)
+            # self.df[yCol].fillna(value=np.nan, inplace=True)
            
             
             self.Canvas.plot_fig(self.df[xCol],self.df[yCol],xCol,yCol,data=self.df,yerr=yerr) #,data=self.)

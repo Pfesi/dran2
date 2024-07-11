@@ -50,6 +50,9 @@ Pygments==2.17.2
 pyparsing==3.1.2
 pyproject-api==1.6.1
 pyproject_hooks==1.1.0
+PyQt5==5.15.10
+PyQt5-Qt5==5.15.12
+PyQt5-sip==12.13.0
 pyspellchecker==0.8.1
 python-dateutil==2.9.0.post0
 pytz==2024.1
