@@ -27,6 +27,13 @@ from common.sqlite_db import SQLiteDB
 from common.observation import Observation
 # =========================================================================== #
 
+def get_tables_from_database(dbName=__DBNAME__):
+    cnx = sqlite3.connect(dbName)
+    dbTables= pd.read_sql_query("SELECT name FROM sqlite_schema WHERE type='table'", cnx)
+    tables=list(dbTables['name'])
+    cnx.close()
+    return tables
+    
 def generate_table_name(files, folderPath,log):
     """Use a random fits file to get the source name and 
     frequency so you can generate a table name"""
@@ -101,17 +108,23 @@ def run(args):
          
         db=args.conv
         print('Converting database files')
-        db = SQLiteDB(__DBNAME__,log)
-        db.create_db()
-        tables=db.get_table_names(__DBNAME__)
+        tables=get_tables_from_database()
+        
+        if len(tables)>0:
+            for table in tables:
+                print(f'Converting table {table} to csv')
+                cnx = sqlite3.connect(__DBNAME__)
+                df = pd.read_sql_query(f"select * from {table}", cnx)
+                df.sort_values('FILENAME',inplace=True)
 
-        for table in tables:
-            print(f'Converting table {table} to csv')
-
-            df = pd.read_sql_query(f"select * from {table}", db.conn)
-            df.sort_values('FILENAME',inplace=True)
-            df.to_csv(f'Table_{table}.csv',sep=',',index=False)
-        sys.exit()
+                try:
+                    os.mkdir('Tables')
+                except:
+                    pass
+                df.to_csv(f'Tables/Table_{table}.csv',sep=',',index=False)
+            sys.exit()
+        else:
+            print('No tables found in the database')
 
     else:
         pass
@@ -131,17 +144,17 @@ def run(args):
             
             # check if file exists
             if not os.path.exists(args.f):
-                msg_wrapper("error",log.error,f"File {args.f} does not exist")
+                msg_wrapper("error",log.error,f"File {args.f} does not exist, stopping quickview")
                 sys.exit()
 
             # check if file is a symlink
             elif os.path.islink(args.f):
-                msg_wrapper("error",log.error,f"File {args.f} is a symlink")
+                msg_wrapper("error",log.error,f"File {args.f} is a symlink, stopping quickview")
                 sys.exit()
 
             # check if file is a directory
             elif os.path.isdir(args.f):
-                msg_wrapper("error",log.error,f"File {args.f} is a directory")
+                msg_wrapper("error",log.error,f"File {args.f} is a directory, stopping quickview")
                 sys.exit()
             
             else:
