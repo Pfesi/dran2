@@ -15,7 +15,7 @@ Introduction
 by `HartRAO's 26m telescope <http://www.hartrao.ac.za/hh26m_factsfile.html>`_. 
 The software is a newly developed program intended to replace the old `LINES <http://www.hartrao.ac.za/hh26m_factsfile.html>`_ program previously used at HartRAO. 
 
-The package is built on Python 3.12 and provides
+The package is built on `Python 3.12 <https://www.python.org/downloads/release/python-3120/>`_ and provides
 a set of tools to perform common analysis tasks that 
 include but are not limited to,
 
@@ -24,9 +24,9 @@ include but are not limited to,
 - Data visualization 
 
 .. caution:: 
-   This project is still under active development, if you would like to see more details 
-   on the sections included in the documentation please contact the author. Details are 
-   listed at the end of the document.
+   This project is still under active development, if you would like to contribute 
+   to the software please contact the author or submit an issue on github. Details 
+   are listed at the end of the document.
 
 How does it work ?
 ------------------
@@ -37,17 +37,24 @@ all the extracted and calculated source parmeters are stored.
 
 It then proceeds to 
 
-    * cleans or filter out any RFI present in the data  
+    * clean or filter out any RFI present in the data  
     * correct or remove any drift that may be present in the data due to telescope effects, and 
-    * tries to fit the peak of the signal (i.e. upper 30% of the beam) depending on how good the signal is after cleansing. 
+    * tries to fit the peak of the signal (i.e. upper 50% of the beam). 
+
+.. note:: 
+   The software previously used to fit the top 30% for bright calibrator sources but this 
+   value was adjusted for both calibrator and target sources in order to maximize 
+   fitting for weak signals.
+
 
 The result and other statistics are then written 
 into a database where they can then be analysed using various statistical tools.
-All accompanying plots are stored in the plots folder created in the users current working directory. 
+All accompanying plots are stored in the 'plots' folder created in the users 
+current working directory. 
 
 .. note:: 
-   Although data is primarily stored in an SQLite database, it can also easily be converted into 
-   a csv file. 
+   Although data is primarily stored in an SQLite database, it can also easily be 
+   converted into a csv file. 
 
 The main mode of data processing in DRAN is through the :doc:`extras/cli`. This interface is best suited for 
 automated or semi-automated analysis. For a more hands on approach a 
@@ -102,6 +109,13 @@ or email Dr. Pfesi van Zyl on pfesi24@gmail.com
    extras/tuts/tutorials.rst
 
    extras/commands.rst
+
+.. toctree::
+   :hidden:
+   :maxdepth: 2
+   :caption: Resources:
+
+   extras/radio_sources.rst
 
 .. toctree::
    :hidden:

@@ -171,12 +171,6 @@ def run(args):
             # split path into subdirectories
             src=(args.f).split('/')
 
-            # get new faulty files from directory
-            faultyFiles=[]
-            with open('faultyFiles.txt','r') as f:
-                for line in f:
-                    faultyFiles.append(line.split('\n')[0])
-
             if readFile:
 
                 print(f'\nWorking on folder: {args.f}')
@@ -238,6 +232,8 @@ def run(args):
                 # search for files
                 files = sorted(os.listdir(args.f))
 
+                # print(files)
+                # sys.exit()
                 if len(files)>0:
                     src, freq, table, pathToFile = generate_table_name(files, args.f,log)
                     # print(src, freq, table, pathToFile)
@@ -309,9 +305,11 @@ def run(args):
                             listb=set(tableFilenames)
                             newFiles = [x for x in lista if x not in listb]
 
-                            # print(temp3)#,lista^listb)
+                            # print(newFiles)#,lista^listb)
+                            print(len(newFiles),len(lista),len(listb), newFiles in files, newFiles in tableFilenames)
                             # print(len(lista),len(listb),len(temp3))
                             # print(tableFilenames in temp3, files in temp3)
+                            # sys.exit()
 
                             if len(newFiles) ==0:
                                 print(f'No new files in {args.f}')
@@ -328,6 +326,7 @@ def run(args):
                                         obs=Observation(FILEPATH=pathToFile, theoFit='',autoFit='',log=log)
                                         obs.get_data()
                                         del obs
+                                        # sys.exit()
 
                                     else:
                                         print(f'File is a symlink: {args.f}/{file}. Stopped processing')
@@ -918,7 +917,7 @@ def run(args):
     
             else:
                 print(f"{args.f} is neither an acceptable file nor folder path, please refer to the documentation and try again\n")
-                # sys.exit()
+                sys.exit()
     else:
         if args.db:
             print('You havent specified the file or folder to process')
@@ -961,12 +960,6 @@ def main():
             e.g. _auto.py -h
     """
 
-    # create file to store faulty file names
-    if os.path.isfile('faultyFiles.txt'):
-        pass
-    else:
-        f1= open('faultyFiles.txt','w+')
-
     # Create storage directory for processing files
     create_current_scan_directory()
 
@@ -993,10 +986,4 @@ def main():
     args.func(args)
 
 if __name__ == '__main__':   
-    # create file to store faulty or symlink file names
-    if os.path.isfile('faultyFiles.txt'):
-        pass
-    else:
-        f1= open('faultyFiles.txt','w+')
-
     main()

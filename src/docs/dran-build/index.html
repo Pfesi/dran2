@@ -63,6 +63,10 @@
 <li class="toctree-l1"><a class="reference internal" href="extras/tuts/tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="extras/commands.html">Commands</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Resources:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="extras/radio_sources.html">Radio sources</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">Guidelines:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="extras/changelog.html">Changelog</a></li>
@@ -101,7 +105,7 @@
 <a class="reference external" href="http://www.hartrao.ac.za/">HartRAO’s</a> drift scan data collected
 by <a class="reference external" href="http://www.hartrao.ac.za/hh26m_factsfile.html">HartRAO’s 26m telescope</a>.
 The software is a newly developed program intended to replace the old <a class="reference external" href="http://www.hartrao.ac.za/hh26m_factsfile.html">LINES</a> program previously used at HartRAO.</p>
-<p>The package is built on Python 3.12 and provides
+<p>The package is built on <a class="reference external" href="https://www.python.org/downloads/release/python-3120/">Python 3.12</a> and provides
 a set of tools to perform common analysis tasks that
 include but are not limited to,</p>
 <ul class="simple">
@@ -111,9 +115,9 @@ include but are not limited to,</p>
 </ul>
 <div class="admonition caution">
 <p class="admonition-title">Caution</p>
-<p>This project is still under active development, if you would like to see more details
-on the sections included in the documentation please contact the author. Details are
-listed at the end of the document.</p>
+<p>This project is still under active development, if you would like to contribute
+to the software please contact the author or submit an issue on github. Details
+are listed at the end of the document.</p>
 </div>
 </section>
 <section id="how-does-it-work">
@@ -124,18 +128,25 @@ all the extracted and calculated source parmeters are stored.</p>
 <p>It then proceeds to</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>cleans or filter out any RFI present in the data</p></li>
+<li><p>clean or filter out any RFI present in the data</p></li>
 <li><p>correct or remove any drift that may be present in the data due to telescope effects, and</p></li>
-<li><p>tries to fit the peak of the signal (i.e. upper 30% of the beam) depending on how good the signal is after cleansing.</p></li>
+<li><p>tries to fit the peak of the signal (i.e. upper 50% of the beam).</p></li>
 </ul>
 </div></blockquote>
-<p>The result and other statistics are then written
-into a database where they can then be analysed using various statistical tools.
-All accompanying plots are stored in the plots folder created in the users current working directory.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Although data is primarily stored in an SQLite database, it can also easily be converted into
-a csv file.</p>
+<p>The software previously used to fit the top 30% for bright calibrator sources but this
+value was adjusted for both calibrator and target sources in order to maximize
+fitting for weak signals.</p>
+</div>
+<p>The result and other statistics are then written
+into a database where they can then be analysed using various statistical tools.
+All accompanying plots are stored in the ‘plots’ folder created in the users
+current working directory.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although data is primarily stored in an SQLite database, it can also easily be
+converted into a csv file.</p>
 </div>
 <p>The main mode of data processing in DRAN is through the <a class="reference internal" href="extras/cli.html"><span class="doc">The command line interface (CLI)</span></a>. This interface is best suited for
 automated or semi-automated analysis. For a more hands on approach a
@@ -161,6 +172,8 @@ on the program limitations and assumptions made before beginning any analysis.</
 <p>If you have any problems, questions, ideas or suggestions, please
 <a class="reference external" href="https://github.com/Pfesi/dran2/issues">OPEN AN ISSUE</a>
 or email Dr. Pfesi van Zyl on <a class="reference external" href="mailto:pfesi24&#37;&#52;&#48;gmail&#46;com">pfesi24<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
+<div class="toctree-wrapper compound">
+</div>
 <div class="toctree-wrapper compound">
 </div>
 <div class="toctree-wrapper compound">

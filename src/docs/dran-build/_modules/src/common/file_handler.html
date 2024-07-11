@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.common.file_handler &mdash; dran v1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e160b93e"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            dran
+          </a>
+              <div class="version">
+                v1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/caveats.html">Caveats</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/quickstart.html">Quickstart Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/cli.html">The command line interface (CLI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html">The graphical user interface (GUI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#the-landing-page">The landing page</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#edit-driftscan">Edit driftscan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#edit-time-series">Edit Time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#view-plots">View plots</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/tuts/tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/commands.html">Commands</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guidelines:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/modules.html">src</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">dran</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.common.file_handler</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.common.file_handler</h1><div class="highlight"><pre>
+<span></span><span class="c1"># =========================================================================== #</span>
+<span class="c1"># File    : file_handler.py                                                   #</span>
+<span class="c1"># Author  : Pfesesani V. van Zyl                                              #</span>
+<span class="c1"># =========================================================================== #</span>
+
+<span class="c1"># Standard library imports</span>
+<span class="c1"># --------------------------------------------------------------------------- #</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">PyQt5.QtWidgets</span> <span class="kn">import</span> <span class="n">QApplication</span><span class="p">,</span> <span class="n">QWidget</span><span class="p">,</span> <span class="n">QFileDialog</span>
+<span class="kn">import</span> <span class="nn">shutil</span> 
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="c1"># Local imports</span>
+<span class="c1"># --------------------------------------------------------------------------- #</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;src/&quot;</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">common.exceptions</span> <span class="k">as</span> <span class="nn">ex</span>
+<span class="kn">from</span> <span class="nn">common.dialog_app</span> <span class="kn">import</span> <span class="n">App</span>
+<span class="kn">from</span> <span class="nn">common.msgConfiguration</span> <span class="kn">import</span> <span class="n">msg_wrapper</span>
+<span class="c1"># =========================================================================== #</span>
+
+
+<div class="viewcode-block" id="FileHandler">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.file_handler.FileHandler">[docs]</a>
+<span class="k">class</span> <span class="nc">FileHandler</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">        FileHandler manages the access and modification of </span>
+<span class="sd">        files and their folders.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            log (object): logging object</span>
+<span class="sd">            path (str): Path to a file</span>
+<span class="sd">    &quot;&quot;&quot;</span> 
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+        
+        <span class="c1"># configure logging</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">=</span> <span class="n">log</span>         
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span><span class="p">(</span><span class="s2">&quot;FileHandler() object to manage document/file access.&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FileHandler.get_details_from_path">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.file_handler.FileHandler.get_details_from_path">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_details_from_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">path</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get file name and containing directory and their from path. &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">path</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">folderName</span> <span class="o">=</span><span class="s2">&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">filePath</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">folderPath</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fileName</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileName</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">filePath</span> <span class="o">=</span> <span class="n">path</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">filePath</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">folderName</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">folderPath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FileHandler.delete_file">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.file_handler.FileHandler.delete_file">[docs]</a>
+    <span class="k">def</span> <span class="nf">delete_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fileName</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Delete a file. </span>
+<span class="sd">        </span>
+<span class="sd">            Args:</span>
+<span class="sd">                fileName (str): The name of the file being deleted. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;basic&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span>
+                    <span class="s2">&quot;Delete file if it exists&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span>
+            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span>
+                        <span class="s2">&quot;Deleted file: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fileName</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span>
+                        <span class="s2">&quot;Can&#39;t delete file </span><span class="si">{}</span><span class="s2">, it doesn&#39;t exist&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fileName</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="FileHandler.confirm_file_path_exists">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.file_handler.FileHandler.confirm_file_path_exists">[docs]</a>
+    <span class="k">def</span> <span class="nf">confirm_file_path_exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filePath</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Confirm the file path / file exists. </span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                filePath (str): The absolute path to a file</span>
+
+<span class="sd">            returns:</span>
+<span class="sd">                Boolean value representing whether the path exists or not. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">if</span> <span class="n">filePath</span><span class="o">==</span><span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">filePath</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filePath</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">pathFound</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filePath</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pathFound</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">OSError</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span>
+                            <span class="s2">&quot;File path validation passed&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">pathFound</span>
+        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;error&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">,</span>
+                        <span class="s2">&quot;Path/File &#39;</span><span class="si">{}</span><span class="s2">&#39; is invalid or doesn&#39;t exist. </span><span class="se">\n</span><span class="s2">Try using the absolute path or relative path.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filePath</span><span class="p">))</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="FileHandler.confirm_file_path_exists_no_exit">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.file_handler.FileHandler.confirm_file_path_exists_no_exit">[docs]</a>
+    <span class="k">def</span> <span class="nf">confirm_file_path_exists_no_exit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filePath</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Confirm the file path / file exists. </span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                filePath (str): The absolute path to a file</span>
+<span class="sd">                </span>
+<span class="sd">            returns:</span>
+<span class="sd">                Boolean value representing whether the path exists or not. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">filePath</span><span class="o">==</span><span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">filePath</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filePath</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+        
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filePath</span><span class="p">)</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;warning&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">,</span>
+                        <span class="s2">&quot;Path/File &#39;</span><span class="si">{}</span><span class="s2">&#39; is invalid or doesn&#39;t exist. </span><span class="se">\n</span><span class="s2">Try using the absolute path or relative path.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filePath</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span>
+                            <span class="s2">&quot;File path validation passed&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filePath</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FileHandler.get_file_name_from_path">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.file_handler.FileHandler.get_file_name_from_path">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_file_name_from_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; return the name of a file from the path. &quot;&quot;&quot;</span>
+
+        <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="s2">&quot;Got filename from path: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">))</span>
+        <span class="n">path</span><span class="p">,</span> <span class="n">fileName</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fileName</span></div>
+
+
+<div class="viewcode-block" id="FileHandler.get_file_extension">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.file_handler.FileHandler.get_file_extension">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_file_extension</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fileName</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get file extension from file name. </span>
+<span class="sd">        </span>
+<span class="sd">            Args:</span>
+<span class="sd">                fileName (str): The name of the file. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">fileName</span><span class="o">==</span><span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">fileName</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="n">name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span>
+        <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span>
+                    <span class="s2">&quot;File extension validated&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ext</span></div>
+
+
+<div class="viewcode-block" id="FileHandler.confirm_file_extension">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.file_handler.FileHandler.confirm_file_extension">[docs]</a>
+    <span class="k">def</span> <span class="nf">confirm_file_extension</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">extension</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Confirm that the file has the correct extension. </span>
+<span class="sd">            e.g. the program processes fits files so the extension should</span>
+<span class="sd">            be .fits </span>
+<span class="sd">            </span>
+<span class="sd">            Args: </span>
+<span class="sd">                extension (str): The file&#39;s extension  </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;basic&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span>
+                    <span class="s2">&quot;Validating file contains correct extension&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">fileExt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_file_extension</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">fileExt</span> <span class="o">!=</span> <span class="n">extension</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ex</span><span class="o">.</span><span class="n">InvalidFileExtensionError</span>
+        <span class="k">except</span> <span class="n">ex</span><span class="o">.</span><span class="n">InvalidFileExtensionError</span><span class="p">:</span>
+            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;error&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">,</span>
+                        <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> has an invalid file extension. Program processes *.fits files</span><span class="se">\n</span><span class="s2"> &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="FileHandler.validate_file">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.file_handler.FileHandler.validate_file">[docs]</a>
+    <span class="k">def</span> <span class="nf">validate_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Perform file validations. Check if the file exists and if it is in the correct format.&quot;&quot;&quot;</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;basic&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span>
+                    <span class="s2">&quot;Validating file conforms to requirements&quot;</span><span class="p">)</span>
+
+        <span class="c1"># check path exists, if path exixts return file name and get its extension</span>
+        <span class="n">pathFound</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">confirm_file_path_exists</span><span class="p">()</span>
+        
+        <span class="c1"># confirm file extension matches required extension</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">confirm_file_extension</span><span class="p">(</span><span class="s2">&quot;.fits&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FileHandler.create_folder">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.file_handler.FileHandler.create_folder">[docs]</a>
+    <span class="k">def</span> <span class="nf">create_folder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">folderName</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Create a folder.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                folderName (str): String of folder name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">folderName</span><span class="p">)</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span>
+                        <span class="n">folderName</span> <span class="o">+</span> <span class="s2">&quot; folder already exists, moving on&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;basic&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span>
+                        <span class="s2">&quot;Create &quot;</span> <span class="o">+</span> <span class="n">folderName</span> <span class="o">+</span> <span class="s2">&quot; folder&quot;</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">folderName</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FileHandler.create_folder_overwrite_existing">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.file_handler.FileHandler.create_folder_overwrite_existing">[docs]</a>
+    <span class="k">def</span> <span class="nf">create_folder_overwrite_existing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">folderName</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Create a folder.&quot;&quot;&quot;</span>
+
+        <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;basic&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span>
+                    <span class="s2">&quot;Created &quot;</span> <span class="o">+</span> <span class="n">folderName</span> <span class="o">+</span> <span class="s2">&quot; folder&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">folderName</span><span class="p">)</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;rm -r &quot;</span><span class="o">+</span><span class="n">folderName</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">folderName</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">folderName</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FileHandler.get_file_name_and_containing_folder">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.file_handler.FileHandler.get_file_name_and_containing_folder">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_file_name_and_containing_folder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the name of the file and its containing folder. &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filePath</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">filePath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_file_path_from_dialog_box</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_file_name_from_path</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_folder_name_from_path</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_path_info</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="FileHandler.get_directory_name">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.file_handler.FileHandler.get_directory_name">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_directory_name</span><span class="p">(</span><span class="n">dirPath</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">filePath</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get directory name from path. You can supply a file path or the full path to the directory.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------    </span>
+<span class="sd">            dirPath: str</span>
+<span class="sd">                path to directory  </span>
+<span class="sd">            filePath: str</span>
+<span class="sd">                Path to file  </span>
+<span class="sd">            log: object</span>
+<span class="sd">                logging object</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            name of opened directory</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">dirPath</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">filePath</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">dirPath</span><span class="p">)</span><span class="o">.</span><span class="n">name</span></div>
+
+
+<div class="viewcode-block" id="FileHandler.print_path_info">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.file_handler.FileHandler.print_path_info">[docs]</a>
+    <span class="k">def</span> <span class="nf">print_path_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Print information on the file. &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="o">*</span><span class="mi">80</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Path name: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filePath</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;File name: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fileName</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Folder name: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folderName</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="o">*</span><span class="mi">80</span><span class="o">+</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="FileHandler.get_folder_name_from_path">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.file_handler.FileHandler.get_folder_name_from_path">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_folder_name_from_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the name of the containing folder from a path. &quot;&quot;&quot;</span>
+
+        <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="s2">&quot;Getting folder name from path&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">folderName</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filePath</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="FileHandler.get_file_path_from_dialog_box">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.file_handler.FileHandler.get_file_path_from_dialog_box">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_file_path_from_dialog_box</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get a file using the file dialog box. &quot;&quot;&quot;</span>
+
+        <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="s2">&quot;Launching file dialog box for file selection.&quot;</span><span class="p">)</span>
+        <span class="n">app1</span><span class="o">=</span><span class="n">QApplication</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span>
+        <span class="n">myapp</span> <span class="o">=</span> <span class="n">App</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">)</span>
+        <span class="n">filePath</span> <span class="o">=</span> <span class="n">myapp</span><span class="o">.</span><span class="n">get_file_path</span><span class="p">()</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">app1</span><span class="o">.</span><span class="n">exec_</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">filePath</span></div>
+
+
+<div class="viewcode-block" id="FileHandler.get_folder_path_from_dialog_box">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.file_handler.FileHandler.get_folder_path_from_dialog_box">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_folder_path_from_dialog_box</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get a file using the file dialog box. &quot;&quot;&quot;</span>
+
+        <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span>
+                    <span class="s2">&quot;Launching file dialog box for file selection.&quot;</span><span class="p">)</span>
+        <span class="n">app</span> <span class="o">=</span> <span class="n">QApplication</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span>
+        <span class="n">myApp</span> <span class="o">=</span> <span class="n">App</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">)</span>
+        <span class="n">filePath</span> <span class="o">=</span> <span class="n">myApp</span><span class="o">.</span><span class="n">get_folder_path</span><span class="p">()</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">filePath</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Pfesesani van Zyl.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -64,6 +64,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../extras/tuts/tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../extras/commands.html">Commands</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Resources:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../extras/radio_sources.html">Radio sources</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">Guidelines:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../extras/changelog.html">Changelog</a></li>
@@ -131,6 +135,7 @@
 <li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.calibrate.calc_tcorr"><code class="docutils literal notranslate"><span class="pre">calc_tcorr()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.calibrate.calc_totFlux"><code class="docutils literal notranslate"><span class="pre">calc_totFlux()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.calibrate.calibrate"><code class="docutils literal notranslate"><span class="pre">calibrate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.calibrate.get_calibrator_flux"><code class="docutils literal notranslate"><span class="pre">get_calibrator_flux()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.calibrate.getpss"><code class="docutils literal notranslate"><span class="pre">getpss()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.calibrate.set_corr_ta_to_zero"><code class="docutils literal notranslate"><span class="pre">set_corr_ta_to_zero()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.calibrate.set_pss_to_zero"><code class="docutils literal notranslate"><span class="pre">set_pss_to_zero()</span></code></a></li>
@@ -269,10 +274,32 @@
 <li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.exceptions.ValueOutOfRangeException"><code class="docutils literal notranslate"><span class="pre">ValueOutOfRangeException</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="src.common.html#src-common-file-handler-module">src.common.file_handler module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.common.html#module-src.common.file_handler">src.common.file_handler module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.file_handler.FileHandler"><code class="docutils literal notranslate"><span class="pre">FileHandler</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.file_handler.FileHandler.confirm_file_extension"><code class="docutils literal notranslate"><span class="pre">FileHandler.confirm_file_extension()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.file_handler.FileHandler.confirm_file_path_exists"><code class="docutils literal notranslate"><span class="pre">FileHandler.confirm_file_path_exists()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.file_handler.FileHandler.confirm_file_path_exists_no_exit"><code class="docutils literal notranslate"><span class="pre">FileHandler.confirm_file_path_exists_no_exit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.file_handler.FileHandler.create_folder"><code class="docutils literal notranslate"><span class="pre">FileHandler.create_folder()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.file_handler.FileHandler.create_folder_overwrite_existing"><code class="docutils literal notranslate"><span class="pre">FileHandler.create_folder_overwrite_existing()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.file_handler.FileHandler.delete_file"><code class="docutils literal notranslate"><span class="pre">FileHandler.delete_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.file_handler.FileHandler.get_details_from_path"><code class="docutils literal notranslate"><span class="pre">FileHandler.get_details_from_path()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.file_handler.FileHandler.get_directory_name"><code class="docutils literal notranslate"><span class="pre">FileHandler.get_directory_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.file_handler.FileHandler.get_file_extension"><code class="docutils literal notranslate"><span class="pre">FileHandler.get_file_extension()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.file_handler.FileHandler.get_file_name_and_containing_folder"><code class="docutils literal notranslate"><span class="pre">FileHandler.get_file_name_and_containing_folder()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.file_handler.FileHandler.get_file_name_from_path"><code class="docutils literal notranslate"><span class="pre">FileHandler.get_file_name_from_path()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.file_handler.FileHandler.get_file_path_from_dialog_box"><code class="docutils literal notranslate"><span class="pre">FileHandler.get_file_path_from_dialog_box()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.file_handler.FileHandler.get_folder_name_from_path"><code class="docutils literal notranslate"><span class="pre">FileHandler.get_folder_name_from_path()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.file_handler.FileHandler.get_folder_path_from_dialog_box"><code class="docutils literal notranslate"><span class="pre">FileHandler.get_folder_path_from_dialog_box()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.file_handler.FileHandler.print_path_info"><code class="docutils literal notranslate"><span class="pre">FileHandler.print_path_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.file_handler.FileHandler.validate_file"><code class="docutils literal notranslate"><span class="pre">FileHandler.validate_file()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="src.common.html#module-src.common.fitting">src.common.fitting module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.calc_residual"><code class="docutils literal notranslate"><span class="pre">calc_residual()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.calc_residual_and_rms"><code class="docutils literal notranslate"><span class="pre">calc_residual_and_rms()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.calc_residual_and_rms_fit"><code class="docutils literal notranslate"><span class="pre">calc_residual_and_rms_fit()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.clean_data"><code class="docutils literal notranslate"><span class="pre">clean_data()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.clean_data_iterative_fitting"><code class="docutils literal notranslate"><span class="pre">clean_data_iterative_fitting()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.clean_rfi"><code class="docutils literal notranslate"><span class="pre">clean_rfi()</span></code></a></li>
@@ -284,9 +311,11 @@
 <li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.gauss"><code class="docutils literal notranslate"><span class="pre">gauss()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.gauss_lin"><code class="docutils literal notranslate"><span class="pre">gauss_lin()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.get_base"><code class="docutils literal notranslate"><span class="pre">get_base()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.get_base_pts"><code class="docutils literal notranslate"><span class="pre">get_base_pts()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.locate_baseline_blocks_auto"><code class="docutils literal notranslate"><span class="pre">locate_baseline_blocks_auto()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.poly_coeff"><code class="docutils literal notranslate"><span class="pre">poly_coeff()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.spline"><code class="docutils literal notranslate"><span class="pre">spline()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.spline_fit"><code class="docutils literal notranslate"><span class="pre">spline_fit()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.test_gauss_fit"><code class="docutils literal notranslate"><span class="pre">test_gauss_fit()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="src.common.html#src.common.fitting.test_position_validity"><code class="docutils literal notranslate"><span class="pre">test_position_validity()</span></code></a></li>
 </ul>
@@ -362,6 +391,7 @@
 <li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.sqlite_db.SQLiteDB.dbPath"><code class="docutils literal notranslate"><span class="pre">SQLiteDB.dbPath</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.sqlite_db.SQLiteDB.get_all_table_coloumns"><code class="docutils literal notranslate"><span class="pre">SQLiteDB.get_all_table_coloumns()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.sqlite_db.SQLiteDB.get_rows"><code class="docutils literal notranslate"><span class="pre">SQLiteDB.get_rows()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.sqlite_db.SQLiteDB.get_rows_of_cols"><code class="docutils literal notranslate"><span class="pre">SQLiteDB.get_rows_of_cols()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.sqlite_db.SQLiteDB.get_table_names"><code class="docutils literal notranslate"><span class="pre">SQLiteDB.get_table_names()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.sqlite_db.SQLiteDB.insert_into_table_stmt_with_pk"><code class="docutils literal notranslate"><span class="pre">SQLiteDB.insert_into_table_stmt_with_pk()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="src.common.html#src.common.sqlite_db.SQLiteDB.log"><code class="docutils literal notranslate"><span class="pre">SQLiteDB.log</span></code></a></li>
@@ -407,11 +437,119 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="src.gui.html#src-gui-mainguilogic-module">src.gui.mainGuiLogic module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.gui.html#module-src.gui.edit_driftscan_window1">src.gui.edit_driftscan_window1 module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.gui.html#src.gui.edit_driftscan_window1.Ui_DriftscanWindow"><code class="docutils literal notranslate"><span class="pre">Ui_DriftscanWindow</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.edit_driftscan_window1.Ui_DriftscanWindow.retranslateUi"><code class="docutils literal notranslate"><span class="pre">Ui_DriftscanWindow.retranslateUi()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.edit_driftscan_window1.Ui_DriftscanWindow.setupUi"><code class="docutils literal notranslate"><span class="pre">Ui_DriftscanWindow.setupUi()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.gui.html#module-src.gui.edit_timeseries_window">src.gui.edit_timeseries_window module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.gui.html#src.gui.edit_timeseries_window.Ui_TimeSeriesWindow"><code class="docutils literal notranslate"><span class="pre">Ui_TimeSeriesWindow</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.edit_timeseries_window.Ui_TimeSeriesWindow.retranslateUi"><code class="docutils literal notranslate"><span class="pre">Ui_TimeSeriesWindow.retranslateUi()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.edit_timeseries_window.Ui_TimeSeriesWindow.setupUi"><code class="docutils literal notranslate"><span class="pre">Ui_TimeSeriesWindow.setupUi()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.gui.html#module-src.gui.mainGuiLogic">src.gui.mainGuiLogic module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main"><code class="docutils literal notranslate"><span class="pre">Main</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.add_items_to_combobox"><code class="docutils literal notranslate"><span class="pre">Main.add_items_to_combobox()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.choose_plot"><code class="docutils literal notranslate"><span class="pre">Main.choose_plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.clear_selection"><code class="docutils literal notranslate"><span class="pre">Main.clear_selection()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.connect_buttons"><code class="docutils literal notranslate"><span class="pre">Main.connect_buttons()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.connect_time_buttons"><code class="docutils literal notranslate"><span class="pre">Main.connect_time_buttons()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.create_tag"><code class="docutils literal notranslate"><span class="pre">Main.create_tag()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.delete_obs"><code class="docutils literal notranslate"><span class="pre">Main.delete_obs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.enable_time_buttons"><code class="docutils literal notranslate"><span class="pre">Main.enable_time_buttons()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.enable_widgets"><code class="docutils literal notranslate"><span class="pre">Main.enable_widgets()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.filter_data"><code class="docutils literal notranslate"><span class="pre">Main.filter_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.filter_timeseries_data"><code class="docutils literal notranslate"><span class="pre">Main.filter_timeseries_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.fit_base"><code class="docutils literal notranslate"><span class="pre">Main.fit_base()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.fit_data"><code class="docutils literal notranslate"><span class="pre">Main.fit_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.fit_dual_peak"><code class="docutils literal notranslate"><span class="pre">Main.fit_dual_peak()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.fit_p1"><code class="docutils literal notranslate"><span class="pre">Main.fit_p1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.fit_p2"><code class="docutils literal notranslate"><span class="pre">Main.fit_p2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.fit_peak"><code class="docutils literal notranslate"><span class="pre">Main.fit_peak()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.fit_timeseries"><code class="docutils literal notranslate"><span class="pre">Main.fit_timeseries()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.get_data_from_db"><code class="docutils literal notranslate"><span class="pre">Main.get_data_from_db()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.get_fit_loc"><code class="docutils literal notranslate"><span class="pre">Main.get_fit_loc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.get_fit_order"><code class="docutils literal notranslate"><span class="pre">Main.get_fit_order()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.get_fit_type"><code class="docutils literal notranslate"><span class="pre">Main.get_fit_type()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.get_plot_index"><code class="docutils literal notranslate"><span class="pre">Main.get_plot_index()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.on_checkbox_changed"><code class="docutils literal notranslate"><span class="pre">Main.on_checkbox_changed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.on_combo_changed"><code class="docutils literal notranslate"><span class="pre">Main.on_combo_changed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.on_filter_changed"><code class="docutils literal notranslate"><span class="pre">Main.on_filter_changed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.on_filter_type_combobox_changed"><code class="docutils literal notranslate"><span class="pre">Main.on_filter_type_combobox_changed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.on_fit_changed"><code class="docutils literal notranslate"><span class="pre">Main.on_fit_changed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.on_fit_combobox_changed"><code class="docutils literal notranslate"><span class="pre">Main.on_fit_combobox_changed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.on_fit_type_combobox_changed"><code class="docutils literal notranslate"><span class="pre">Main.on_fit_type_combobox_changed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.on_table_name_changed"><code class="docutils literal notranslate"><span class="pre">Main.on_table_name_changed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.open_db"><code class="docutils literal notranslate"><span class="pre">Main.open_db()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.open_db_path"><code class="docutils literal notranslate"><span class="pre">Main.open_db_path()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.open_drift_window"><code class="docutils literal notranslate"><span class="pre">Main.open_drift_window()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.open_file"><code class="docutils literal notranslate"><span class="pre">Main.open_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.open_file_name_dialog"><code class="docutils literal notranslate"><span class="pre">Main.open_file_name_dialog()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.open_plots_window"><code class="docutils literal notranslate"><span class="pre">Main.open_plots_window()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.open_timeseries_window"><code class="docutils literal notranslate"><span class="pre">Main.open_timeseries_window()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.plot_cols"><code class="docutils literal notranslate"><span class="pre">Main.plot_cols()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.plot_cols_df"><code class="docutils literal notranslate"><span class="pre">Main.plot_cols_df()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.plot_new_fig"><code class="docutils literal notranslate"><span class="pre">Main.plot_new_fig()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.populate_cols"><code class="docutils literal notranslate"><span class="pre">Main.populate_cols()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.populate_widgets"><code class="docutils literal notranslate"><span class="pre">Main.populate_widgets()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.popup_msg_dict"><code class="docutils literal notranslate"><span class="pre">Main.popup_msg_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.refresh_db"><code class="docutils literal notranslate"><span class="pre">Main.refresh_db()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.refresh_list"><code class="docutils literal notranslate"><span class="pre">Main.refresh_list()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.reset_dict"><code class="docutils literal notranslate"><span class="pre">Main.reset_dict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.reset_dual_plot_fit_a"><code class="docutils literal notranslate"><span class="pre">Main.reset_dual_plot_fit_a()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.reset_dual_plot_fit_b"><code class="docutils literal notranslate"><span class="pre">Main.reset_dual_plot_fit_b()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.reset_peak"><code class="docutils literal notranslate"><span class="pre">Main.reset_peak()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.reset_plot"><code class="docutils literal notranslate"><span class="pre">Main.reset_plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.reset_plot_fit"><code class="docutils literal notranslate"><span class="pre">Main.reset_plot_fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.reset_previous_fits"><code class="docutils literal notranslate"><span class="pre">Main.reset_previous_fits()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.reset_status"><code class="docutils literal notranslate"><span class="pre">Main.reset_status()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.reset_timeseries"><code class="docutils literal notranslate"><span class="pre">Main.reset_timeseries()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.reset_xy"><code class="docutils literal notranslate"><span class="pre">Main.reset_xy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.save_fit"><code class="docutils literal notranslate"><span class="pre">Main.save_fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.save_time_db"><code class="docutils literal notranslate"><span class="pre">Main.save_time_db()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.save_to_DB"><code class="docutils literal notranslate"><span class="pre">Main.save_to_DB()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.set_dual_data"><code class="docutils literal notranslate"><span class="pre">Main.set_dual_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.set_fit_parmeters"><code class="docutils literal notranslate"><span class="pre">Main.set_fit_parmeters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.set_flags"><code class="docutils literal notranslate"><span class="pre">Main.set_flags()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.set_nb_data"><code class="docutils literal notranslate"><span class="pre">Main.set_nb_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.set_title"><code class="docutils literal notranslate"><span class="pre">Main.set_title()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.setup_flags"><code class="docutils literal notranslate"><span class="pre">Main.setup_flags()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.show_plot_browser"><code class="docutils literal notranslate"><span class="pre">Main.show_plot_browser()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.toggle_range_filter"><code class="docutils literal notranslate"><span class="pre">Main.toggle_range_filter()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.update_base_fit"><code class="docutils literal notranslate"><span class="pre">Main.update_base_fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.update_db"><code class="docutils literal notranslate"><span class="pre">Main.update_db()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.update_db_all"><code class="docutils literal notranslate"><span class="pre">Main.update_db_all()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.update_dual_peak_fit"><code class="docutils literal notranslate"><span class="pre">Main.update_dual_peak_fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.update_fit_parmeters"><code class="docutils literal notranslate"><span class="pre">Main.update_fit_parmeters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.update_peak_fit"><code class="docutils literal notranslate"><span class="pre">Main.update_peak_fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.update_plot"><code class="docutils literal notranslate"><span class="pre">Main.update_plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.update_point"><code class="docutils literal notranslate"><span class="pre">Main.update_point()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.update_smoothing_params"><code class="docutils literal notranslate"><span class="pre">Main.update_smoothing_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.view_fit"><code class="docutils literal notranslate"><span class="pre">Main.view_fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.view_status"><code class="docutils literal notranslate"><span class="pre">Main.view_status()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.mainGuiLogic.Main.write"><code class="docutils literal notranslate"><span class="pre">Main.write()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="src.gui.html#module-src.gui.main_window">src.gui.main_window module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="src.gui.html#src.gui.main_window.Ui_MainWindow"><code class="docutils literal notranslate"><span class="pre">Ui_MainWindow</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.main_window.Ui_MainWindow.retranslateUi"><code class="docutils literal notranslate"><span class="pre">Ui_MainWindow.retranslateUi()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.main_window.Ui_MainWindow.setupUi"><code class="docutils literal notranslate"><span class="pre">Ui_MainWindow.setupUi()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.gui.html#module-src.gui.main_window1">src.gui.main_window1 module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.gui.html#src.gui.main_window1.Ui_MainWindow"><code class="docutils literal notranslate"><span class="pre">Ui_MainWindow</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.main_window1.Ui_MainWindow.retranslateUi"><code class="docutils literal notranslate"><span class="pre">Ui_MainWindow.retranslateUi()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.main_window1.Ui_MainWindow.setupUi"><code class="docutils literal notranslate"><span class="pre">Ui_MainWindow.setupUi()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -428,6 +566,34 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="src.gui.html#src.gui.secondaryCanvasManager.fxn"><code class="docutils literal notranslate"><span class="pre">fxn()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.gui.html#module-src.gui.timeseries_canvas">src.gui.timeseries_canvas module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.gui.html#src.gui.timeseries_canvas.TimeCanvas"><code class="docutils literal notranslate"><span class="pre">TimeCanvas</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.timeseries_canvas.TimeCanvas.clear_figure"><code class="docutils literal notranslate"><span class="pre">TimeCanvas.clear_figure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.timeseries_canvas.TimeCanvas.dday"><code class="docutils literal notranslate"><span class="pre">TimeCanvas.dday()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.timeseries_canvas.TimeCanvas.onclick"><code class="docutils literal notranslate"><span class="pre">TimeCanvas.onclick()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.timeseries_canvas.TimeCanvas.onpick"><code class="docutils literal notranslate"><span class="pre">TimeCanvas.onpick()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.timeseries_canvas.TimeCanvas.plot_dual_fig"><code class="docutils literal notranslate"><span class="pre">TimeCanvas.plot_dual_fig()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.timeseries_canvas.TimeCanvas.plot_fig"><code class="docutils literal notranslate"><span class="pre">TimeCanvas.plot_fig()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.timeseries_canvas.TimeCanvas.plot_fig_errs"><code class="docutils literal notranslate"><span class="pre">TimeCanvas.plot_fig_errs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.timeseries_canvas.TimeCanvas.pop"><code class="docutils literal notranslate"><span class="pre">TimeCanvas.pop()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.timeseries_canvas.TimeCanvas.replaceDateItem"><code class="docutils literal notranslate"><span class="pre">TimeCanvas.replaceDateItem()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.timeseries_canvas.TimeCanvas.replaceitem"><code class="docutils literal notranslate"><span class="pre">TimeCanvas.replaceitem()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.timeseries_canvas.TimeCanvas.reset_lists"><code class="docutils literal notranslate"><span class="pre">TimeCanvas.reset_lists()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.timeseries_canvas.TimeCanvas.setLabels"><code class="docutils literal notranslate"><span class="pre">TimeCanvas.setLabels()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.timeseries_canvas.TimeCanvas.setLabelsNoLegend"><code class="docutils literal notranslate"><span class="pre">TimeCanvas.setLabelsNoLegend()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.timeseries_canvas.TimeCanvas.show_plots"><code class="docutils literal notranslate"><span class="pre">TimeCanvas.show_plots()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.gui.html#module-src.gui.view_plots_window">src.gui.view_plots_window module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.gui.html#src.gui.view_plots_window.Ui_PlotViewer"><code class="docutils literal notranslate"><span class="pre">Ui_PlotViewer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.view_plots_window.Ui_PlotViewer.retranslateUi"><code class="docutils literal notranslate"><span class="pre">Ui_PlotViewer.retranslateUi()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.gui.html#src.gui.view_plots_window.Ui_PlotViewer.setupUi"><code class="docutils literal notranslate"><span class="pre">Ui_PlotViewer.setupUi()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="src.gui.html#module-src.gui">Module contents</a></li>

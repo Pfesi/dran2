@@ -174,7 +174,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">myDict</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tag</span><span class="si">}{</span><span class="n">key</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">val</span></div>
 
-                <span class="c1"># print(&#39;+--+&#39;,f&#39;{tag}{key}&#39;,key, tag, myDict[f&#39;{tag}{key}&#39;])</span>
+                <span class="c1"># print(&#39;+-/-+&#39;,f&#39;{tag}{key}&#39;,key, tag, myDict[f&#39;{tag}{key}&#39;])</span>
 
 <div class="viewcode-block" id="DriftScans.fill_in_missing_data_sb">
 <a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScans.DriftScans.fill_in_missing_data_sb">[docs]</a>
@@ -192,7 +192,7 @@
 <a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScans.DriftScans.fill_in_missing_data_db_common">[docs]</a>
     <span class="k">def</span> <span class="nf">fill_in_missing_data_db_common</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">myDict</span><span class="p">,</span><span class="n">tag</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Fill in the missing data from the observing file&quot;&quot;&quot;</span>
-        <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;RMSB&#39;</span><span class="p">,</span><span class="s1">&#39;RMSA&#39;</span><span class="p">,</span><span class="s1">&#39;BRMS&#39;</span><span class="p">,</span><span class="s1">&#39;SLOPE&#39;</span><span class="p">,</span>
+        <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;RMSB&#39;</span><span class="p">,</span><span class="s1">&#39;RMSA&#39;</span><span class="p">,</span><span class="s1">&#39;BRMS&#39;</span><span class="p">,</span><span class="s1">&#39;SLOPE&#39;</span><span class="p">,</span><span class="s1">&#39;WINDSPD&#39;</span><span class="p">,</span>
             <span class="s1">&#39;MIDOFFSET&#39;</span><span class="p">,</span><span class="s1">&#39;BASELEFT&#39;</span><span class="p">,</span><span class="s1">&#39;BASERIGHT&#39;</span><span class="p">,</span><span class="s1">&#39;COORDSYS&#39;</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">try_test</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="n">myDict</span><span class="p">,</span><span class="n">tag</span><span class="p">)</span></div>
@@ -497,9 +497,10 @@
             <span class="c1"># &#39;03.5D&#39; or &quot;06.0D&quot;</span>
 
             <span class="c1"># Get driftscan data</span>
+            <span class="c1"># print(self.__dict__)</span>
             <span class="n">data</span><span class="o">=</span><span class="n">DriftScanData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;---&#39;</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">v</span><span class="p">)</span>
+            <span class="c1"># for k,v in data.__dict__.items():</span>
+                <span class="c1"># print(&#39;---&#39;,k,v)</span>
 
             <span class="n">hpnOffset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getScanData</span><span class="p">(</span><span class="s1">&#39;HPN_OFFSET&#39;</span><span class="p">)</span> <span class="c1">#self.__dict__[&#39;HPN_OFFSET&#39;][&#39;value&#39;]</span>
             <span class="n">lcpHpnScan</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getScanData</span><span class="p">(</span><span class="s1">&#39;HPN_TA_LCP&#39;</span><span class="p">)</span> <span class="c1">#self.__dict__[&#39;HPN_TA_LCP&#39;][&#39;value&#39;]</span>
@@ -543,9 +544,9 @@
                         <span class="n">tg</span><span class="o">=</span><span class="n">tag</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
                     
                     <span class="n">myTag</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tg</span><span class="si">}</span><span class="s1">L&#39;</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="n">myTag</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;A</span><span class="si">{</span><span class="n">myTag</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;B</span><span class="si">{</span><span class="n">myTag</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="n">processedLCPData</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="n">processedRCPData</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                    <span class="c1"># print(myTag,f&#39;A{myTag}&#39;,f&#39;B{myTag}&#39;)</span>
+                    <span class="c1"># print(processedLCPData.__dict__.keys())</span>
+                    <span class="c1"># print(processedRCPData.__dict__.keys())</span>
                     <span class="c1"># sys.exit()</span>
                     
                     <span class="bp">self</span><span class="o">.</span><span class="n">fill_in_missing_data_db_common</span><span class="p">(</span><span class="n">processedLCPData</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="n">myTag</span><span class="p">)</span>
@@ -573,6 +574,8 @@
             <span class="n">pols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;lcp&#39;</span><span class="p">,</span><span class="s1">&#39;rcp&#39;</span><span class="p">]</span>
             <span class="n">beams</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">,</span><span class="s1">&#39;B&#39;</span><span class="p">]</span>
 
+            <span class="c1"># print(myDict)</span>
+            <span class="c1"># sys.exit()</span>
             <span class="c1"># for beam in beams:</span>
             <span class="k">for</span> <span class="n">pol</span> <span class="ow">in</span> <span class="n">pols</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">:</span>
@@ -644,13 +647,18 @@
                                         <span class="c1"># print(f&#39;{tg}{pol[0]}{div}SLOPE&#39;.upper(),t[0])</span>
 
                                         <span class="c1"># coeff=t #.split()</span>
+                                        <span class="c1"># print(t)</span>
                                         <span class="k">try</span><span class="p">:</span>
                                             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
                                                 <span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beams</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}{</span><span class="n">tg</span><span class="si">}{</span><span class="n">pol</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}{</span><span class="n">div</span><span class="si">}</span><span class="s1">BASELocs&#39;</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                                                <span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tg</span><span class="si">}{</span><span class="n">pol</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}{</span><span class="n">div</span><span class="si">}</span><span class="s1">SLOPE&#39;</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                                                <span class="c1"># print(f&#39;### {tg}{pol[0]}{div}SLOPE&#39;.upper())</span>
                                             <span class="k">else</span><span class="p">:</span>
                                                 <span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tg</span><span class="si">}{</span><span class="n">pol</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}{</span><span class="n">div</span><span class="si">}</span><span class="s1">SLOPE&#39;</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span><span class="o">=</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                                                <span class="c1"># print(f&#39;xxx {tg}{pol[0]}{div}SLOPE&#39;.upper())</span>
                                         <span class="k">except</span><span class="p">:</span>
                                             <span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tg</span><span class="si">}{</span><span class="n">pol</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}{</span><span class="n">div</span><span class="si">}</span><span class="s1">SLOPE&#39;</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                                            <span class="c1"># print(f&#39;--- {tg}{pol[0]}{div}SLOPE&#39;.upper())</span>
                                         <span class="c1"># dbInfo[f&#39;{c[i]}intercept&#39;]=float(coeff[1])</span>
                                     <span class="k">elif</span> <span class="s1">&#39;baseLocsLeft&#39;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
                                         <span class="c1"># print(f&#39;{beams[0]}{tg}{pol[0]}{div}BASELeft&#39;.upper(), f&#39;{t[0]};{t[-1]}&#39;)</span>
@@ -710,9 +718,14 @@
                         <span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s1">CORTAERR&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">taErr</span>
                         <span class="k">break</span>
 
-            <span class="c1"># Calibrate the data</span>
+            <span class="c1"># # Calibrate the data</span>
             <span class="c1"># for k,v in tableData.items():</span>
-            <span class="c1">#     print(&#39;* &#39;,k,&#39;: &#39;,v)</span>
+            <span class="c1">#     # print(&#39;* &#39;,k,&#39;: &#39;,v)</span>
+            <span class="c1">#     # if &#39;SLOPE&#39; in k:</span>
+            <span class="c1">#     #     print(k)</span>
+            <span class="c1">#         print(&#39;* &#39;,k,&#39;: &#39;,v)</span>
+            <span class="c1">#     #     sys.exit()</span>
+            <span class="c1"># sys.exit()</span>
 
             <span class="n">tableData</span><span class="p">[</span><span class="s1">&#39;SRC&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">tableData</span><span class="p">[</span><span class="s1">&#39;OBJECT&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
             <span class="n">freq</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">tableData</span><span class="p">[</span><span class="s1">&#39;CENTFREQ&#39;</span><span class="p">])</span>
@@ -742,7 +755,7 @@
 
 <div class="viewcode-block" id="DriftScans.process_data_only">
 <a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScans.DriftScans.process_data_only">[docs]</a>
-    <span class="k">def</span> <span class="nf">process_data_only</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">process_data_only</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">qv</span><span class="o">=</span><span class="s1">&#39;no&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Process the drift scan observations. Get observations from the files</span>
 <span class="sd">        and prepare it for analysis.</span>
@@ -804,37 +817,58 @@
                 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
             
             <span class="n">cnt</span><span class="o">=</span><span class="mi">1</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">cnt</span><span class="p">)</span>
+            <span class="c1"># print(cnt)</span>
             <span class="c1"># plt.title(f&#39;Plot of {self.__dict__[&#39;FILENAME&#39;]}&#39;)</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">scans</span><span class="p">)):</span>
-                <span class="c1"># print(i)</span>
-                
-                <span class="k">if</span> <span class="n">i</span><span class="o">%</span><span class="mi">3</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;--&#39;</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span>
-                    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">cnt</span><span class="p">)</span>
-                    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Ta [K]&#39;</span><span class="p">)</span>
-                    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Offset [deg]&#39;</span><span class="p">)</span>
-                    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">scans</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1"> - scan of </span><span class="si">{</span><span class="n">fileName</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-                    <span class="c1"># plt.title(f&#39;{scans[i+1]}&#39;)</span>
-                    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dataScans</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">dataScans</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="n">dataScans</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+            <span class="c1"># print(len(scans))</span>
+            
+            <span class="k">if</span> <span class="n">qv</span><span class="o">!=</span><span class="s1">&#39;no&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">frontend</span> <span class="o">!=</span> <span class="s1">&#39;13.0S&#39;</span> <span class="ow">and</span> <span class="n">frontend</span> <span class="o">!=</span> <span class="s2">&quot;18.0S&quot;</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">scans</span><span class="p">)):</span>
+                        <span class="c1"># print(i)</span>
+                        
+                        <span class="k">if</span> <span class="n">i</span><span class="o">%</span><span class="mi">3</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                            <span class="c1"># print(&#39;--&#39;,i,i+1,i+2)</span>
+                            <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">cnt</span><span class="p">)</span>
+                            <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Ta [K]&#39;</span><span class="p">)</span>
+                            <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Offset [deg]&#39;</span><span class="p">)</span>
+                            <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">scans</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1"> - scan of </span><span class="si">{</span><span class="n">fileName</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                            <span class="c1"># plt.title(f&#39;{scans[i+1]}&#39;)</span>
+                            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dataScans</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">dataScans</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="n">dataScans</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
 
-                    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">cnt</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
-                    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Ta [K]&#39;</span><span class="p">)</span>
-                    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Offset [deg]&#39;</span><span class="p">)</span>
-                    <span class="c1"># plt.title(f&#39;{scans[i+2]}&#39;)</span>
-                    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">scans</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s1"> - scan of </span><span class="si">{</span><span class="n">fileName</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-                    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dataScans</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">dataScans</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">])</span>
-                    <span class="n">cnt</span><span class="o">=</span><span class="n">cnt</span><span class="o">+</span><span class="mi">2</span>
-                    
-                    <span class="c1"># print(&#39;--&#39;,cnt)</span>
+                            <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">cnt</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+                            <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Ta [K]&#39;</span><span class="p">)</span>
+                            <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Offset [deg]&#39;</span><span class="p">)</span>
+                            <span class="c1"># plt.title(f&#39;{scans[i+2]}&#39;)</span>
+                            <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">scans</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s1"> - scan of </span><span class="si">{</span><span class="n">fileName</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dataScans</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">dataScans</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">])</span>
+                            <span class="n">cnt</span><span class="o">=</span><span class="n">cnt</span><span class="o">+</span><span class="mi">2</span>
+                        
+                        <span class="c1"># print(&#39;--&#39;,cnt)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">cnt</span><span class="o">=</span><span class="mi">1</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">scans</span><span class="p">)):</span>
+                        <span class="k">if</span> <span class="n">cnt</span><span class="o">&lt;=</span><span class="mi">2</span><span class="p">:</span>
+                            <span class="c1"># print(i+1)</span>
+                            <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">cnt</span><span class="p">)</span>
+                            <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Ta [K]&#39;</span><span class="p">)</span>
+                            <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Offset [deg]&#39;</span><span class="p">)</span>
+                            <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">scans</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1"> - scan of </span><span class="si">{</span><span class="n">fileName</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                            <span class="c1"># plt.title(f&#39;{scans[i+1]}&#39;)</span>
+                            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dataScans</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">dataScans</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+                            <span class="c1"># print(dataScans[i+1])</span>
+                        <span class="n">cnt</span><span class="o">=</span><span class="n">cnt</span><span class="o">+</span><span class="mi">1</span>
 
-            <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;quickview_</span><span class="si">{</span><span class="n">src</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">frq</span><span class="p">)</span><span class="si">}</span><span class="s1">-</span><span class="si">{</span><span class="n">fileName</span><span class="si">}</span><span class="s1">.png&#39;</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">qv</span><span class="o">==</span><span class="s1">&#39;yes&#39;</span><span class="p">:</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;quickview_</span><span class="si">{</span><span class="n">src</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">frq</span><span class="p">)</span><span class="si">}</span><span class="s1">-</span><span class="si">{</span><span class="n">fileName</span><span class="si">}</span><span class="s1">.png&#39;</span><span class="p">)</span>
+                <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;info&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;Quickview file saved to: quickview_</span><span class="si">{</span><span class="n">src</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">frq</span><span class="p">)</span><span class="si">}</span><span class="s1">-</span><span class="si">{</span><span class="n">fileName</span><span class="si">}</span><span class="s1">.png&#39;</span><span class="p">)</span>
+         
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">pass</span>
             <span class="c1"># plt.show()</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;info&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;Quickview file saved to: quickview_</span><span class="si">{</span><span class="n">src</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">frq</span><span class="p">)</span><span class="si">}</span><span class="s1">-</span><span class="si">{</span><span class="n">fileName</span><span class="si">}</span><span class="s1">.png&#39;</span><span class="p">)</span>
-         
+            
         <span class="k">elif</span> <span class="s1">&#39;D&#39;</span> <span class="ow">in</span> <span class="n">frontend</span><span class="p">:</span> 
             <span class="c1"># &#39;03.5D&#39; or &quot;06.0D&quot;</span>
 
@@ -842,7 +876,7 @@
             <span class="n">data</span><span class="o">=</span><span class="n">DriftScanData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
             <span class="c1"># for k,v in data.__dict__.items():</span>
             <span class="c1">#     # print(&#39;---&#39;,k,v)</span>
-
+            
             <span class="n">hpnOffset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getScanData</span><span class="p">(</span><span class="s1">&#39;HPN_OFFSET&#39;</span><span class="p">)</span> <span class="c1">#self.__dict__[&#39;HPN_OFFSET&#39;][&#39;value&#39;]</span>
             <span class="n">lcpHpnScan</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getScanData</span><span class="p">(</span><span class="s1">&#39;HPN_TA_LCP&#39;</span><span class="p">)</span> <span class="c1">#self.__dict__[&#39;HPN_TA_LCP&#39;][&#39;value&#39;]</span>
             <span class="n">rcpHpnScan</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getScanData</span><span class="p">(</span><span class="s1">&#39;HPN_TA_RCP&#39;</span><span class="p">)</span> <span class="c1">#self.__dict__[&#39;HPN_TA_RCP&#39;][&#39;value&#39;]</span>
@@ -889,12 +923,15 @@
                     
                     <span class="c1"># print(&#39;--&#39;,cnt)</span>
 
-            <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;quickview_</span><span class="si">{</span><span class="n">src</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">frq</span><span class="p">)</span><span class="si">}</span><span class="s1">-</span><span class="si">{</span><span class="n">fileName</span><span class="si">}</span><span class="s1">.png&#39;</span><span class="p">)</span>
-            <span class="c1"># plt.show()</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;info&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;Quickview file saved to: quickview_</span><span class="si">{</span><span class="n">src</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">frq</span><span class="p">)</span><span class="si">}</span><span class="s1">-</span><span class="si">{</span><span class="n">fileName</span><span class="si">}</span><span class="s1">.png&#39;</span><span class="p">)</span>
-         
+            <span class="k">if</span> <span class="n">qv</span><span class="o">==</span><span class="s1">&#39;no&#39;</span><span class="p">:</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;quickview_</span><span class="si">{</span><span class="n">src</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">frq</span><span class="p">)</span><span class="si">}</span><span class="s1">-</span><span class="si">{</span><span class="n">fileName</span><span class="si">}</span><span class="s1">.png&#39;</span><span class="p">)</span>
+                <span class="c1"># plt.show()</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;info&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;Quickview file saved to: quickview_</span><span class="si">{</span><span class="n">src</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">frq</span><span class="p">)</span><span class="si">}</span><span class="s1">-</span><span class="si">{</span><span class="n">fileName</span><span class="si">}</span><span class="s1">.png&#39;</span><span class="p">)</span>
+            
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown source frontend value : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">frontend</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">. Contact author to have it included.&quot;</span><span class="p">)</span>
             <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span></div>

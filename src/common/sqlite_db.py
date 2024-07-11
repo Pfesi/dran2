@@ -140,12 +140,13 @@ class SQLiteDB:
         # print(sqlStmt)
         # print(values)
 
-        
+        # self.c.execute(sqlStmt, values)
+        # self.commit_changes()
         try:
             self.c.execute(sqlStmt, values)
             self.commit_changes()
         except Exception as e:
-
+            # TODO: fix this exception
             msg_wrapper('debug',self.log.debug,f"issue: {e}")
 
             s=sqlStmt.split(' ')

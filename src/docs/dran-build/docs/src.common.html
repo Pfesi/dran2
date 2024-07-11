@@ -64,6 +64,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../extras/tuts/tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../extras/commands.html">Commands</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Resources:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../extras/radio_sources.html">Radio sources</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">Guidelines:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../extras/changelog.html">Changelog</a></li>
@@ -262,6 +266,13 @@ errCorrTa: the error in the corrected antenna temperature</p>
 <dd class="field-odd"><p>pc</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.common.calibrate.get_calibrator_flux">
+<span class="sig-prename descclassname"><span class="pre">src.common.calibrate.</span></span><span class="sig-name descname"><span class="pre">get_calibrator_flux</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calibrationPaper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/calibrate.html#get_calibrator_flux"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.calibrate.get_calibrator_flux" title="Link to this definition"></a></dt>
+<dd><p>Calculate the source flux for the calibrator.
+Use the Ott and Baars system.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -761,7 +772,7 @@ and prepare it for analysis.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.common.driftScans.DriftScans.process_data_only">
-<span class="sig-name descname"><span class="pre">process_data_only</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScans.html#DriftScans.process_data_only"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScans.DriftScans.process_data_only" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">process_data_only</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'no'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScans.html#DriftScans.process_data_only"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScans.DriftScans.process_data_only" title="Link to this definition"></a></dt>
 <dd><p>Process the drift scan observations. Get observations from the files
 and prepare it for analysis.</p>
 </dd></dl>
@@ -979,8 +990,170 @@ and prepare it for analysis.</p>
 </dd></dl>
 
 </section>
-<section id="src-common-file-handler-module">
-<h2>src.common.file_handler module<a class="headerlink" href="#src-common-file-handler-module" title="Link to this heading"></a></h2>
+<section id="module-src.common.file_handler">
+<span id="src-common-file-handler-module"></span><h2>src.common.file_handler module<a class="headerlink" href="#module-src.common.file_handler" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.common.file_handler.FileHandler">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.common.file_handler.</span></span><span class="sig-name descname"><span class="pre">FileHandler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/file_handler.html#FileHandler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.file_handler.FileHandler" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>FileHandler manages the access and modification of
+files and their folders.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>log</strong> (<em>object</em>) – logging object</p></li>
+<li><p><strong>path</strong> (<em>str</em>) – Path to a file</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.common.file_handler.FileHandler.confirm_file_extension">
+<span class="sig-name descname"><span class="pre">confirm_file_extension</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extension</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/file_handler.html#FileHandler.confirm_file_extension"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.file_handler.FileHandler.confirm_file_extension" title="Link to this definition"></a></dt>
+<dd><p>Confirm that the file has the correct extension.
+e.g. the program processes fits files so the extension should
+be .fits</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>extension</strong> (<em>str</em>) – The file’s extension</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.common.file_handler.FileHandler.confirm_file_path_exists">
+<span class="sig-name descname"><span class="pre">confirm_file_path_exists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filePath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/file_handler.html#FileHandler.confirm_file_path_exists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.file_handler.FileHandler.confirm_file_path_exists" title="Link to this definition"></a></dt>
+<dd><p>Confirm the file path / file exists.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filePath</strong> (<em>str</em>) – The absolute path to a file</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Boolean value representing whether the path exists or not.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.common.file_handler.FileHandler.confirm_file_path_exists_no_exit">
+<span class="sig-name descname"><span class="pre">confirm_file_path_exists_no_exit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filePath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/file_handler.html#FileHandler.confirm_file_path_exists_no_exit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.file_handler.FileHandler.confirm_file_path_exists_no_exit" title="Link to this definition"></a></dt>
+<dd><p>Confirm the file path / file exists.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filePath</strong> (<em>str</em>) – The absolute path to a file</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Boolean value representing whether the path exists or not.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.common.file_handler.FileHandler.create_folder">
+<span class="sig-name descname"><span class="pre">create_folder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folderName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/file_handler.html#FileHandler.create_folder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.file_handler.FileHandler.create_folder" title="Link to this definition"></a></dt>
+<dd><p>Create a folder.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>folderName</strong> (<em>str</em>) – String of folder name</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.common.file_handler.FileHandler.create_folder_overwrite_existing">
+<span class="sig-name descname"><span class="pre">create_folder_overwrite_existing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folderName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/file_handler.html#FileHandler.create_folder_overwrite_existing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.file_handler.FileHandler.create_folder_overwrite_existing" title="Link to this definition"></a></dt>
+<dd><p>Create a folder.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.common.file_handler.FileHandler.delete_file">
+<span class="sig-name descname"><span class="pre">delete_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/file_handler.html#FileHandler.delete_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.file_handler.FileHandler.delete_file" title="Link to this definition"></a></dt>
+<dd><p>Delete a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fileName</strong> (<em>str</em>) – The name of the file being deleted.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.common.file_handler.FileHandler.get_details_from_path">
+<span class="sig-name descname"><span class="pre">get_details_from_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/file_handler.html#FileHandler.get_details_from_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.file_handler.FileHandler.get_details_from_path" title="Link to this definition"></a></dt>
+<dd><p>Get file name and containing directory and their from path.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.common.file_handler.FileHandler.get_directory_name">
+<span class="sig-name descname"><span class="pre">get_directory_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filePath</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/file_handler.html#FileHandler.get_directory_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.file_handler.FileHandler.get_directory_name" title="Link to this definition"></a></dt>
+<dd><p>Get directory name from path. You can supply a file path or the full path to the directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dirPath</strong> (<em>str</em>) – path to directory</p></li>
+<li><p><strong>filePath</strong> (<em>str</em>) – Path to file</p></li>
+<li><p><strong>log</strong> (<em>object</em>) – logging object</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>name of opened directory</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.common.file_handler.FileHandler.get_file_extension">
+<span class="sig-name descname"><span class="pre">get_file_extension</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/file_handler.html#FileHandler.get_file_extension"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.file_handler.FileHandler.get_file_extension" title="Link to this definition"></a></dt>
+<dd><p>Get file extension from file name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fileName</strong> (<em>str</em>) – The name of the file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.common.file_handler.FileHandler.get_file_name_and_containing_folder">
+<span class="sig-name descname"><span class="pre">get_file_name_and_containing_folder</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/file_handler.html#FileHandler.get_file_name_and_containing_folder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.file_handler.FileHandler.get_file_name_and_containing_folder" title="Link to this definition"></a></dt>
+<dd><p>Get the name of the file and its containing folder.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.common.file_handler.FileHandler.get_file_name_from_path">
+<span class="sig-name descname"><span class="pre">get_file_name_from_path</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/file_handler.html#FileHandler.get_file_name_from_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.file_handler.FileHandler.get_file_name_from_path" title="Link to this definition"></a></dt>
+<dd><p>return the name of a file from the path.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.common.file_handler.FileHandler.get_file_path_from_dialog_box">
+<span class="sig-name descname"><span class="pre">get_file_path_from_dialog_box</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/file_handler.html#FileHandler.get_file_path_from_dialog_box"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.file_handler.FileHandler.get_file_path_from_dialog_box" title="Link to this definition"></a></dt>
+<dd><p>Get a file using the file dialog box.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.common.file_handler.FileHandler.get_folder_name_from_path">
+<span class="sig-name descname"><span class="pre">get_folder_name_from_path</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/file_handler.html#FileHandler.get_folder_name_from_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.file_handler.FileHandler.get_folder_name_from_path" title="Link to this definition"></a></dt>
+<dd><p>Get the name of the containing folder from a path.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.common.file_handler.FileHandler.get_folder_path_from_dialog_box">
+<span class="sig-name descname"><span class="pre">get_folder_path_from_dialog_box</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/file_handler.html#FileHandler.get_folder_path_from_dialog_box"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.file_handler.FileHandler.get_folder_path_from_dialog_box" title="Link to this definition"></a></dt>
+<dd><p>Get a file using the file dialog box.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.common.file_handler.FileHandler.print_path_info">
+<span class="sig-name descname"><span class="pre">print_path_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/file_handler.html#FileHandler.print_path_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.file_handler.FileHandler.print_path_info" title="Link to this definition"></a></dt>
+<dd><p>Print information on the file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.common.file_handler.FileHandler.validate_file">
+<span class="sig-name descname"><span class="pre">validate_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/file_handler.html#FileHandler.validate_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.file_handler.FileHandler.validate_file" title="Link to this definition"></a></dt>
+<dd><p>Perform file validations. Check if the file exists and if it is in the correct format.</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="module-src.common.fitting">
 <span id="src-common-fitting-module"></span><h2>src.common.fitting module<a class="headerlink" href="#module-src.common.fitting" title="Link to this heading"></a></h2>
@@ -1009,6 +1182,32 @@ and prepare it for analysis.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="src.common.fitting.calc_residual_and_rms">
 <span class="sig-prename descclassname"><span class="pre">src.common.fitting.</span></span><span class="sig-name descname"><span class="pre">calc_residual_and_rms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/fitting.html#calc_residual_and_rms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.fitting.calc_residual_and_rms" title="Link to this definition"></a></dt>
+<dd><p>Calculate the residual and rms from data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>array</em>) – 1d array</p></li>
+<li><p><strong>x-axis</strong> (<em>data representing the</em>) – </p></li>
+<li><p><strong>y</strong> (<em>array</em>) – 1d array
+data representing the y-axis</p></li>
+<li><p><strong>deg</strong> (<em>int</em>) – degree of the polynomial</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>model of
+res (array):
+rms (float):
+coeff():</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>model (array)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.common.fitting.calc_residual_and_rms_fit">
+<span class="sig-prename descclassname"><span class="pre">src.common.fitting.</span></span><span class="sig-name descname"><span class="pre">calc_residual_and_rms_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/fitting.html#calc_residual_and_rms_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.fitting.calc_residual_and_rms_fit" title="Link to this definition"></a></dt>
 <dd><p>Calculate the residual and rms from data</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1256,6 +1455,13 @@ to the half-power beamwidth.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="src.common.fitting.get_base_pts">
+<span class="sig-prename descclassname"><span class="pre">src.common.fitting.</span></span><span class="sig-name descname"><span class="pre">get_base_pts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_index_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/fitting.html#get_base_pts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.fitting.get_base_pts" title="Link to this definition"></a></dt>
+<dd><p>Get baseline points from a list of
+indexes.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="src.common.fitting.locate_baseline_blocks_auto">
 <span class="sig-prename descclassname"><span class="pre">src.common.fitting.</span></span><span class="sig-name descname"><span class="pre">locate_baseline_blocks_auto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peakCenterGuess</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hfnbw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">saveLoc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/fitting.html#locate_baseline_blocks_auto"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.fitting.locate_baseline_blocks_auto" title="Link to this definition"></a></dt>
 <dd><p>Find the locations to fit a baseline automatically.</p>
@@ -1297,6 +1503,29 @@ data representing the y-axis</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="src.common.fitting.spline">
 <span class="sig-prename descclassname"><span class="pre">src.common.fitting.</span></span><span class="sig-name descname"><span class="pre">spline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anchor_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/fitting.html#spline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.fitting.spline" title="Link to this definition"></a></dt>
+<dd><p>Given a set of data points (x,y) determine a smooth spline
+approximation of degree k on the interval x[0] &lt;= x &lt;= x[n]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>array</em>) – 1D array of data representing the x-axis</p></li>
+<li><p><strong>y</strong> (<em>array</em>) – 1D array of data representing the y-axis</p></li>
+<li><p><strong>anchor_points</strong> (<em>int</em>) – the number of anchor points in the data</p></li>
+<li><p><strong>order</strong> (<em>int</em>) – polynomial order to fit, preferrably a cubic spline</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Spline of the data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>spline_fit (array)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.common.fitting.spline_fit">
+<span class="sig-prename descclassname"><span class="pre">src.common.fitting.</span></span><span class="sig-name descname"><span class="pre">spline_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anchor_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/fitting.html#spline_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.fitting.spline_fit" title="Link to this definition"></a></dt>
 <dd><p>Given a set of data points (x,y) determine a smooth spline
 approximation of degree k on the interval x[0] &lt;= x &lt;= x[n]</p>
 <dl class="field-list simple">
@@ -1417,7 +1646,7 @@ is printed to file.</p>
 <span id="src-common-miscellaneousfunctions-module"></span><h2>src.common.miscellaneousFunctions module<a class="headerlink" href="#module-src.common.miscellaneousFunctions" title="Link to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="src.common.miscellaneousFunctions.calc_log_freq">
-<span class="sig-prename descclassname"><span class="pre">src.common.miscellaneousFunctions.</span></span><span class="sig-name descname"><span class="pre">calc_log_freq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">freq</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/miscellaneousFunctions.html#calc_log_freq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.miscellaneousFunctions.calc_log_freq" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">src.common.miscellaneousFunctions.</span></span><span class="sig-name descname"><span class="pre">calc_log_freq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/miscellaneousFunctions.html#calc_log_freq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.miscellaneousFunctions.calc_log_freq" title="Link to this definition"></a></dt>
 <dd><p>Calculate the log(frequency)</p>
 </dd></dl>
 
@@ -1477,7 +1706,7 @@ x (array) : A 1D array without any NAN values</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.common.miscellaneousFunctions.set_dict_item">
-<span class="sig-prename descclassname"><span class="pre">src.common.miscellaneousFunctions.</span></span><span class="sig-name descname"><span class="pre">set_dict_item</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/src/common/miscellaneousFunctions.html#set_dict_item"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.miscellaneousFunctions.set_dict_item" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">src.common.miscellaneousFunctions.</span></span><span class="sig-name descname"><span class="pre">set_dict_item</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dictionary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/src/common/miscellaneousFunctions.html#set_dict_item"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.miscellaneousFunctions.set_dict_item" title="Link to this definition"></a></dt>
 <dd><p>Set dictionary key, value and description</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1626,7 +1855,7 @@ created if it does not already exist.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="src.common.observation.Observation.get_data_only">
-<span class="sig-name descname"><span class="pre">get_data_only</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/observation.html#Observation.get_data_only"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.observation.Observation.get_data_only" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_data_only</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">noqv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/observation.html#Observation.get_data_only"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.observation.Observation.get_data_only" title="Link to this definition"></a></dt>
 <dd><p>Get data from fits file hdu. This is for the quick file view.</p>
 </dd></dl>
 
@@ -1837,6 +2066,23 @@ return index, coloumn name and coloumn type</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="src.common.sqlite_db.SQLiteDB.get_rows">
 <span class="sig-name descname"><span class="pre">get_rows</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tbname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/sqlite_db.html#SQLiteDB.get_rows"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.sqlite_db.SQLiteDB.get_rows" title="Link to this definition"></a></dt>
+<dd><p>Get the rows in the database table.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tbname</strong> (<em>str</em>) – table name</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>rows</strong> – table row list</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.common.sqlite_db.SQLiteDB.get_rows_of_cols">
+<span class="sig-name descname"><span class="pre">get_rows_of_cols</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tbname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/sqlite_db.html#SQLiteDB.get_rows_of_cols"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.sqlite_db.SQLiteDB.get_rows_of_cols" title="Link to this definition"></a></dt>
 <dd><p>Get the rows in the database table.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

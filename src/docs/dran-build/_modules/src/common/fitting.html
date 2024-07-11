@@ -475,6 +475,76 @@
     <span class="k">return</span> <span class="n">spline_fit</span><span class="c1">#,anchor_points_pos</span></div>
 
 
+<div class="viewcode-block" id="spline_fit">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.fitting.spline_fit">[docs]</a>
+<span class="k">def</span> <span class="nf">spline_fit</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">anchor_points</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Given a set of data points (x,y) determine a smooth spline</span>
+<span class="sd">        approximation of degree k on the interval x[0] &lt;= x &lt;= x[n]</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x (array): 1D array of data representing the x-axis</span>
+<span class="sd">            y (array): 1D array of data representing the y-axis</span>
+<span class="sd">            anchor_points (int): the number of anchor points in the data</span>
+<span class="sd">            order (int): polynomial order to fit, preferrably a cubic spline</span>
+<span class="sd">        Return:</span>
+<span class="sd">            spline_fit (array): Spline of the data</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">nx</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">ny</span><span class="o">=</span><span class="p">[]</span>
+    <span class="c1"># remove nan values</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>
+        <span class="c1">#print(i,y[i],type(y[i]))</span>
+        <span class="k">if</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="ow">or</span> <span class="nb">str</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">==</span><span class="s2">&quot;nan&quot;</span><span class="p">:</span>
+            <span class="c1">#print(i,y[i])</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">nx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">ny</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+    <span class="n">scanLen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">nx</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">scanLen</span> <span class="o">&lt;=</span> <span class="n">anchor_points</span><span class="o">*</span><span class="mi">2</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Too few points to interpolate, consider entering lower knot points&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;spline not set&quot;</span><span class="p">)</span>
+        <span class="n">spline_fit</span><span class="o">=</span><span class="p">[]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1">#anchor_points=7</span>
+        <span class="n">anchor_points_intervals</span> <span class="o">=</span> <span class="n">scanLen</span><span class="o">/</span><span class="n">anchor_points</span>  <span class="c1"># intervals where anchor points will be placed</span>
+        <span class="n">anchor_points_pos</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># list to hold positions where anchor_points will be placed olong the array</span>
+        <span class="n">anchor_points_counter</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># position counter or locator </span>
+
+        <span class="c1"># create a list of the positions where the anchor_points will be located</span>
+        <span class="c1">#anchor_points=10</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">anchor_points</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">anchor_points_counter</span> <span class="o">=</span> <span class="n">anchor_points_counter</span> <span class="o">+</span> <span class="n">anchor_points_intervals</span>
+            <span class="n">anchor_points_pos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">anchor_points_counter</span><span class="p">))</span>
+
+        <span class="c1"># interpolate the data</span>
+        <span class="c1"># create linearly spaced data points</span>
+        <span class="n">x1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">scanLen</span><span class="p">,</span> <span class="n">scanLen</span><span class="p">)</span>
+        <span class="n">x2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="n">anchor_points_pos</span><span class="p">),</span> <span class="nb">int</span><span class="p">)</span>	<span class="c1"># create array of anchor_points positions</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">tck</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">splrep</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">order</span><span class="p">,</span> <span class="n">task</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+                                    <span class="n">t</span><span class="o">=</span><span class="n">x2</span><span class="p">)</span>  <span class="c1"># interpolate, k=5 is max</span>
+            <span class="n">spline_fit</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">splev</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">tck</span><span class="p">,</span> <span class="n">der</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Failed to interpolate, Error on input data,too few points, min required = 9&quot;</span><span class="p">)</span>
+            <span class="n">spline_fit</span><span class="o">=</span><span class="n">ny</span>
+
+        <span class="c1">#print(len(x),len(spline_fit))</span>
+        <span class="c1">#print(spline_fit)</span>
+    <span class="c1">#     pl.plot(x,y,&#39;k.&#39;)</span>
+    <span class="c1">#     pl.plot(nx,spline_fit,&#39;r&#39;)</span>
+    <span class="c1">#    # pl.plot(nx[anchor_points_pos],spline_fit[anchor_points_pos],&#39;r.&#39;)</span>
+    <span class="c1">#     pl.show()</span>
+    <span class="c1">#     pl.close()</span>
+    <span class="c1">#     print(&#39;closed&#39;)</span>
+    <span class="c1">#     sys.exit()</span>
+    <span class="k">return</span> <span class="n">nx</span><span class="p">,</span><span class="n">spline_fit</span><span class="c1">#,anchor_points_pos</span></div>
+
+
 <div class="viewcode-block" id="gauss">
 <a class="viewcode-back" href="../../../docs/src.common.html#src.common.fitting.gauss">[docs]</a>
 <span class="k">def</span> <span class="nf">gauss</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">*</span><span class="n">p</span><span class="p">):</span>
@@ -1293,6 +1363,54 @@
     <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">rms</span><span class="p">,</span> <span class="n">coeffs</span></div>
 
 
+<div class="viewcode-block" id="calc_residual_and_rms_fit">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.fitting.calc_residual_and_rms_fit">[docs]</a>
+<span class="k">def</span> <span class="nf">calc_residual_and_rms_fit</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the residual and rms from data</span>
+<span class="sd">    </span>
+<span class="sd">        Args:</span>
+<span class="sd">            x (array): 1d array</span>
+<span class="sd">            data representing the x-axis</span>
+<span class="sd">            y (array): 1d array</span>
+<span class="sd">                data representing the y-axis</span>
+<span class="sd">            deg(int): degree of the polynomial</span>
+
+<span class="sd">        Return:</span>
+<span class="sd">            model (array): model of </span>
+<span class="sd">            res (array):</span>
+<span class="sd">            rms (float):</span>
+<span class="sd">            coeff():</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="c1">#TODO: remove redundant code</span>
+    
+    <span class="n">nx</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">ny</span><span class="o">=</span><span class="p">[]</span>
+    <span class="c1"># remove nan values</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>
+        <span class="c1">#print(i,y[i],type(y[i]))</span>
+        <span class="k">if</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="ow">or</span> <span class="nb">str</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">==</span><span class="s2">&quot;nan&quot;</span><span class="p">:</span>
+            <span class="c1">#print(i,y[i])</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">nx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">ny</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+    <span class="c1"># fit the baseline and get best fit coeffecients</span>
+    <span class="n">coeffs</span> <span class="o">=</span> <span class="n">poly_coeff</span><span class="p">(</span><span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;coeffs: &#39;</span><span class="p">,</span><span class="n">coeffs</span><span class="p">)</span>
+
+    <span class="c1"># get a model for the fit using the best fit coeffecients</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyval</span><span class="p">(</span><span class="n">coeffs</span><span class="p">,</span> <span class="n">nx</span><span class="p">)</span>
+
+    <span class="c1">#print(&#39;model: &#39;, model)</span>
+
+    <span class="c1"># Calculate the residual and rms</span>
+    <span class="n">res</span><span class="p">,</span> <span class="n">rms</span> <span class="o">=</span> <span class="n">calc_residual</span><span class="p">(</span><span class="n">ny</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">nx</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">rms</span><span class="p">,</span> <span class="n">coeffs</span></div>
+
+    
 <div class="viewcode-block" id="poly_coeff">
 <a class="viewcode-back" href="../../../docs/src.common.html#src.common.fitting.poly_coeff">[docs]</a>
 <span class="k">def</span> <span class="nf">poly_coeff</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">deg</span><span class="p">):</span>
@@ -3083,6 +3201,39 @@
         <span class="k">return</span> <span class="n">base</span><span class="p">,</span> <span class="n">basel</span><span class="p">,</span><span class="n">baser</span><span class="p">,</span><span class="n">basell</span><span class="p">,</span><span class="n">baserr</span><span class="p">,</span><span class="n">lp</span><span class="p">,</span><span class="n">rp</span></div>
 
 
+<span class="c1"># GUI operation</span>
+<div class="viewcode-block" id="get_base_pts">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.fitting.get_base_pts">[docs]</a>
+<span class="k">def</span> <span class="nf">get_base_pts</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">base_index_list</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Get baseline points from a list of </span>
+<span class="sd">        indexes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Get data between the indexes selected</span>
+    <span class="n">ind_list</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">base_index_list</span><span class="p">)</span>
+
+    <span class="c1"># get location of all points</span>
+    <span class="n">xb_data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">yb_data</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ind_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">ind_1</span> <span class="o">=</span> <span class="n">ind_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">ind_2</span> <span class="o">=</span> <span class="n">ind_list</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1">#print(i, i+1, ind_1, ind_2, len(ind_list))</span>
+        <span class="n">xb_data</span> <span class="o">=</span> <span class="n">xb_data</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">ind_1</span><span class="p">:</span><span class="n">ind_2</span><span class="p">])</span>
+        <span class="n">yb_data</span> <span class="o">=</span> <span class="n">yb_data</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">ind_1</span><span class="p">:</span><span class="n">ind_2</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ind_list</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">ind_1</span> <span class="o">=</span> <span class="n">ind_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">ind_2</span> <span class="o">=</span> <span class="n">ind_list</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+                <span class="c1">#print(i, i+1, ind_1, ind_2, len(ind_list))</span>
+                <span class="n">xb_data</span> <span class="o">=</span> <span class="n">xb_data</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">ind_1</span><span class="p">:</span><span class="n">ind_2</span><span class="p">])</span>
+                <span class="n">yb_data</span> <span class="o">=</span> <span class="n">yb_data</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">ind_1</span><span class="p">:</span><span class="n">ind_2</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">xb_data</span><span class="p">,</span> <span class="n">yb_data</span></div>
+
+
 <div class="viewcode-block" id="filter_scans">
 <a class="viewcode-back" href="../../../docs/src.common.html#src.common.fitting.filter_scans">[docs]</a>
 <span class="k">def</span> <span class="nf">filter_scans</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">window_len</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="s1">&#39;flat&#39;</span><span class="p">):</span>
@@ -3141,6 +3292,7 @@
     <span class="c1"># Calculate the residual and rms of the peak fit</span>
     <span class="n">peakRes</span><span class="p">,</span> <span class="n">peakRms</span> <span class="o">=</span> <span class="n">calc_residual</span><span class="p">(</span><span class="n">peakModel</span><span class="p">,</span> <span class="n">yp</span><span class="p">,</span><span class="n">log</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">peakRes</span><span class="p">,</span> <span class="n">peakRms</span><span class="p">,</span> <span class="n">peakModel</span></div>
+
 
 </pre></div>
 

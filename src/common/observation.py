@@ -266,7 +266,7 @@ class Observation:
                 or 'TDISP' in column or 'PCOUNT' in column or 'GCOUNT' in column or 'TFIELDS' in column\
                 or column=='SCAN' or 'XT' in column or 'TCALDAT' in column or 'SCANANGL' in column\
                 or 'TCALFRQ' in column or 'HZZER' in column or 'SCANTYPE' in column or 'STEPSEQ' in column\
-                or 'TCALSIG' in column:
+                or 'TCALSIG' in column or 'HAPOINTC' in column or 'DEPOINTC' in column:
                 # self.__dict__[f'{column}_{hduindex}'] = {'value':hdu[column],'description':hdu.comments[column]}
                 pass
             else:

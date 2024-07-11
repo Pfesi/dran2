@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.gui.timeseries_canvas &mdash; dran v1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e160b93e"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            dran
+          </a>
+              <div class="version">
+                v1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/caveats.html">Caveats</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/quickstart.html">Quickstart Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/cli.html">The command line interface (CLI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html">The graphical user interface (GUI)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#the-landing-page">The landing page</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#edit-driftscan">Edit driftscan</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#edit-time-series">Edit Time series</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/gui.html#view-plots">View plots</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/tuts/tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/commands.html">Commands</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guidelines:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/modules.html">src</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">dran</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.gui.timeseries_canvas</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.gui.timeseries_canvas</h1><div class="highlight"><pre>
+<span></span><span class="c1"># ============================================================================#</span>
+<span class="c1"># File: timeseries_canvas.py                                                  #</span>
+<span class="c1"># Author: Pfesesani V. van Zyl                                                #</span>
+<span class="c1"># ============================================================================#</span>
+
+<span class="c1"># Standard library imports</span>
+<span class="c1"># --------------------------------------------------------------------------- #</span>
+<span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">matplotlib.backends.backend_qt5agg</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">FigureCanvasQTAgg</span> <span class="k">as</span> <span class="n">FigureCanvas</span><span class="p">,</span> <span class="n">NavigationToolbar2QT</span> <span class="k">as</span> <span class="n">NavigationToolbar</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">matplotlib.figure</span> <span class="kn">import</span> <span class="n">Figure</span>
+<span class="kn">from</span> <span class="nn">matplotlib.lines</span> <span class="kn">import</span> <span class="n">Line2D</span>
+<span class="c1">#import matplotlib.style as mplstyle</span>
+<span class="c1">#mplstyle.use(&#39;fast&#39;)</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">webbrowser</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="c1"># Local imports</span>
+<span class="c1"># --------------------------------------------------------------------------- #</span>
+<span class="c1"># sys.path.append(&quot;src/&quot;)</span>
+<span class="kn">from</span> <span class="nn">common.msgConfiguration</span> <span class="kn">import</span> <span class="n">msg_wrapper</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;plots/&quot;</span><span class="p">)</span>
+<span class="c1"># =========================================================================== #</span>
+
+<div class="viewcode-block" id="TimeCanvas">
+<a class="viewcode-back" href="../../../docs/src.gui.html#src.gui.timeseries_canvas.TimeCanvas">[docs]</a>
+<span class="k">class</span> <span class="nc">TimeCanvas</span><span class="p">(</span><span class="n">FigureCanvas</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">wid</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">hgt</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="n">plotName</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="n">log</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize an empty canvas for all plots.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">log</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">=</span> <span class="nb">print</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">=</span> <span class="n">log</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">previous_point</span><span class="o">=</span><span class="p">[]</span>
+
+        <span class="c1"># Create a figure object</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">Figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">wid</span><span class="p">,</span> <span class="n">hgt</span><span class="p">),</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
+
+        <span class="c1"># A canvas must be manually attached to the figure (pyplot would automatically</span>
+        <span class="c1"># do it).  This is done by instantiating the canvas with the figure as</span>
+        <span class="c1"># argument.</span>
+        <span class="c1"># Create an axes object in the figure</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+        
+        <span class="c1"># Initialize the figure onto the canvas</span>
+        <span class="n">FigureCanvas</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fig</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">=</span><span class="n">fig</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setParent</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+
+        <span class="c1"># Setup clicks array to hold selected positions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset_lists</span><span class="p">()</span>
+
+        <span class="c1"># set x,y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">=</span><span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">=</span><span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xlab</span><span class="o">=</span><span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ylab</span><span class="o">=</span><span class="p">[]</span>
+        
+<div class="viewcode-block" id="TimeCanvas.reset_lists">
+<a class="viewcode-back" href="../../../docs/src.gui.html#src.gui.timeseries_canvas.TimeCanvas.reset_lists">[docs]</a>
+    <span class="k">def</span> <span class="nf">reset_lists</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setup lists to store data for the click_index and fit_points.</span>
+<span class="sd">        click_index : the indeces of the points clicked on the figure.</span>
+<span class="sd">        fit_points: the values of the click_index</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span>
+                    <span class="s2">&quot;Reset fit points&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">click_index</span> <span class="o">=</span> <span class="p">[]</span>   <span class="c1"># Indeces of clicked points along x-axis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_points</span> <span class="o">=</span> <span class="p">[]</span>    <span class="c1"># Points to be fit/modelled</span></div>
+
+
+<div class="viewcode-block" id="TimeCanvas.plot_fig_errs">
+<a class="viewcode-back" href="../../../docs/src.gui.html#src.gui.timeseries_canvas.TimeCanvas.plot_fig_errs">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_fig_errs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="p">[],</span> <span class="n">y</span><span class="o">=</span><span class="p">[],</span> <span class="n">xlab</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">ylab</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Main database plot window&quot;</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="s2">&quot;C0.&quot;</span><span class="p">,</span> <span class="n">errs</span><span class="o">=</span><span class="p">[],</span><span class="n">data</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot a figure with errorbars.</span>
+<span class="sd">       </span>
+<span class="sd">            A helper function to make a graph</span>
+
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">            ax : Axes</span>
+<span class="sd">                The axes to draw to</span>
+
+<span class="sd">            data1 : array</span>
+<span class="sd">            The x data</span>
+
+<span class="sd">            data2 : array</span>
+<span class="sd">            The y data</span>
+
+<span class="sd">            param_dict : dict</span>
+<span class="sd">            Dictionary of kwargs to pass to ax.plot</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">            out : list</span>
+<span class="sd">                list of artists added</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">=</span><span class="n">data</span> <span class="c1"># drift scan data</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clear_figure</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setLabelsNoLegend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">clear_figure</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">70</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">=</span><span class="n">x</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">=</span><span class="n">y</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">xlab</span><span class="o">=</span><span class="n">xlab</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ylab</span><span class="o">=</span><span class="n">ylab</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">yerr</span><span class="o">=</span><span class="n">errs</span><span class="p">,</span><span class="n">fmt</span><span class="o">=</span><span class="n">col</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">picker</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setLabels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="p">,</span> <span class="n">xlab</span><span class="p">,</span> <span class="n">ylab</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mpl_connect</span><span class="p">(</span><span class="s1">&#39;pick_event&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">onpick</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span></div>
+
+    
+<div class="viewcode-block" id="TimeCanvas.replaceitem">
+<a class="viewcode-back" href="../../../docs/src.gui.html#src.gui.timeseries_canvas.TimeCanvas.replaceitem">[docs]</a>
+    <span class="k">def</span> <span class="nf">replaceitem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;replace an item in a list of items&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># print(&#39;*&#39;,x)</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">elif</span> <span class="n">x</span> <span class="o">==</span> <span class="s1">&#39;None&#39;</span><span class="p">:</span>
+            <span class="c1"># print(&#39;%&#39;,x)</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">elif</span> <span class="n">x</span> <span class="o">==</span> <span class="s1">&#39;NaT&#39;</span><span class="p">:</span>
+            <span class="c1"># print(&#39;+&#39;,x)</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># print(&#39;&amp;&#39;,x)</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="TimeCanvas.replaceDateItem">
+<a class="viewcode-back" href="../../../docs/src.gui.html#src.gui.timeseries_canvas.TimeCanvas.replaceDateItem">[docs]</a>
+    <span class="k">def</span> <span class="nf">replaceDateItem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;replace an item in a list of items&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;NaTType&#39;</span><span class="p">:</span>
+            <span class="c1"># print(&#39;*&#39;,x)</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">elif</span> <span class="n">x</span> <span class="o">==</span> <span class="s1">&#39;None&#39;</span><span class="p">:</span>
+            <span class="c1"># print(&#39;%&#39;,x)</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">elif</span> <span class="n">x</span> <span class="o">==</span> <span class="s1">&#39;NaT&#39;</span><span class="p">:</span>
+            <span class="c1"># print(&#39;+&#39;,x)</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># print(&#39;&amp;&#39;,x)</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="TimeCanvas.plot_fig">
+<a class="viewcode-back" href="../../../docs/src.gui.html#src.gui.timeseries_canvas.TimeCanvas.plot_fig">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_fig</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="p">[],</span> <span class="n">y</span><span class="o">=</span><span class="p">[],</span> <span class="n">xlab</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">ylab</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Main database plot window&quot;</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="s2">&quot;C0.&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="n">yerr</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="c1"># plot_fig(self.df[xCol],self.df[yCol],xCol,yCol,data=self.df,yerr=yerr)</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot a figure.</span>
+<span class="sd">       </span>
+<span class="sd">            A helper function to make a graph</span>
+
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">            ax : Axes</span>
+<span class="sd">                The axes to draw to</span>
+
+<span class="sd">            data1 : array</span>
+<span class="sd">            The x data</span>
+
+<span class="sd">            data2 : array</span>
+<span class="sd">            The y data</span>
+
+<span class="sd">            param_dict : dict</span>
+<span class="sd">            Dictionary of kwargs to pass to ax.plot</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">            out : list</span>
+<span class="sd">                list of artists added</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">=</span><span class="n">data</span> <span class="c1"># drift scan data</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clear_figure</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setLabelsNoLegend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">clear_figure</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">=</span><span class="n">x</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">=</span><span class="n">y</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">xlab</span><span class="o">=</span><span class="n">xlab</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ylab</span><span class="o">=</span><span class="n">ylab</span>
+
+           
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">yerr</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span> <span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">picker</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># print(&#39;yerr - &#39;,list(yerr))</span>
+                <span class="n">yerr</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">replaceitem</span><span class="p">,</span><span class="n">yerr</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">replaceitem</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">))</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">yerr</span><span class="p">,</span><span class="n">fmt</span><span class="o">=</span><span class="n">col</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">picker</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+                    <span class="c1"># self.ax.errorbar(data[xlab], data[ylab], data[yerr],fmt=col, label=&quot;data&quot;, picker=5)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="c1"># self.ax.errorbar(self.x, self.y, yerr,fmt=col, label=&quot;data&quot;, picker=5)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">setLabels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="p">,</span> <span class="n">xlab</span><span class="p">,</span> <span class="n">ylab</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+            <span class="n">connection_id_0</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpl_connect</span><span class="p">(</span><span class="s1">&#39;pick_event&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">onpick</span><span class="p">)</span>
+            <span class="n">connection_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mpl_connect</span><span class="p">(</span><span class="s1">&#39;button_press_event&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">onclick</span><span class="p">)</span>
+            <span class="c1">#self.mpl_connect(&#39;pick_event&#39;, self.onpick)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TimeCanvas.plot_dual_fig">
+<a class="viewcode-back" href="../../../docs/src.gui.html#src.gui.timeseries_canvas.TimeCanvas.plot_dual_fig">[docs]</a>
+    <span class="k">def</span> <span class="nf">plot_dual_fig</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="p">[],</span> <span class="n">y</span><span class="o">=</span><span class="p">[],</span><span class="n">x1</span><span class="o">=</span><span class="p">[],</span><span class="n">y1</span><span class="o">=</span><span class="p">[],</span> <span class="n">xlab</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">ylab</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Main database plot window&quot;</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="s2">&quot;C0.&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot a figure.</span>
+<span class="sd">       </span>
+<span class="sd">            A helper function to make a graph</span>
+
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">            ax : Axes</span>
+<span class="sd">                The axes to draw to</span>
+
+<span class="sd">            data1 : array</span>
+<span class="sd">            The x data</span>
+
+<span class="sd">            data2 : array</span>
+<span class="sd">            The y data</span>
+
+<span class="sd">            param_dict : dict</span>
+<span class="sd">            Dictionary of kwargs to pass to ax.plot</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">            out : list</span>
+<span class="sd">                list of artists added</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">=</span><span class="n">data</span> <span class="c1"># drift scan data</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clear_figure</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setLabelsNoLegend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">clear_figure</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">=</span><span class="n">x</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">=</span><span class="n">y</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">xlab</span><span class="o">=</span><span class="n">xlab</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ylab</span><span class="o">=</span><span class="n">ylab</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">picker</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;fit&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setLabels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="p">,</span> <span class="n">xlab</span><span class="p">,</span> <span class="n">ylab</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+            <span class="c1">#connection_id_0=self.mpl_connect(&#39;pick_event&#39;, self.onpick)</span>
+            <span class="c1">#connection_id = self.mpl_connect(&#39;button_press_event&#39;, self.onclick)</span>
+            
+            <span class="c1">#self.mpl_connect(&#39;pick_event&#39;, self.onpick)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TimeCanvas.clear_figure">
+<a class="viewcode-back" href="../../../docs/src.gui.html#src.gui.timeseries_canvas.TimeCanvas.clear_figure">[docs]</a>
+    <span class="k">def</span> <span class="nf">clear_figure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Clear the current figure </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>  <span class="c1"># .gcf().clear()  # which clears data and axes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TimeCanvas.onclick">
+<a class="viewcode-back" href="../../../docs/src.gui.html#src.gui.timeseries_canvas.TimeCanvas.onclick">[docs]</a>
+    <span class="k">def</span> <span class="nf">onclick</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">event</span><span class="p">):</span>
+
+        <span class="c1">#print(event, &quot;\n&quot;)</span>
+        
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">xdata</span><span class="o">==</span><span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Nothing selected, aim for the tiny blue dots ;)</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="c1">#print(len(self.fit_points))</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_points</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">click_index</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">No points selected, try aiming for the tiny blue dots</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;in</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">click_index</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span>  <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_points</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Clicked the </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">button</span><span class="si">}</span><span class="s1"> button&#39;</span><span class="p">)</span>
+                    
+                    <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">dblclick</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;double clicked - &#39;</span><span class="p">)</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">click_index</span><span class="p">)</span>
+
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Clicked: </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">button</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;x: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_points</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">, </span><span class="se">\n</span><span class="s1">y: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_points</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ind: &#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">click_index</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+                    <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">button</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">event</span><span class="o">.</span><span class="n">button</span> <span class="o">==</span> <span class="s2">&quot;MouseButton.LEFT&quot;</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">previous_point</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_points</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_points</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">previous_point</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">)</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">previous_point</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_points</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">previous_point</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_points</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+                            <span class="n">cond</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">previous_point</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_points</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> 
+                            <span class="k">if</span> <span class="n">cond</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+                                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">aim for blue dots</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">fit_points</span><span class="o">=</span><span class="p">[]</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">click_index</span><span class="o">=</span><span class="p">[]</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;left - &#39;</span><span class="p">)</span>
+                                <span class="c1">#self.fitpoints=[]</span>
+                                <span class="c1">#self.click_index=[]</span>
+                                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Clicked: </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">button</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;x: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_points</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">, </span><span class="se">\n</span><span class="s1">y: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_points</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ind: &#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">click_index</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">previous_point</span><span class="o">=</span><span class="p">[[</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_points</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_points</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]]]</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="c1">#self.previous_point=[[self.fit_points[0][0],self.fit_points[0][1]]]</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;left - first time&#39;</span><span class="p">)</span>
+                            <span class="c1">#self.fitpoints=[]</span>
+                            <span class="c1">#self.click_index=[]</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Clicked: </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">button</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;x: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_points</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">, </span><span class="se">\n</span><span class="s1">y: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_points</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ind: &#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">click_index</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">previous_point</span><span class="o">=</span><span class="p">[[</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_points</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_points</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]]]</span>
+
+                    <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">button</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">click_index</span><span class="o">==</span><span class="p">[]:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;No click index&#39;</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Clicked: </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">button</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                            
+                            <span class="c1"># Points clicked to plot</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fit_points</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_points</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;r.&#39;</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">click_index</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">show_plots</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">click_index</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">show_plots</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">click_index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                            <span class="c1">#sys.exit()</span>
+
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Not sure what happend</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;click index: &#39;</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">click_index</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">click_index</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TimeCanvas.onpick">
+<a class="viewcode-back" href="../../../docs/src.gui.html#src.gui.timeseries_canvas.TimeCanvas.onpick">[docs]</a>
+    <span class="k">def</span> <span class="nf">onpick</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Click event handler.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">artist</span><span class="p">,</span> <span class="n">Line2D</span><span class="p">):</span>
+            <span class="n">thisline</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">artist</span>
+            <span class="n">xdata</span> <span class="o">=</span> <span class="n">thisline</span><span class="o">.</span><span class="n">get_xdata</span><span class="p">()</span>
+            <span class="n">ydata</span> <span class="o">=</span> <span class="n">thisline</span><span class="o">.</span><span class="n">get_ydata</span><span class="p">()</span>
+            
+            <span class="n">ind</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">ind</span>
+
+            <span class="c1">#print(xdata[ind],ydata[ind],ind,event)</span>
+            <span class="c1">#sys.exit()</span>
+
+            <span class="n">pointsx</span> <span class="o">=</span> <span class="n">xdata</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
+            <span class="n">pointsy</span> <span class="o">=</span> <span class="n">ydata</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
+
+            <span class="c1"># Points clicked to plot</span>
+            <span class="c1">#self.ax.plot(pointsx[0], pointsy[0], &#39;r.&#39;)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span><span class="s2">&quot;-&quot;</span><span class="o">*</span><span class="mi">30</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;picked: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">pointsx</span><span class="p">[</span><span class="mi">0</span><span class="p">])[:</span><span class="mi">10</span><span class="p">]</span><span class="si">}</span><span class="s1">,</span><span class="si">{</span><span class="n">pointsy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1"> @ index: </span><span class="si">{</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Require a numerical value to print points picked</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fit_points</span><span class="o">=</span><span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">click_index</span><span class="o">=</span><span class="p">[]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">fit_points</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">pointsx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">pointsy</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">click_index</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TimeCanvas.show_plots">
+<a class="viewcode-back" href="../../../docs/src.gui.html#src.gui.timeseries_canvas.TimeCanvas.show_plots">[docs]</a>
+    <span class="k">def</span> <span class="nf">show_plots</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ind</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Show plots on click event in html browser. &quot;&quot;&quot;</span>
+
+        <span class="n">obj</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">ind</span><span class="p">,][</span><span class="s1">&#39;OBJECT&#39;</span><span class="p">]</span>
+        <span class="n">obj</span><span class="o">=</span><span class="n">obj</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">freq</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">ind</span><span class="p">,][</span><span class="s2">&quot;CENTFREQ&quot;</span><span class="p">])</span>
+
+        <span class="n">imgDir</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;plots/</span><span class="si">{</span><span class="n">obj</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">freq</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">plotFolderList</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">imgDir</span><span class="p">)</span>
+        <span class="n">plotFolderName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">ind</span><span class="p">,][</span><span class="s2">&quot;FILEPATH&quot;</span><span class="p">]</span>
+        
+        <span class="n">plotFileName</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">ind</span><span class="p">,][</span><span class="s2">&quot;FILENAME&quot;</span><span class="p">])</span>
+        <span class="n">plotMJD</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">ind</span><span class="p">,][</span><span class="s2">&quot;MJD&quot;</span><span class="p">])</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="n">plotDATE</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">ind</span><span class="p">,][</span><span class="s2">&quot;OBSDATE&quot;</span><span class="p">])[:</span><span class="mi">10</span><span class="p">]</span> 
+        <span class="n">imgPaths</span><span class="o">=</span><span class="p">[]</span>
+        <span class="n">imgTags</span><span class="o">=</span><span class="p">[]</span>
+
+        <span class="n">imageNames</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">imgDir</span><span class="p">))</span>
+            
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">imageNames</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;We are missing images for this source, try automatically processing the data first&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Showing: &#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">imageNames</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">imageNames</span><span class="p">[</span><span class="n">i</span><span class="p">][:</span><span class="mi">18</span><span class="p">]</span> <span class="o">==</span> <span class="n">plotFileName</span><span class="p">[:</span><span class="mi">18</span><span class="p">]:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- &quot;</span><span class="p">,</span><span class="n">imgDir</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">imageNames</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">imgPaths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">imgDir</span><span class="o">+</span><span class="s2">&quot;/&quot;</span><span class="o">+</span><span class="n">imageNames</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">imgTags</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">imageNames</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">19</span><span class="p">:</span><span class="o">-</span><span class="mi">4</span><span class="p">]))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="mi">30</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="c1"># print(imgPaths)</span>
+
+            <span class="n">htmlstart</span> <span class="o">=</span> <span class="s1">&#39;&lt;html&gt; &lt;head&gt;</span><span class="se">\</span>
+<span class="s1">                &lt;meta charset = &quot;utf-8&quot; &gt;</span><span class="se">\</span>
+<span class="s1">                &lt;meta name = &quot;viewport&quot; content = &quot;width=device-width, initial-scale=1&quot; &gt; &lt;link href=&quot;https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css&quot; rel=&quot;stylesheet&quot; integrity=&quot;sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl&quot; crossorigin=&quot;anonymous&quot;&gt; &lt;script src=&quot;https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js&quot; integrity=&quot;sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt; &lt;style&gt; img {border: 2px solid  #ddd; /* Gray border */border-radius: 4px;  /* Rounded border */padding: 5px; /* Some padding */width: 400px; /* Set a small width */}/* Add a hover effect (blue shadow) */img:hover {box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);}&lt;/style&gt; </span><span class="se">\</span>
+<span class="s1">                &lt;title&gt;Plots&lt;/title&gt;</span><span class="se">\</span>
+<span class="s1">                &lt;/head&gt;</span><span class="se">\</span>
+<span class="s1">                &lt;div class=&quot;container-fluid&quot;&gt; </span><span class="se">\</span>
+<span class="s1">                    &lt;div class=&quot;row&quot;&gt;</span><span class="se">\</span>
+<span class="s1">                        &lt;hr&gt;</span><span class="se">\</span>
+<span class="s1">                            &lt;h3&gt; Plots of &#39;</span><span class="o">+</span><span class="n">plotFileName</span><span class="p">[:</span><span class="mi">18</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39; ( MJD &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">plotMJD</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39; or &#39;</span><span class="o">+</span><span class="n">plotDATE</span><span class="o">+</span><span class="s1">&#39;) for  &#39;</span><span class="o">+</span><span class="n">plotFileName</span> <span class="o">+</span> <span class="s1">&#39; at &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span><span class="o">+</span> <span class="s1">&#39; &lt;/h3&gt; &lt;p&gt;&#39;</span>
+                    
+            <span class="n">htmlmid</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">imgPaths</span><span class="p">)):</span>
+                <span class="n">pathtoimg</span><span class="o">=</span><span class="n">imgPaths</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">img</span> <span class="o">=</span> <span class="s1">&#39;&lt;h5 class=&quot;card-title&quot;&gt;&#39;</span><span class="o">+</span><span class="n">imgTags</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;&lt;/h5&gt;&lt;br/&gt;</span><span class="se">\</span>
+<span class="s1">                    &lt;a target=&quot;_blank&quot; href=&quot;&#39;</span><span class="o">+</span><span class="n">pathtoimg</span> <span class="o">+</span> \
+                    <span class="s1">&#39;&quot;&gt;&lt;img src=&quot;&#39;</span><span class="o">+</span><span class="n">pathtoimg</span> <span class="o">+</span> \
+                    <span class="s1">&#39;&quot; class=&quot;card-img-top&quot; alt=&quot;image goes here&quot;&gt;&lt;/a&gt;&#39;</span>
+                <span class="n">imglink</span> <span class="o">=</span><span class="s1">&#39;&lt;div class = &quot;card&quot; style = &quot;width: 18rem;&quot; &gt;</span><span class="se">\</span>
+<span class="s1">                        &#39;</span><span class="o">+</span><span class="n">img</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\</span>
+<span class="s1">                            &lt;/div&gt;&#39;</span>
+                <span class="n">htmlmid</span><span class="o">=</span><span class="n">htmlmid</span><span class="o">+</span><span class="n">imglink</span>
+
+            <span class="n">htmlmid</span><span class="o">=</span><span class="n">htmlmid</span><span class="o">+</span><span class="s1">&#39;&lt;/p&gt;&lt;/div&gt;&#39;</span>
+            <span class="n">htmlend</span> <span class="o">=</span> <span class="s1">&#39;&lt;/div&gt;&lt;/html&gt;&#39;</span>
+            <span class="n">html</span> <span class="o">=</span> <span class="n">htmlstart</span><span class="o">+</span><span class="n">htmlmid</span><span class="o">+</span><span class="n">htmlend</span>
+
+        <span class="c1"># create the html file</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s1">&#39;temp.html&#39;</span><span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;file://&#39;</span> <span class="o">+</span> <span class="n">path</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+        <span class="n">webbrowser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">url</span><span class="p">)</span></div>
+
+
+
+
+
+
+
+
+
+<span class="c1">#---------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="TimeCanvas.pop">
+<a class="viewcode-back" href="../../../docs/src.gui.html#src.gui.timeseries_canvas.TimeCanvas.pop">[docs]</a>
+    <span class="k">def</span> <span class="nf">pop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Ask to remove: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">img_loc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">click_index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span></div>
+
+        <span class="c1">#img = Image.open(&quot;plots/&quot;+self.img_loc[self.click_index[-1]])</span>
+        <span class="c1">#plt.imshow(img)</span>
+
+        <span class="c1"># show image of plot</span>
+        <span class="c1">#pl.plot()</span>
+
+        <span class="c1">#fig = Figure(figsize=(100, 100), facecolor=&#39;w&#39;, edgecolor=&#39;k&#39;)</span>
+
+        <span class="c1"># A canvas must be manually attached to the figure (pyplot would automatically</span>
+        <span class="c1"># do it).  This is done by instantiating the canvas with the figure as</span>
+        <span class="c1"># argument.</span>
+        <span class="c1"># Create an axes object in the figure</span>
+        <span class="c1">#ax = fig.add_subplot(111)</span>
+        <span class="c1">#app = QApplication(sys.argv)</span>
+
+        <span class="c1">#sys.exit(app.exec_())</span>
+
+        <span class="c1">#img = Image.open(&quot;plots/&quot;+self.img_loc[self.click_index[-1]])</span>
+        <span class="c1">#plt.imshow(img)</span>
+        <span class="c1"># Initialize the figure onto the canvas</span>
+
+        <span class="c1">#self.toolbar = NavigationToolbar(self,fig)</span>
+
+<div class="viewcode-block" id="TimeCanvas.dday">
+<a class="viewcode-back" href="../../../docs/src.gui.html#src.gui.timeseries_canvas.TimeCanvas.dday">[docs]</a>
+    <span class="k">def</span> <span class="nf">dday</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Date handler</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1">#d1 = x[0]</span>
+        <span class="c1">#d2 = x[-1]</span>
+
+        <span class="c1">#print(d1,d2)</span>
+        <span class="c1">#string = d1#&quot;19 Nov 2015  18:45:00.000&quot;</span>
+
+        <span class="c1">#date = datetime.datetime.strptime(string, &quot;%Y-%m-%d&quot;)# %H:%M:%S.%f&quot;)</span>
+        <span class="c1">#print(date, date.year, date.month, date.day)</span>
+
+        <span class="c1">#sys.exit()</span>
+        <span class="c1">#date1 = datetime.date(2002, 1, 5)</span>
+        <span class="c1">#date2 = datetime.date(2003, 12, 1)</span>
+
+        <span class="c1"># every monday</span>
+        <span class="n">mondays</span> <span class="o">=</span> <span class="n">WeekdayLocator</span><span class="p">(</span><span class="n">MONDAY</span><span class="p">)</span>
+
+        <span class="c1"># every 3rd month</span>
+        <span class="n">months</span> <span class="o">=</span> <span class="n">MonthLocator</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">13</span><span class="p">),</span> <span class="n">bymonthday</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">monthsFmt</span> <span class="o">=</span> <span class="n">DateFormatter</span><span class="p">(</span><span class="s2">&quot;%b &#39;%y&quot;</span><span class="p">)</span>
+
+        <span class="n">dates</span> <span class="o">=</span> <span class="n">x</span><span class="c1">#[q[0] for q in quotes]</span>
+        <span class="n">opens</span> <span class="o">=</span> <span class="n">y</span><span class="c1">#[q[1] for q in quotes]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear_figure</span><span class="p">()</span>
+        <span class="c1">#fig, ax = plt.subplots()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">plot_date</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span> <span class="n">opens</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">months</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_formatter</span><span class="p">(</span><span class="n">monthsFmt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_minor_locator</span><span class="p">(</span><span class="n">mondays</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">autoscale_view</span><span class="p">()</span>
+        <span class="c1">#ax.xaxis.grid(False, &#39;major&#39;)</span>
+        <span class="c1">#ax.xaxis.grid(True, &#39;minor&#39;)</span>
+        <span class="c1">#ax.grid(True)</span>
+
+        <span class="c1">#self.fig.autofmt_xdate()</span>
+
+        <span class="c1">#plt.show()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TimeCanvas.setLabelsNoLegend">
+<a class="viewcode-back" href="../../../docs/src.gui.html#src.gui.timeseries_canvas.TimeCanvas.setLabelsNoLegend">[docs]</a>
+    <span class="k">def</span> <span class="nf">setLabelsNoLegend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;My title&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set labels for basic plot.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;x-large&#39;</span><span class="p">)</span>  <span class="c1"># pad=3</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Y-axis&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="s2">&quot;medium&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;X-axis&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="s2">&quot;medium&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TimeCanvas.setLabels">
+<a class="viewcode-back" href="../../../docs/src.gui.html#src.gui.timeseries_canvas.TimeCanvas.setLabels">[docs]</a>
+    <span class="k">def</span> <span class="nf">setLabels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">xlab</span><span class="p">,</span> <span class="n">ylab</span><span class="p">,</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;My title&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set labels for basic plot.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="s1">&#39;x-large&#39;</span><span class="p">)</span>  <span class="c1"># pad=3</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylab</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="s2">&quot;medium&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">xlab</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="s2">&quot;medium&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="s2">&quot;small&quot;</span><span class="p">,</span> <span class="n">fancybox</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">framealpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span></div>
+
+
+<span class="c1">#if __name__ == &#39;__main__&#39;:</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;def plotRawData(self, x=[], y=[]):</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        Plot raw data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+<span class="sd">        #zero = np.zeros(len(x))</span>
+<span class="sd">        if len(x) == 0:</span>
+<span class="sd">            pass</span>
+<span class="sd">        else:</span>
+<span class="sd">            self.clear_figure(self.ax2)</span>
+<span class="sd">            self.ax2.plot(x, y, &#39;k&#39;, label=&quot;Raw data&quot;)</span>
+<span class="sd">            #plotRawplotRawDataself.ax2.plot(x, zero, &#39;c&#39;)</span>
+<span class="sd">            self.ax2.legend(loc=&quot;best&quot;)</span>
+<span class="sd">            self.ax2.set_xlabel(&quot;Dist [deg]&quot;)</span>
+<span class="sd">            self.draw()</span>
+
+<span class="sd">    def resetLists(self):</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        Setup lists to store the following data of: </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        self.click_index = []   # Indeces of picked points along x-axis</span>
+<span class="sd">        self.fit_points = []   # Points to be fit/modelled</span>
+
+<span class="sd">    def plotRes(self, x=[], title=&quot;Residuals&quot;):</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        Plot the residuals</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+<span class="sd">        self.clear_figure(self.ax1)</span>
+
+<span class="sd">        if len(x) == 0:</span>
+
+<span class="sd">            self.ax1.set_title(title)</span>
+<span class="sd">        else:</span>
+<span class="sd">            pass</span>
+
+<span class="sd">            # get resid min/max</span>
+<span class="sd">            res_min = max(x)</span>
+<span class="sd">            res_max = min(x)</span>
+<span class="sd">            res_mean = np.mean(x)</span>
+<span class="sd">            sd = 3*np.std(x)</span>
+<span class="sd">            res_3sdmax = res_mean + sd</span>
+<span class="sd">            res_3sdmin = res_mean - sd</span>
+
+<span class="sd">            sdd = np.zeros_like(x)</span>
+<span class="sd">            sdmx = np.ones_like(x)*res_3sdmax</span>
+<span class="sd">            sdmn = np.ones_like(x)*res_3sdmin</span>
+
+<span class="sd">            # label=&quot;res mean +- 3 std&quot;</span>
+<span class="sd">            self.ax1.plot(sdd, sdmx)  # , fontsize=&quot;medium&quot;)</span>
+<span class="sd">            self.ax1.plot(sdd, sdmn)</span>
+
+<span class="sd">        self.ax1.plot(x)</span>
+<span class="sd">        self.ax1.set_xlabel(&quot;N&quot;, fontsize=&quot;medium&quot;)</span>
+<span class="sd">        self.ax1.set_ylabel(&quot;res&quot;, fontsize=&quot;medium&quot;)</span>
+<span class="sd">        self.draw()</span>
+
+<span class="sd">    def plotBaseLocs(self, ax, left_locs, right_locs, x, y):</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        Add baseline correction locations</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        ax.plot(x[left_locs], y[left_locs], &quot;m.&quot;)</span>
+<span class="sd">        ax.plot(x[right_locs], y[right_locs], &quot;m.&quot;)</span>
+<span class="sd">        self.draw()</span>
+
+<span class="sd">    def addLineToAxis(self, ax, x, y, lab):</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        Add data to axis</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        #if t==&quot;--&quot;:</span>
+<span class="sd">        #    ax.plot(x,y,c=&quot;b&quot;, label=lab)</span>
+<span class="sd">        #    ax.legend(loc=&quot;best&quot;)</span>
+<span class="sd">        #    self.draw()</span>
+<span class="sd">        #else:</span>
+<span class="sd">        ax.plot(x, y, &#39;m.&#39;, label=lab, lw=1)</span>
+<span class="sd">        ax.legend(loc=&quot;best&quot;)</span>
+<span class="sd">        self.draw()</span>
+
+<span class="sd">#==========================================================</span>
+
+<span class="sd">    def setLegendParms(self):</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        Legend parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+<span class="sd">        legend_parms_fontsize = [&#39;xx-small&#39;, &#39;x-small&#39;,</span>
+<span class="sd">                                 &#39;small&#39;, &#39;medium&#39;, &#39;large&#39;, &#39;x-large&#39;, &#39;xx-large&#39;]</span>
+<span class="sd">        legend_parms_loc = [&#39;best&#39;, &#39;upper right&#39;, &#39;upper left&#39;, &#39;lower left&#39;,</span>
+<span class="sd">                            &#39;lower right&#39;, &#39;right&#39;, &#39;center left&#39;, &#39;center right&#39;, &#39;lower center&#39;, &#39;center&#39;]</span>
+<span class="sd">        _facecolor = []</span>
+<span class="sd">        _edgecolor = []</span>
+<span class="sd">        _title = []</span>
+<span class="sd">        _title_fontsize = []</span>
+<span class="sd">        #from matplotlib import rcParams</span>
+<span class="sd">        #rcParams[&#39;axes.titlepad&#39;] = 20</span>
+
+<span class="sd">    def setMainFigurecustomization(self):</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        Customize the main figure look.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+<span class="sd">        pass</span>
+<span class="sd">        &quot;&quot;&quot;plt.rc(&#39;font&#39;, family = &#39;serif&#39;)</span>
+<span class="sd">        plt.rc(&#39;legend&#39;, fontsize=&#39;small&#39;)</span>
+<span class="sd">        plt.rc(&#39;xtick&#39;, color=&#39;red&#39;, labelsize = &#39;x-small&#39;)</span>
+<span class="sd">        plt.rc(&#39;xtick&#39;, color=&#39;r&#39;, labelsize=&#39;medium&#39;, direction=&#39;out&#39;)</span>
+<span class="sd">        plt.rc(&#39;xtick.major&#39;, size=4, pad=4)</span>
+<span class="sd">        plt.rc(&#39;xtick.minor&#39;, size=2, pad=4)&quot;&quot;&quot;</span>
+<span class="sd">        #xtick.major.size     : 4      # major tick size in points</span>
+<span class="sd">        #xtick.minor.size     : 2      # minor tick size in points</span>
+<span class="sd">        #xtick.major.pad      : 4      # distance to major tick label in points</span>
+<span class="sd">        #xtick.minor.pad      : 4      # distance to the minor tick label in points</span>
+<span class="sd">        #xtick.color          : r      # color of the tick labels</span>
+<span class="sd">        #xtick.labelsize      : medium # fontsize of the tick labels</span>
+<span class="sd">        #xtick.direction      : out     # direction: in or out</span>
+<span class="sd">        #plt.rcdefaults # To reset rc parameters</span>
+
+<span class="sd">    def setResidualFigurecustomization(self):</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        Customize the residual figure look.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+<span class="sd">        pass</span>
+
+<span class="sd">    def setTimeseriesFigurecustomization(self):</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        Customize the residual figure look.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+<span class="sd">        pass</span>
+
+<span class="sd">    def setTicks(self):</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        Set tick properties for the figure.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+<span class="sd">        for tick in self.ax.xaxis.get_ticklabels():</span>
+<span class="sd">            tick.set_fontsize(&#39;medium&#39;)</span>
+<span class="sd">            tick.set_fontname(&#39;serif&#39;)  # Times New Roman&#39;)</span>
+<span class="sd">            tick.set_color(&#39;blue&#39;)</span>
+<span class="sd">            tick.set_weight(&#39;bold&#39;)</span>
+
+<span class="sd">    def plotPeak(self, xp, yp, x=[], y=[], title=&quot;Basic plot window&quot;):</span>
+
+<span class="sd">        self.fit_points = []    # List of points selected for fitting</span>
+<span class="sd">        self.click_index = []   # List of Index of point selected for fitting</span>
+
+<span class="sd">        if len(x) == 0:</span>
+<span class="sd">            print(&quot;\n-- This plot has no data&quot;)</span>
+<span class="sd">            #data = [random.random() for i in range(25)]</span>
+<span class="sd">            #self.ax.plot(data, &#39;b&#39;)</span>
+<span class="sd">        else:</span>
+<span class="sd">            self.ax.plot(x, y, &#39;b&#39;, label=&quot;data&quot;, picker=1)</span>
+<span class="sd">            self.ax.plot(xp, yp, &#39;r&#39;, label=&#39;fit&#39;)</span>
+<span class="sd">            #</span>
+
+<span class="sd">        self.ax.set_title(title)</span>
+<span class="sd">        self.ax.set_ylabel(&quot;Ta [K]&quot;)</span>
+<span class="sd">        self.ax.set_xlabel(&quot;Dist [Deg]&quot;)</span>
+<span class="sd">        self.ax.legend(loc=&quot;best&quot;)</span>
+<span class="sd">        #Cursor(self.ax, useblit=True, color=&#39;red&#39;, linewidth=1)</span>
+<span class="sd">        #self.mpl_connect(&#39;pick_event&#39;, self.onpick1)</span>
+<span class="sd">        self.draw()</span>
+
+<span class="sd">    def plotNoPick(self, ax, res):</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        Plot the residual.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+<span class="sd">        #ax.set_ylabel(&quot;Res&quot;)</span>
+<span class="sd">        #ax.set_xlabel(&quot;N&quot;)</span>
+<span class="sd">        ax.plot(res)</span>
+<span class="sd">        ax.draw()&#39;&#39;&#39;</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Pfesesani van Zyl.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
