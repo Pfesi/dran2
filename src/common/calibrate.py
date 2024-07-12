@@ -254,7 +254,7 @@ def calibrate(  hpsTa, errHpsTa, hpnTa, errHpnTa, onTa, errOnTa, data, log):
         #print("\npc: {}, corrTa: {}, Tcorrerr: {}\n".format(pc, corrTa, errCorrTa))
         return pc, corrTa, errCorrTa
 
-def calc_pc_eq(Ta1, Ta2, term2=""):
+def calc_pc_eq(Ta1, Ta2, term2="",pol=''):
 
     """ Calculate the pointing correction and its derivatives.
     The pointing equations are given in the method 
@@ -273,7 +273,10 @@ def calc_pc_eq(Ta1, Ta2, term2=""):
     """
 
     if term2=="":
-        term1 = (np.log(abs(Ta1)) - np.log(abs(Ta2)) - np.log(2))**2
+        if pol=='s':
+            term1 = (np.log(abs(Ta1)) - np.log(abs(Ta2)) + np.log(2))**2
+        elif pol=='n':
+            term1 = (np.log(abs(Ta1)) - np.log(abs(Ta2)) - np.log(2))**2
         term2 = 4*np.log(2)
     else:
         term1 = (np.log(abs(Ta1)) - np.log(abs(Ta2)))**2

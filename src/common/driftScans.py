@@ -11,6 +11,7 @@ from .sqlite_db import SQLiteDB
 from .calibrate import calibrate
 
 import matplotlib.pyplot as plt
+from config import __DBNAME__
 
 @dataclass
 class DriftScans(DriftScanAttributes):
@@ -85,8 +86,8 @@ class DriftScans(DriftScanAttributes):
 
     def fill_in_missing_data_db_common(self, myDict,tag=''):
         """ Fill in the missing data from the observing file"""
-        keys=['RMSB','RMSA','BRMS','SLOPE','WINDSPD',
-            'MIDOFFSET','BASELEFT','BASERIGHT','COORDSYS']
+        keys=['RMSB','RMSA','BRMS','SLOPE',
+            'MIDOFFSET','BASELEFT','BASERIGHT']
         for key in keys:
             self.try_test(key,myDict,tag)
         # self.try_test('FLAG',myDict,tag,56)
@@ -627,7 +628,7 @@ class DriftScans(DriftScanAttributes):
             # Get data to save to dictionary
             # --- Setup database where you will be storing information
             msg_wrapper("debug",self.log.debug,"Setup database")
-            db= SQLiteDB('HART26DATA.db',self.log)
+            db= SQLiteDB(__DBNAME__,self.log)
             db.create_db()
             table=db.create_table(tableData,dbTable)
             db.populate_table(tableData, table)
@@ -636,6 +637,28 @@ class DriftScans(DriftScanAttributes):
             print(f"Unknown source frontend value : {self.__dict__[frontend]['value']}. Contact author to have it included.")
             sys.exit()
 
+    def get_table_cols(self,frq:int):
+        if frq >= 4000 and frq<=9000:
+            cols=['id','FILENAME','FILEPATH','FRONTEND','HDULENGTH','CURDATETIME','MJD','OBSDATE','OBSTIME','OBSDATETIME',
+                    'OBJECT','SRC','OBSERVER','OBSLOCAL','OBSNAME','PROJNAME','PROPOSAL','TELESCOP','UPGRADE',
+                    'CENTFREQ','BANDWDTH','LOGFREQ','BEAMTYPE','HPBW','FNBW','SNBW','FEEDTYPE',
+                    'LONGITUD','LATITUDE','COORDSYS','EQUINOX','RADECSYS',
+                    'FOCUS','TILT','TAMBIENT','PRESSURE','HUMIDITY','WINDSPD','SCANDIR','POINTING','BMOFFHA','BMOFFDEC','HABMSEP',
+                    'DICHROIC','PHASECAL','NOMTSYS','SCANDIST','SCANTIME',
+                    'HZPERK1','HZKERR1','HZPERK2','HZKERR2','INSTRUME','INSTFLAG',
+                    'TCAL1','TCAL2','TSYS1','TSYSERR1','TSYS2','TSYSERR2','ELEVATION',
+                    'ZA','HA','PWV','SVP','AVP','DPT','WVD','SEC_Z','X_Z','DRY_ATMOS_TRANSMISSION','ZENITH_TAU_AT_1400M','ABSORPTION_AT_ZENITH',
+                    
+                    'ANLTA','ANLTAERR','ANLMIDOFFSET','ANLS2N','BNLTA','BNLTAERR','BNLMIDOFFSET','BNLS2N','NLFLAG','NLBRMS','NLSLOPE','ANLBASELOCS','BNLBASELOCS',
+                    'ASLTA','ASLTAERR','ASLMIDOFFSET','ASLS2N','BSLTA','BSLTAERR','BSLMIDOFFSET','BSLS2N','SLFLAG','SLBRMS','SLSLOPE','ASLBASELOCS','BSLBASELOCS',
+                    'AOLTA','AOLTAERR','AOLMIDOFFSET','AOLS2N','BOLTA','BOLTAERR','BOLMIDOFFSET','BOLS2N','OLFLAG','OLBRMS','OLSLOPE','AOLBASELOCS','BOLBASELOCS',
+                    'AOLPC','ACOLTA','ACOLTAERR','BOLPC','BCOLTA','BCOLTAERR',
+                    
+                    'ANRTA','ANRTAERR','ANRMIDOFFSET','ANRS2N','BNRTA','BNRTAERR','BNRMIDOFFSET','BNRS2N','NRFLAG','NRBRMS','NRSLOPE','ANRBASELOCS','BNRBASELOCS',
+                    'ASRTA','ASRTAERR','ASRMIDOFFSET','ASRS2N','BSRTA','BSRTAERR','BSRMIDOFFSET','BSRS2N','SRFLAG','SRBRMS','SRSLOPE','ASRBASELOCS','BSRBASELOCS',
+                    'AORTA','AORTAERR','AORMIDOFFSET','AORS2N','BORTA','BORTAERR','BORMIDOFFSET','BORS2N','ORFLAG','ORBRMS','ORSLOPE','AORBASELOCS','BORBASELOCS',
+                    'AORPC','ACORTA','ACORTAERR','BORPC','BCORTA','BCORTAERR']
+        
     def process_data_only(self,qv='no'):
         """
         Process the drift scan observations. Get observations from the files
@@ -643,10 +666,13 @@ class DriftScans(DriftScanAttributes):
         """
         create_current_scan_directory()
 
+        
         frontend=self.__dict__['FRONTEND']['value']
         theoFit=self.__dict__['theoFit']
         autoFit=self.__dict__['autoFit']
         frq=int(self.__dict__['CENTFREQ']['value'])
+
+
         
         hpbw=self.__dict__['HPBW']['value']
         fnbw=self.__dict__['FNBW']['value']

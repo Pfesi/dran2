@@ -317,6 +317,7 @@ def run(args):
                                 # sys.exit()
                             else:
                                 print(f'Found {len(newFiles)} new files:')
+                              
                                 for file in newFiles:
                                     pathToFile = os.path.join(args.f,file)
                                     isSymlink=os.path.islink(f'{pathToFile}')
@@ -324,9 +325,18 @@ def run(args):
                                     if not isSymlink:
                                         print(f'Processing file: {pathToFile}')
                                         obs=Observation(FILEPATH=pathToFile, theoFit='',autoFit='',log=log)
+                                        print(obs.__dict__)
+                                        
+                                        try:
+                                            x=obs.__dict__['COORSYS']
+                                        except:
+                                            print('not found')
+                                            obs.__dict__['COORSYS']
+                                            sys.exit()
+                                        sys.exit()
                                         obs.get_data()
                                         del obs
-                                        # sys.exit()
+                                        sys.exit()
 
                                     else:
                                         print(f'File is a symlink: {args.f}/{file}. Stopped processing')
