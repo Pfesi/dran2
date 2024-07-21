@@ -9,7 +9,7 @@ import sys,os
 from .miscellaneousFunctions import create_current_scan_directory
 from .sqlite_db import SQLiteDB
 from .calibrate import calibrate
-
+import pandas as pd
 import matplotlib.pyplot as plt
 from config import __DBNAME__
 
@@ -125,11 +125,14 @@ class DriftScans(DriftScanAttributes):
         src=self.__dict__['OBJECT']['value']
         src=src.replace(' ','')
         saveTo=f'plots/{src}/{int(frq)}'
-
+        # print(saveTo)
         msg_wrapper("debug",self.log.debug,f"Saving plots to: {saveTo}")
         msg_wrapper("info",self.log.info,f"Getting drift scans from file")
             
+        # for k,v in self.__dict__.items():
+        #     print(k,v)
         
+        # sys.exit()
         if 'S' in frontend: 
             #'13.0S' or "18.0S" or '02.5S' or "04.5S" or '01.3S' :
             
@@ -163,6 +166,9 @@ class DriftScans(DriftScanAttributes):
             scanData={} 
             tableData={} 
 
+            # print(lcpHpsScan)
+            # sys.exit()
+
             if len(dataScans)==3:
                 tag="ON"
                 tags=[tag]
@@ -173,7 +179,7 @@ class DriftScans(DriftScanAttributes):
                 # process the data - i.e. run the fitting and plotting algorithms
                 processedLCPData=DataProcessingFlowManager(fileName,frq,src,x,lcp,log,0,'y',saveTo,f'{tag}_LCP','LCP',frontend,hpbw,fnbw,theoFit, autoFit)
                 processedRCPData=DataProcessingFlowManager(fileName,frq,src,x,rcp,log,0,'y',saveTo,f'{tag}_RCP','RCP',frontend,hpbw,fnbw,theoFit, autoFit)
-                
+                # sys.exit()
                 self.fill_in_missing_data_sb(processedLCPData.__dict__,f'{tag[0]}L')
                 self.fill_in_missing_data_sb(processedRCPData.__dict__,f'{tag[0]}R')
 
@@ -208,8 +214,16 @@ class DriftScans(DriftScanAttributes):
                         processedRCPData=DataProcessingFlowManager(fileName,frq,src,x,rcp,log,0,'y',saveTo,f'{tag}_RCP','RCP',frontend,hpbw,fnbw,theoFit, autoFit)
                         # if tag=='ON':
                         #     sys.exit()
-                        self.fill_in_missing_data_sb(processedLCPData.__dict__,f'{tag[0]}L')
-                        self.fill_in_missing_data_sb(processedRCPData.__dict__,f'{tag[0]}R')
+
+                        if tag=='ON':
+                            tg='O'
+                        elif tag=='HPN':
+                            tg='N'
+                        elif tag=='HPS':
+                            tg='S'
+
+                        self.fill_in_missing_data_sb(processedLCPData.__dict__,f'{tg}L')
+                        self.fill_in_missing_data_sb(processedRCPData.__dict__,f'{tg}R')
 
                         scanData[tag]={'lcp':processedLCPData, 'rcp':processedRCPData}
 
@@ -234,8 +248,13 @@ class DriftScans(DriftScanAttributes):
             # sys.exit()
 
             for pol in pols:
+
+                print()
+
                 for tag in tags:
 
+                    print('\nWorking on:', tag,pol)
+                    # sys.exit()
                     scan=scanData[f'{tag}'][pol].__dict__
 
                     # print(scan)
@@ -252,7 +271,7 @@ class DriftScans(DriftScanAttributes):
                             # sys.exit()
                             for s,t in v.items():
                                 if 'peakModel' in s or 'correctedData' in s\
-                                    or 'peakPts' in s or 'Res' in s or 'baseLocs' in s:
+                                    or 'peakPts' in s or 'Res' in s  or 'baseLocs' in s:
                                     # print('+',s)
                                     pass
                                 else:
@@ -287,11 +306,13 @@ class DriftScans(DriftScanAttributes):
                                         # print(f'{tg}{pol[0]}{div}SLOPE'.upper(),t[0])
 
                                         coeff=t #.split()
+
                                         try:
                                             tableData[f'{tg}{pol[0]}{div}SLOPE'.upper()]=float(coeff[0])
                                         except:
                                             tableData[f'{tg}{pol[0]}{div}SLOPE'.upper()]=np.nan
                                         # dbInfo[f'{c[i]}intercept']=float(coeff[1])
+                                    
                                     elif 'base' in s:
                                         ch=str(t).replace(',',';').replace('[','').replace(']','')
                                         # print(s,ch)
@@ -306,32 +327,37 @@ class DriftScans(DriftScanAttributes):
                         else:
                             # if pol==pols[0] and tag==tags[0]:
                                 # print(f'{tag[0]}{pol[0]}')
+                                # print('===',tag,pol[0])
+
+                                if tag=='HPN':
+                                    tg='N'
+                                elif tag=='ON':
+                                    tg='O'
+                                elif tag=='HPS':
+                                    tg='S'
+
+                                key=f'{tg}{pol[0]}'.upper()
+                                # print('$$$',key)
                                 if k == 'fileName':
                                     tableData['OBSNAME']=v
                                     # print('<<',k,v)
                                 # elif k.startswith(f'{tag[0]}{pol[0]}'.upper()): #'RMS' in k:
                                 #     tableData[k]=v
                                 #     print('>>',k,v)
+                                elif 'RMSB' in k:
+                                    if k==f'{key}RMSB' :
+                                        # print('>>>',k,v) 
+                                        tableData[k.upper()]=v
+                                elif 'RMSA' in k:
+                                    if k==f'{key}RMSA' :
+                                        # print('<<<',k,v) 
+                                        tableData[k.upper()]=v   
                                 else:
                                     # print('<<-',k,v)
                                     if tag=='HPS' or tag=='HPN':
                                         # print(f'=*= {k}'.upper(), f'{tag[-1]}{pol[0]}rms'.upper())
                                         if f'{tag[-1]}{pol[0]}rms'.upper() in k:
                                             tableData[f'{div}{k}'.upper()]=v
-                                            # print(f'{tag[-1]}{pol[0]}rms'.upper())
-                                    # else:
-                                        
-                                    # else:
-                                    #     print(f'==={k}'.upper())
-                                    #     if f'{tag[0]}{pol[0]}rms'.upper() in k:
-                                    #         tableData[f'{div}{k}'.upper()]=v
-                                    #         print(f'=== {div}{k}'.upper())
-                                    # pass
-                            # else: 
-                            #     pass
-                    # print()
-            # fill in missing data
-            # 
 
             # sys.exit()
             # Calibrate the data
@@ -343,7 +369,6 @@ class DriftScans(DriftScanAttributes):
                     tableData['COLTAERR']=taErr
                     break
                 
-
             for k,v in tableData.items():
                 if k=='ORTA' and len(tags)>1:
                     pc,ta,taErr=calibrate(tableData['SRTA'], tableData['SRTAERR'], tableData['NRTA'], tableData['NRTAERR'], tableData['ORTA'], tableData['ORTAERR'], tableData, self.log)        
@@ -353,7 +378,11 @@ class DriftScans(DriftScanAttributes):
                     break
 
             # for k,v in tableData.items():
-            #     print('* ',k,': ',v)
+            #     if k=='keys' or k=='values':
+            #         pass
+            #     else:
+            #         if 'S2N' in k:# or 'RMS' in k:
+            #             print('* ',k,': ',v)
             # sys.exit()
             tableData['SRC']=tableData['OBJECT'].replace(' ','')
             freq=int(tableData['CENTFREQ'])
@@ -365,15 +394,50 @@ class DriftScans(DriftScanAttributes):
             except:
                 pass
 
-            print(f'Table: {dbTable}', freq)
+            print(f'Saving to Table: {dbTable}', freq)
 
+            # sys.exit()
             # Get data to save to dictionary
             # --- Setup database where you will be storing information
             msg_wrapper("debug",self.log.debug,"Setup database")
+
+            # df=pd.DataFrame(tableData)
+            # print(df)
+
+            finalDict={}
+            for m in tableData['keys']:
+                # print('\n',m)
+                for k,v in tableData.items():
+                    if m==k:
+                        if m=='keys' or m=='values':
+                            pass
+                        else:
+                            # print(m,k)
+                            try:
+                                # print(m,k,v['value'])
+                                finalDict[k]=v['value']
+                            except:
+                                # print(m,k,v)
+                                finalDict[k]=v
+                    
+            # print(tableData['keys'])
+            # # print(tableData['values'])
+            # for l,v in finalDict.items():
+            #     print(l,v)
+
+            # print(finalDict['OBSDATE'].split('T')[0])
+            # Get date
+            finalDict['OBSDATE']=finalDict['OBSDATE'].split('T')[0]
+            # print(finalDict['OBSDATE'])
+            # print(finalDict)
+            # print(len(tableData['keys']),len(tableData['values'][:-1]),len(finalDict))
+# 
+            # sys.exit()
+
             db= SQLiteDB('HART26DATA.db',self.log)
             db.create_db()
-            table=db.create_table(tableData,dbTable)
-            db.populate_table(tableData, table)
+            table=db.create_table(finalDict,dbTable)
+            db.populate_table(finalDict, table)
             db.close_db()
             # sys.exit()
             # sys.exit()
@@ -382,11 +446,10 @@ class DriftScans(DriftScanAttributes):
             # '03.5D' or "06.0D"
 
             # Get driftscan data
-            # print(self.__dict__)
             data=DriftScanData(self.__dict__)
             # for k,v in data.__dict__.items():
-                # print('---',k,v)
-
+            #     print('---',k,v)
+            # sys.exit()
             hpnOffset=self.getScanData('HPN_OFFSET') #self.__dict__['HPN_OFFSET']['value']
             lcpHpnScan=self.getScanData('HPN_TA_LCP') #self.__dict__['HPN_TA_LCP']['value']
             rcpHpnScan=self.getScanData('HPN_TA_RCP') #self.__dict__['HPN_TA_RCP']['value']
@@ -444,6 +507,9 @@ class DriftScans(DriftScanAttributes):
                     
                     scanData[tag]={'lcp':processedLCPData, 'rcp':processedRCPData}
 
+                    # print(processedLCPData)
+                    # sys.exit()
+
                     del processedLCPData
                     del processedRCPData
 
@@ -462,9 +528,11 @@ class DriftScans(DriftScanAttributes):
             # print(myDict)
             # sys.exit()
             # for beam in beams:
+            # cnt=0
             for pol in pols:
+                print()
                 for tag in tags:
-                    # print('Working on:', tag,pol)
+                    print('\nWorking on:', tag,pol)
                     # print(f'{tag.upper()}_{pol.upper()}')
                     # print(scanData.keys())
                     scan=scanData[f'{tag}'][pol].__dict__
@@ -476,16 +544,20 @@ class DriftScans(DriftScanAttributes):
                             or k=='applyRFIremoval' or k=='spl' or k=='pt'\
                             or k=='srcTag' or k=='flag' or k=='pol':
                             pass
+
                         elif f'{tag.upper()}_{pol.upper()}' in k:
                             # print(f'{tag.upper()}_{pol.upper()}')
+
                             for s,t in v.items():
-                                # print('---',s)
+                                # print('-+-',s)
+
                                 if 'PeakModel' in s or 'correctedData' in s\
                                     or 'PeakData' in s or 'Res' in s: # or  'baseLocs' in s:
                                     # print('+',s)
                                     pass
                                 
                                 else:
+
                                     # print('-<<',k,s,t)
                                     if tag=='ON':
                                         tg='O'
@@ -493,10 +565,9 @@ class DriftScans(DriftScanAttributes):
                                         tg="N"
                                     elif tag=="HPS":
                                         tg="S"
-                                    # tg=tag
+
                                     div='' #divider = '_' or ""
-                                    # print(tg,pol)
-                                    
+
                                     if s=='leftPeakFit':
                                         # print(f'{beams[0]}{tg}{pol[0]}{div}TA'.upper(),t)
                                         tableData[f'{beams[0]}{tg}{pol[0]}{div}TA'.upper()]=t
@@ -526,16 +597,18 @@ class DriftScans(DriftScanAttributes):
                                         tableData[f'{beams[1]}{tg}{pol[0]}{div}midoffset'.upper()]=t
                                     
                                     elif s=='driftRms':
-                                            # print(f'{tg}{pol[0]}{div}BRMS'.upper(),t)
+                                            print('drift rms: ', f'{tg}{pol[0]}{div}BRMS'.upper(),t)
                                             tableData[f'{tg}{pol[0]}{div}BRMS'.upper()]=t
                                     elif 'driftCoeffs' in s:
+                                        print('driftCoeffs: ', f'{tg}{pol[0]}{div}BRMS'.upper(),t)
                                         # print(f'{tg}{pol[0]}{div}SLOPE'.upper(),t[0])
 
                                         # coeff=t #.split()
                                         # print(t)
                                         try:
                                             if len(t)==0:
-                                                tableData[f'{beams[0]}{tg}{pol[0]}{div}BASELocs'.upper()] = np.nan
+
+                                                # tableData[f'{beams[0]}{tg}{pol[0]}{div}BASELocs'.upper()] = np.nan
                                                 tableData[f'{tg}{pol[0]}{div}SLOPE'.upper()]=np.nan
                                                 # print(f'### {tg}{pol[0]}{div}SLOPE'.upper())
                                             else:
@@ -562,7 +635,7 @@ class DriftScans(DriftScanAttributes):
                                         #     ch=str(t).replace(',',';').replace('[','').replace(']','')
                                         #     # print(s,ch)
                                         if len(t)==0:
-                                            tableData[f'{beams[0]}{tg}{pol[0]}{div}BASELocs'.upper()] = ''
+                                            tableData[f'{beams[1]}{tg}{pol[0]}{div}BASELocs'.upper()] = ''
                                         else:
                                             tableData[f'{beams[1]}{tg}{pol[0]}{div}BASElocs'.upper()] = f'{t[0]};{t[-1]}'
                                         #     # print(f'{tg}{pol[0]}{div}{s}'.upper(),ch)
@@ -573,18 +646,95 @@ class DriftScans(DriftScanAttributes):
                                             pass
                                         else:
                                             tableData[f'{tg}{pol[0]}{div}{s}'.upper()] = t
-                                            # print(f'{tg}{pol[0]}{div}{s}'.upper(),t)
+                                            # print(f'>>>> {tg}{pol[0]}{div}{s}'.upper(),t)
 
                         else:
-                            if k == 'fileName':
-                                tableData['OBSNAME']=v
-                            else:
-                                pass
-                                # print('$$',k)     
-            # print()
-            # for k,v in tableData.items():
-            #     print('*',k,v)
+                            # pass
+                            # print('-----',k,beams[0])
+
+                            # if k == 'fileName':
+                            #     tableData['OBSNAME']=v
+                            if tag=='ON':
+                                tg='O'
+                            elif tag=='HPN':
+                                tg="N"
+                            elif tag=="HPS":
+                                tg="S"
+                            div=''
+
+                            if 'RMSB' in k: # or 'RMSA' in k:
+                                tg=f'{tg}{pol[0]}'.upper()
+                                
+                                if pol=='rcp' :
+                                    tg=f'{tg}R'.upper()
+                                    k=k.replace('L','R')
+                                    print(k,v,tg)
+                                    tableData[f'{k}'.upper()]=v
+                                else:
+                                    if tg in k:
+                                        # print(pol,tag,k,v, 'L')
+                                        print(k,v)
+                                        tableData[f'{k}'.upper()]=v
+                                    else:
+                                        pass
+                            # elif 'RMSA' in k: # or 'RMSA' in k:
+                                
+                                # print(pol,tag,k,v)
+                                
+                                # # tableData[k]=v
+                            elif 'RMSA' in k: # or 'RMSA' in k:
+                                
+                                # print(tg)
+                                if pol=='rcp' :
+                                    tg=f'{tg}R'.upper()
+                                    k=k.replace('L','R')
+                                    # print(k,v,tg)
+                                    tableData[f'{k}'.upper()]=v
+                                    # print('>>>',tg,pol)
+                                    # if tg in k:
+                                    #     print(pol,tag,k,v,'R')
+                                    # else:
+                                    #     pass
+                                else:
+                                    tg=f'{tg}{pol[0]}'.upper()
+                                    if tg in k:
+                                        # print(pol,tag,k,v, 'L')
+                                        # print(k,v)
+                                        tableData[f'{k}'.upper()]=v
+                                    else:
+                                        pass
+                            # elif 'RMSA' in k: # or 'RMSA' in k:
+                                
+                                # print(pol,tag,k,v)
+
+                                
+                                # if pol=='LCP' or pol=='lcp':
+                                #     p='L'
+                                # elif pol=='RCP' or pol=='rcp':
+                                #     p='R'
+                                # else:
+                                #     print(pol)
+                                #     print('ERROR: unknown polarization')
+                                #     sys.exit()
+                                #     # continue
+                                # print('pol: ', pol)
+
+                                # if k=='RMSA' or k=='RMSB':
+                                #     print('((((()))))',k,f'{tg}{p}{k}'.upper(),v)
+                                # else:
+                          
+                                #     print('-->>-',k, tag,f'{k}'.upper(),v)
+                            #     tableData[f'{k}'.upper()]=v
+                                # tableData[f'{beams[0]}{tg}{p}{k}'.upper()]=v
+
+                            # else:
+                            #     pass
+
             # sys.exit()
+
+            # for k,v in tableData.items():
+            #     print(k,v)
+
             for beam in beams:
                 for k,v in tableData.items():
                     if k==f'{beam}OLTA':
@@ -597,25 +747,61 @@ class DriftScans(DriftScanAttributes):
             for beam in beams:
                 for k,v in tableData.items():
                     if k==f'{beam}ORTA':
-                        pc,ta,taErr=calibrate(tableData[f'{beam}SRTA'], tableData[f'{beam}SRTAERR'], tableData[f'{beam}NRTA'], tableData[f'{beam}NRTAERR'], tableData[f'{beam}ORTA'], tableData[f'{beam}ORTAERR'], tableData, self.log)
+                        # print('----',tableData[f'{beam}SRTAERR'])
+
+                        srta=float(tableData[f'{beam}SRTA'])
+                        try:
+                            srtaerr= float(tableData[f'{beam}SRTAERR'])
+                        except:
+                            srtaerr=np.nan
+                            tableData[f'{beam}SRTAERR']=np.nan
+
+                        nrta= float(tableData[f'{beam}NRTA'])
+
+                        try:
+                            nrtaerr= float(tableData[f'{beam}NRTAERR'])
+                        except:
+                            nrtaerr= np.nan
+                            tableData[f'{beam}NRTAERR']=np.nan
+                        orta=float(tableData[f'{beam}ORTA'])
+
+                        try:
+                            ortaerr=float( tableData[f'{beam}ORTAERR'])
+                        except:
+                            ortaerr=np.nan
+                            tableData[f'{beam}ORTAERR']=np.nan
+                            
+                        # print(srta,srtaerr,orta,ortaerr,nrta,nrtaerr)
+                        pc,ta,taErr=calibrate(srta, srtaerr, nrta,nrtaerr, orta,ortaerr, tableData, self.log)
                         tableData[f'{beam}ORPC']=pc
                         tableData[f'{beam}CORTA']=ta
                         tableData[f'{beam}CORTAERR']=taErr
                         break
 
-            # # Calibrate the data
-            # for k,v in tableData.items():
-            #     # print('* ',k,': ',v)
-            #     # if 'SLOPE' in k:
-            #     #     print(k)
-            #         print('* ',k,': ',v)
-            #     #     sys.exit()
+            # Calibrate the data
+            finalData={}
+            for k,v in tableData.items():
+                if k=='keys' or k=='values':
+                    pass
+                else:
+                    
+                    if k=='RMSA' or k=='RMSB':
+                        pass
+                    else:
+                        print('* ',k,': ',v)
+                        finalData[k]=v
+                # if 'RMS' in k:
+                # #     print(k)
+                #     print('* ',k,': ',v)
+                # #     sys.exit()
+
+            # Save to table
+            finalData['SRC']=finalData['OBJECT'].replace(' ','')
+            freq=int(finalData['CENTFREQ'])
+            dbTable = f"{finalData['SRC']}_{freq}"
+
+            # print(dbTable)
             # sys.exit()
-
-            tableData['SRC']=tableData['OBJECT'].replace(' ','')
-            freq=int(tableData['CENTFREQ'])
-            dbTable = f"{tableData['SRC']}_{freq}"
-
             try:
                 int(dbTable[0])
                 dbTable=f"_{dbTable}"
@@ -623,41 +809,41 @@ class DriftScans(DriftScanAttributes):
                 pass
 
             # print(f'Table: {dbTable}', freq)
-            dbTable=set_table_name(dbTable, self.log)
+            # dbTable=set_table_name(dbTable, self.log)
 
             # Get data to save to dictionary
             # --- Setup database where you will be storing information
             msg_wrapper("debug",self.log.debug,"Setup database")
             db= SQLiteDB(__DBNAME__,self.log)
             db.create_db()
-            table=db.create_table(tableData,dbTable)
-            db.populate_table(tableData, table)
+            table=db.create_table(finalData,dbTable)
+            db.populate_table(finalData, table)
             db.close_db()
         else:
             print(f"Unknown source frontend value : {self.__dict__[frontend]['value']}. Contact author to have it included.")
             sys.exit()
 
-    def get_table_cols(self,frq:int):
-        if frq >= 4000 and frq<=9000:
-            cols=['id','FILENAME','FILEPATH','FRONTEND','HDULENGTH','CURDATETIME','MJD','OBSDATE','OBSTIME','OBSDATETIME',
-                    'OBJECT','SRC','OBSERVER','OBSLOCAL','OBSNAME','PROJNAME','PROPOSAL','TELESCOP','UPGRADE',
-                    'CENTFREQ','BANDWDTH','LOGFREQ','BEAMTYPE','HPBW','FNBW','SNBW','FEEDTYPE',
-                    'LONGITUD','LATITUDE','COORDSYS','EQUINOX','RADECSYS',
-                    'FOCUS','TILT','TAMBIENT','PRESSURE','HUMIDITY','WINDSPD','SCANDIR','POINTING','BMOFFHA','BMOFFDEC','HABMSEP',
-                    'DICHROIC','PHASECAL','NOMTSYS','SCANDIST','SCANTIME',
-                    'HZPERK1','HZKERR1','HZPERK2','HZKERR2','INSTRUME','INSTFLAG',
-                    'TCAL1','TCAL2','TSYS1','TSYSERR1','TSYS2','TSYSERR2','ELEVATION',
-                    'ZA','HA','PWV','SVP','AVP','DPT','WVD','SEC_Z','X_Z','DRY_ATMOS_TRANSMISSION','ZENITH_TAU_AT_1400M','ABSORPTION_AT_ZENITH',
+    # def get_table_cols(self,frq:int):
+    #     if frq >= 4000 and frq<=9000:
+    #         cols=['id','FILENAME','FILEPATH','FRONTEND','HDULENGTH','CURDATETIME','MJD','OBSDATE','OBSTIME','OBSDATETIME',
+    #                 'OBJECT','SRC','OBSERVER','OBSLOCAL','OBSNAME','PROJNAME','PROPOSAL','TELESCOP','UPGRADE',
+    #                 'CENTFREQ','BANDWDTH','LOGFREQ','BEAMTYPE','HPBW','FNBW','SNBW','FEEDTYPE',
+    #                 'LONGITUD','LATITUDE','COORDSYS','EQUINOX','RADECSYS',
+    #                 'FOCUS','TILT','TAMBIENT','PRESSURE','HUMIDITY','WINDSPD','SCANDIR','POINTING','BMOFFHA','BMOFFDEC','HABMSEP',
+    #                 'DICHROIC','PHASECAL','NOMTSYS','SCANDIST','SCANTIME',
+    #                 'HZPERK1','HZKERR1','HZPERK2','HZKERR2','INSTRUME','INSTFLAG',
+    #                 'TCAL1','TCAL2','TSYS1','TSYSERR1','TSYS2','TSYSERR2','ELEVATION',
+    #                 'ZA','HA','PWV','SVP','AVP','DPT','WVD','SEC_Z','X_Z','DRY_ATMOS_TRANSMISSION','ZENITH_TAU_AT_1400M','ABSORPTION_AT_ZENITH',
                     
-                    'ANLTA','ANLTAERR','ANLMIDOFFSET','ANLS2N','BNLTA','BNLTAERR','BNLMIDOFFSET','BNLS2N','NLFLAG','NLBRMS','NLSLOPE','ANLBASELOCS','BNLBASELOCS',
-                    'ASLTA','ASLTAERR','ASLMIDOFFSET','ASLS2N','BSLTA','BSLTAERR','BSLMIDOFFSET','BSLS2N','SLFLAG','SLBRMS','SLSLOPE','ASLBASELOCS','BSLBASELOCS',
-                    'AOLTA','AOLTAERR','AOLMIDOFFSET','AOLS2N','BOLTA','BOLTAERR','BOLMIDOFFSET','BOLS2N','OLFLAG','OLBRMS','OLSLOPE','AOLBASELOCS','BOLBASELOCS',
-                    'AOLPC','ACOLTA','ACOLTAERR','BOLPC','BCOLTA','BCOLTAERR',
+    #                 'ANLTA','ANLTAERR','ANLMIDOFFSET','ANLS2N','BNLTA','BNLTAERR','BNLMIDOFFSET','BNLS2N','NLFLAG','NLBRMS','NLSLOPE','ANLBASELOCS','BNLBASELOCS',
+    #                 'ASLTA','ASLTAERR','ASLMIDOFFSET','ASLS2N','BSLTA','BSLTAERR','BSLMIDOFFSET','BSLS2N','SLFLAG','SLBRMS','SLSLOPE','ASLBASELOCS','BSLBASELOCS',
+    #                 'AOLTA','AOLTAERR','AOLMIDOFFSET','AOLS2N','BOLTA','BOLTAERR','BOLMIDOFFSET','BOLS2N','OLFLAG','OLBRMS','OLSLOPE','AOLBASELOCS','BOLBASELOCS',
+    #                 'AOLPC','ACOLTA','ACOLTAERR','BOLPC','BCOLTA','BCOLTAERR',
                     
-                    'ANRTA','ANRTAERR','ANRMIDOFFSET','ANRS2N','BNRTA','BNRTAERR','BNRMIDOFFSET','BNRS2N','NRFLAG','NRBRMS','NRSLOPE','ANRBASELOCS','BNRBASELOCS',
-                    'ASRTA','ASRTAERR','ASRMIDOFFSET','ASRS2N','BSRTA','BSRTAERR','BSRMIDOFFSET','BSRS2N','SRFLAG','SRBRMS','SRSLOPE','ASRBASELOCS','BSRBASELOCS',
-                    'AORTA','AORTAERR','AORMIDOFFSET','AORS2N','BORTA','BORTAERR','BORMIDOFFSET','BORS2N','ORFLAG','ORBRMS','ORSLOPE','AORBASELOCS','BORBASELOCS',
-                    'AORPC','ACORTA','ACORTAERR','BORPC','BCORTA','BCORTAERR']
+    #                 'ANRTA','ANRTAERR','ANRMIDOFFSET','ANRS2N','BNRTA','BNRTAERR','BNRMIDOFFSET','BNRS2N','NRFLAG','NRBRMS','NRSLOPE','ANRBASELOCS','BNRBASELOCS',
+    #                 'ASRTA','ASRTAERR','ASRMIDOFFSET','ASRS2N','BSRTA','BSRTAERR','BSRMIDOFFSET','BSRS2N','SRFLAG','SRBRMS','SRSLOPE','ASRBASELOCS','BSRBASELOCS',
+    #                 'AORTA','AORTAERR','AORMIDOFFSET','AORS2N','BORTA','BORTAERR','BORMIDOFFSET','BORS2N','ORFLAG','ORBRMS','ORSLOPE','AORBASELOCS','BORBASELOCS',
+    #                 'AORPC','ACORTA','ACORTAERR','BORPC','BCORTA','BCORTAERR']
         
     def process_data_only(self,qv='no'):
         """

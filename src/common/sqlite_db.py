@@ -87,7 +87,7 @@ class SQLiteDB:
         try:
             # sqlStmt = self.create_table_stmt(data, tableName)
             self.c.execute(sqlStmt)
-            print('added')
+            # print('added')
         except:
             # tableName=f'_{tableName}'
             # sqlStmt = self.create_table_stmt(data, tableName)
@@ -137,7 +137,8 @@ class SQLiteDB:
 
         sqlStmt, values = self.insert_into_table_stmt_with_pk(data, tableName)
         # for i in range(len(values)):
-        # print(sqlStmt)
+        print(sqlStmt)
+        # sys.exit()
         # print(values)
 
         # self.c.execute(sqlStmt, values)
@@ -148,7 +149,8 @@ class SQLiteDB:
         except Exception as e:
             # TODO: fix this exception
             msg_wrapper('debug',self.log.debug,f"issue: {e}")
-
+            print(e)
+            sys.exit()
             s=sqlStmt.split(' ')
             v1=values[1]
             v=values[1].upper()
@@ -181,7 +183,7 @@ class SQLiteDB:
                 print(f'File {s} already exists in the database')
                 # sys.exit()
 
-        # sys.exit()
+            sys.exit()
         
 
     def set_database_name(self, databaseName):

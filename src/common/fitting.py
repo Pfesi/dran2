@@ -1340,6 +1340,8 @@ def fit_beam(x, y, p, fnbw, force, log, saveTag, fitTheoretical, autoFit=None):
         # 2) correct the drift in the data and get the residual and rms
         baseLocs=[]#np.where()[0]
 
+        # print(autoFit)
+        # sys.exit()
         for i in range(len(autoFit['baselocs'])):
             if i%2==0:
                 #print(autoFit['baselocs'][i],autoFit['baselocs'][i+1])
@@ -2296,7 +2298,10 @@ def fit_dual_beam(x, y, hpbw, fnbw, factor,saveTo,log): #, npts, dec, srcType, d
         #print("Fitting negative")
         fa="n"
 
-    beamCut = 0.6 # fitting top 40%, 0.7 (30% for cals) or 0.5 (50% for targets) should make this an option
+    # TODO: should make this an option
+    # Decided to change this because the software now treats both 
+    # target sources and calibrators the same way
+    beamCut = 0.6 # fitting top 40%, 0.7 (30% for cals) or 0.5 (50% for targets) 
 
     # Ensure peak is within accepted limits
     if fa=="p":

@@ -12,6 +12,7 @@ from datetime import datetime
 import argparse
 from config import __version__, __DBNAME__
 import pandas as pd
+import sqlite3
 
 # Module imports
 # --------------------------------------------------------------------------- #
@@ -36,36 +37,87 @@ class Observation:
     theoFit: str    # theoretical fit implemented y/n
     autoFit:str     # automated fit implemented y/n
     log:object      # logger
+    dbCols: dict    # dictionary of table columns
+    
 
     # -- Observation parameters not initialized when class called
     HDULIST: str = field(init=False)        # list of HDU objects
     HDULENGTH: str = field(init=False)      # length of HDULIST
     INFOHEADER: str = field(init=False)     # summarizes the content of the opened FITS file
+    
+    
 
     def __post_init__(self):
         """ Open file and get file info. 
         """
 
         # TODO: remember to include the value and description for these items when you're done
-        
-        try:
-            msg_wrapper("info",self.log.info,f"Opening file {self.FILEPATH}")
 
-            with open_file(self.FILEPATH) as f:
-                self.HDULIST = f
-                self.HDULENGTH=len(self.HDULIST)
-                self.INFOHEADER = f.info
+        if len(self.dbCols)==0:
+            print('probably change this too')
+            sys.exit()
+            try:
+                msg_wrapper("info",self.log.info,f"Opening file {self.FILEPATH}")
 
-                # set values to dictionary
-                msg_wrapper("debug",self.log.debug,f"Setting FILEPATH, HDULIST, HDULENGTH and INFOHEADER to internal dict")
-                self.__dict__["HDULIST"]={'value':self.HDULIST, 'description':"Header data unit for observing file"}
-                self.__dict__["HDULENGTH"]={'value':self.HDULENGTH, 'description':"Number of HDUs in observing file"}
-                self.__dict__["INFOHEADER"]={'value':self.INFOHEADER, 'description':"Information header for observing file"}
-                self.__dict__["FILEPATH"]={'value':self.FILEPATH, 'description':"Path to file or filename"}
-        except Exception as e:
-            # TODO:  put in proper file exception handling
-            # see context manager
-            return f'{self.FILEPATH} is corrupt'
+                with open_file(self.FILEPATH) as f:
+                    self.HDULIST = f
+                    self.HDULENGTH=len(self.HDULIST)
+                    self.INFOHEADER = f.info
+
+                    # set values to dictionary
+                    msg_wrapper("debug",self.log.debug,f"Setting FILEPATH, HDULIST, HDULENGTH and INFOHEADER to internal dict")
+                    self.__dict__["HDULIST"]={'value':self.HDULIST, 'description':"Header data unit for observing file"}
+                    self.__dict__["HDULENGTH"]={'value':self.HDULENGTH, 'description':"Number of HDUs in observing file"}
+                    self.__dict__["INFOHEADER"]={'value':self.INFOHEADER, 'description':"Information header for observing file"}
+                    self.__dict__["FILEPATH"]={'value':self.FILEPATH, 'description':"Path to file or filename"}
+            except Exception as e:
+                # TODO:  put in proper file exception handling
+                # see context manager
+                return f'{self.FILEPATH} is corrupt'
+        else:
+            msg_wrapper('info',self.log.info,'Using predefined cols')
+            
+            self.dbCols['keys']=list(self.dbCols.keys())
+            self.dbCols['values']=list(self.dbCols.values())
+
+            self.dbCols['FILEPATH']={'value':self.FILEPATH, 'description':'Path to file'}
+            self.dbCols['theoFit']={'value':self.theoFit, 'description':'Theoretical fit to be used'}
+            self.dbCols['autoFit']={'value':self.autoFit, 'description':'Automated fitting to be used'}
+            self.dbCols['log']=self.log
+
+            try:
+                msg_wrapper("info",self.log.info,f"Opening file {self.FILEPATH}")
+
+                with open_file(self.FILEPATH) as f:
+                    self.HDULIST = f
+                    self.HDULENGTH=len(self.HDULIST)
+                    self.INFOHEADER = f.info
+
+                #     # set values to dictionary
+                    msg_wrapper("debug",self.log.debug,f"Setting FILEPATH, HDULIST, HDULENGTH and INFOHEADER to internal dict")
+                    self.dbCols["HDULIST"]={'value':self.HDULIST, 'description':"Header data unit for observing file"}
+                    self.dbCols["HDULENGTH"]={'value':self.HDULENGTH, 'description':"Number of HDUs in observing file"}
+                    self.dbCols["INFOHEADER"]={'value':self.INFOHEADER, 'description':"Information header for observing file"}
+                    self.__dict__= self.dbCols
+
+            except Exception as e:
+                # TODO:  put in proper file exception handling
+                print('error: ',e)
+                # sys.exit()
+                # see context manager
+                return f'{self.FILEPATH} is corrupt'
+            
+            # sys.exit()
+            for k,v in self.__dict__.items():
+                if type(v).__name__ =='dict' or k=='log' or k=='keys' or k=='values':
+                    pass
+                else:
+                    # print(k,v)
+                    self.__dict__[k]={'value':np.nan, 'description':''}
+
+            # for k,v in self.__dict__.items():
+            #     print(k,v)
+            # sys.exit()    
 
     def set_key_value_pairs(self, key1, desc1, key2, desc2,indexKey,keys):
         """
@@ -203,6 +255,7 @@ class Observation:
         # create_current_scan_directory()
         self.create_final_plot_directory(src,freq)
         
+        
         if 'S' in (frontend):
             if '13.0S' in frontend or '18.0S' in frontend:
                 set_dict_item(self.__dict__,'BEAMTYPE',ScanType.SBW.name, 'wide single beam drift scan')
@@ -212,6 +265,153 @@ class Observation:
                 print(f'Unknown beam type :{frontend} - contact author to have it included\n')
                 sys.exit()
 
+            # get driftscan data from file
+            for k,v in self.__dict__.items():
+                if 'CENTFREQ' in k:
+                    
+                    freq=int(v['value'])
+                if 'FILEPATH' in k:
+                    fpath=v['value']
+            
+            # TODO: decide what to do with this
+            if str(freq) in fpath:
+                pass
+            else:
+                print('Frequency and path dont match')
+                print(fpath,freq)
+                # create required table
+
+                
+            driftScans=DriftScans(self.__dict__)
+            driftScans.process_data() # process the data
+            del driftScans # release from memory
+
+        elif 'D' in (frontend):
+            set_dict_item(self.__dict__,'BEAMTYPE',ScanType.DB.name, 'dual beam drift scan')
+
+            # get driftscan data from \file
+            driftScans=DriftScans(self.__dict__)
+            driftScans.process_data() # process the data
+            del driftScans # release from memory
+
+    def get_data_from_predefined_cols(self):
+        """ Get data from fits file hdu
+        """
+
+        msg_wrapper("debug",self.log.debug,f"Getting data from fits file hdulist")
+        msg_wrapper("debug",self.log.debug,f"Create dict object to store read parameters")
+        self.__dict__['CARDS']={} #{'value':[], 'description':"Placeholder for hdu card titles or names"} # holds hdu card titles or names
+
+        # print(self.__dict__)
+        # sys.exit()
+        # 
+        
+        CURDATETIME = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        msg_wrapper("info",self.log.info,f"Date and time of data processing: {CURDATETIME}")
+        self.__dict__["CURDATETIME"]={'value':CURDATETIME, 'description':"Current date and time of the data processing"}
+
+        msg_wrapper("debug",self.log.debug,f"Looping over each HDU object in hdulist")
+
+        
+        try:
+            hdulen=self.HDULENGTH['value']
+        except:
+            with open('faultyFiles.txt','a') as f:
+                f.write(f'{self.FILEPATH}\n')
+                print(f'\nFile is a symlink: {self.FILEPATH}. Stopped processing')
+            return
+        
+        for index in range(hdulen):
+            self.read_data_from_hdu_lists(index)
+
+        keys=self.__dict__.keys()
+        self.set_key_value_pairs('HZPERK1', 'HZPERK1', 'HZKERR1', '[Hz/K] Counter cal error','TCAL2',keys)
+        self.set_key_value_pairs('HZPERK2', 'HZPERK2', 'HZKERR2', '[Hz/K] Counter cal error','HZKERR1',keys)
+        self.set_key_value_pairs('TSYS1', 'TSYS1 [K]', 'TSYSERR1', '[K] System temperature','HZKERR2',keys)
+        self.set_key_value_pairs('TSYS2', 'TSYS2[K]', 'TSYSERR2', '[K] System temperature','TSYSERR1',keys)
+        
+        
+        # add other important bits
+        # ----------------------------------
+
+        # get drift scans
+        # use hdu frontend to determine path to data processing
+        # print(self.__dict__.keys())
+        # sys.exit()
+
+        frontend = self.__dict__['FRONTEND']['value']
+        src = self.__dict__['OBJECT']['value']
+        freq = self.__dict__['CENTFREQ']['value']
+
+        keys=self.__dict__['keys']
+        values=self.__dict__['values'][:-1]
+        lenValues=len(values)
+        lenKeys=len(keys)
+        
+        # create table with frequency:
+        # -------------------------------
+
+       
+        # fn=
+        # print()
+        # sys.exit()
+        print(freq)
+        # if freq=='nan':
+        fp=self.__dict__["FILEPATH"]['value']
+        fn=fp.split('/')[-1]
+        # print(fn)
+
+        # sys.exit()
+        # print(freq)
+        tbFreq=int(freq)
+        table=f'{src}_{tbFreq}'.upper().replace(' ', '')
+        # print(table)
+
+        sys.exit()
+        cnx = sqlite3.connect(__DBNAME__)
+        dbTables= pd.read_sql_query("SELECT name FROM sqlite_schema WHERE type='table'", cnx)
+        tables=list(dbTables['name'])
+        print(tables)
+        if table in tables:
+            pass
+        else:
+            sqlStmt=''
+            if lenKeys==lenValues:
+                for i in range(lenValues):
+                    # print('---',key,value)
+                    if keys[i]=='FILENAME':
+                        sqlStmt +=f'CREATE TABLE IF NOT EXISTS {table} ('
+                        idKey = sqlStmt + "id INTEGER PRIMARY KEY AUTOINCREMENT" + ", "
+                        sqlStmt = idKey + keys[i] + " " + "TEXT" + " UNIQUE , "
+                                                    # print(sqlStmt)
+                    else:
+                        if keys[i]=='log' or keys[i]=='CARDS' or keys[i]=='INFOHEADER' or keys[i]=='HDULIST':
+                            pass
+                        else:
+                            sqlStmt = sqlStmt + keys[i] + f" {values[i]}, "
+                                                    # print(key,value)
+                        pass
+                stmt=sqlStmt[:-2]+')'
+
+            print(stmt)
+        cnx.close()
+        # sys.exit()
+
+        # create_current_scan_directory()
+        self.create_final_plot_directory(src,tbFreq)
+        # sys.exit()
+
+        if 'S' in (frontend):
+            if '13.0S' in frontend or '18.0S' in frontend:
+                set_dict_item(self.__dict__,'BEAMTYPE',ScanType.SBW.name, 'wide single beam drift scan')
+            elif '02.5S' in frontend or '04.5S' in frontend or '01.3S' in frontend:
+                set_dict_item(self.__dict__,'BEAMTYPE',ScanType.SBN.name, 'narrow single beam drift scan')
+            else:
+                print(f'Unknown beam type :{frontend} - contact author to have it included\n')
+                sys.exit()
+
+            print('about to process')
+            sys.exit()
             # get driftscan data from file
             driftScans=DriftScans(self.__dict__)
             driftScans.process_data() # process the data
@@ -224,6 +424,7 @@ class Observation:
             driftScans=DriftScans(self.__dict__)
             driftScans.process_data() # process the data
             del driftScans # release from memory
+            # sys.exit()
 
     def get_hdu_info(self, hduindex: int) -> None:
         """Get information from individual hdu
@@ -291,7 +492,8 @@ class Observation:
                     except:
                         self.__dict__['FRONTEND'] = {'value':hdu['FRONTEND'],'description':hdu.comments['FRONTEND']}
 
-                    if 'D' in self.__dict__['FRONTEND']['value'] and '_CAL' in hduIndexName:
+                    
+                    if 'D' in str(self.__dict__['FRONTEND']['value']) and '_CAL' in hduIndexName:
                         if '_CAL' in hduIndexName:
                             # print(column)#,hdu.columns())
                             # use low noise diode
@@ -303,7 +505,7 @@ class Observation:
                             msg_wrapper("debug",self.log.debug,f"{column}: {str(self.__dict__[f'{column}'])}")
                         else:
                             pass
-                    elif 'S'  in self.__dict__['FRONTEND']['value'] :
+                    elif 'S'  in str(self.__dict__['FRONTEND']['value']):
                         # print('---',hduIndexName)
                         if 'Chart' in hduIndexName:
                         
@@ -358,4 +560,3 @@ class Observation:
             os.makedirs(self.plotDir)
         except:
             pass
-

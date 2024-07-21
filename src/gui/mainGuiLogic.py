@@ -1091,7 +1091,6 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
                 self.write("Fit stats for "+self.scanKeys[plotIndex]+" data",'info')
                 self.iter_dict("AORTA", "")
             
-
     # def iter_dict(self, filter_key1, filter_key2=""):
     #     """
     #     Dictionary iterator to extract current fit information
@@ -1204,7 +1203,9 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
         """ Open the database. """
 
         # get db file
-        self.dbFile = '/Users/pfesesanivanzyl/dran/HART26DATA.db' #'/Users/pfesesanivanzyl/software/working/HartSoftware/dran/CALDB.db' #self.open_file_name_dialog("*.db")
+        # self.dbFile = '/Users/pfesesanivanzyl/dran/HART26DATA.db' 
+        # self.dbFile = '/Users/pfesesanivanzyl/software/working/HartSoftware/dran/CALDB.db' 
+        self.dbFile = self.open_file_name_dialog("*.db")
         # get db file
         # self.dbFile = self.open_file_name_dialog("*.db")
         if self.dbFile == None:
@@ -1306,7 +1307,12 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
         self.df = pd.DataFrame(list(self.rows), columns=self.colNames)
         self.df = self.df.sort_values('FILENAME')
         self.orig_df=self.df # copy of df
+        # try:
+            
         self.df["OBSDATE"]=pd.to_datetime(self.df["OBSDATE"],format="%Y-%m-%d")
+        # except:
+        #     pass
+        # self.df.fillna(value=np.nan, inplace=True)
 
         # self.time_ui.comboBoxColsX.clear()
         # self.time_ui.comboBoxColsY.clear()
@@ -1348,8 +1354,11 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
 
         errcols=[]
         for name in self.colNames:
-            if   'ERR' in name : #'LD' in name or 'RD' in name or or 'DS' in name or 'DN' in name or 'DO' in name or 'DF' in name or 'DC' in name
-                errcols.append(name)
+            if   'ERR' in name or 'LD' in name or 'RD' in name or 'DS' in name or 'DN' in name or 'DO' in name or 'DF' in name or 'DC' in name:
+                if 'WINDSPD' in name or 'ADOPTED' in name or 'DATE' in name:
+                    pass
+                else:
+                    errcols.append(name)
             else:
                 pass
 
@@ -1471,9 +1480,15 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
         self.rows = self.db.get_rows_of_cols(self.table, self.colNames)
 
         # sys.exit()
+        # print([d for d in self.colNames if 'DTA' in d].replace('DTA','ERRTA'))
+        # sys.exit()
         self.df = pd.DataFrame(list(self.rows), columns=self.colNames)
         self.df=self.df.sort_values('FILENAME')
-        self.df["OBSDATE"]=pd.to_datetime(self.df["OBSDATE"],format="%Y-%m-%d")
+
+        try:
+            self.df["OBSDATE"]=pd.to_datetime(self.df["OBSDATE"],format="%Y-%m-%d")
+        except:
+            pass
 
         # get col names
         if xcol!="" and ycol!="" and yerr!="":
@@ -1535,8 +1550,8 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
             # print(t[['id','FILENAME','OBSDATE']])
 
             #TODO: clean this up
-            self.df[xCol].fillna(value=0, inplace=True)
-            self.df[xCol].fillna(value=pd.NaT, inplace=True)
+            # self.df[xCol].fillna(value=0, inplace=True)
+            # self.df[xCol].fillna(value=pd.NaT, inplace=True)
 
             # self.df[yCol].fillna(value=np.nan, inplace=True)
            
@@ -1900,18 +1915,12 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
 
                     # find what i is in the db
                     id=self.df['id'].iloc[i]
-                    
-                    #print(f'i: {ii}, id: {id}')
-                    # i=ii#d
                     mjd=self.df['MJD'].iloc[i]
                     FN=self.df['FILENAME'].iloc[i]
 
                     print('\n-mjd: ',mjd,'\n-file: ',FN) #date_str
-
                     print(f"\n-id: {self.df['id'].iloc[i]}, \n-index: {i}")
-                    
                     print(f'\n> Setting {yCol}: {self.df.iloc[i][yCol]:.3f}, to np.nan')
-                    #print(self.df.iloc[i][yCol])
                     
                     try:
                         self.df.at[i,yCol]=np.nan
@@ -1941,8 +1950,15 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
                     stmt=f"UPDATE '{tablename}' SET "
 
                     dct={}
+                    print(list(self.df.columns))
 
-                    dct['BEAMTYPE']=self.df['BEAMTYPE'].iloc[i]
+                    dct['OBJECT'] = self.df['OBJECT'].iloc[i]
+                    
+                    try:
+                        dct['FRONTEND']=self.df['FRONTEND'].iloc[i]
+                    except:
+                        dct['BEAMTYPE']=self.df['BEAMTYPE'].iloc[i]
+                        dct['FRONTEND']=self.df['BEAMTYPE'].iloc[i]
 
                     try:
                         dct['ATMOS_ABSORPTION_CORR']=self.df['ATMOS_ABSORPTION_CORR'].iloc[i]
@@ -1953,6 +1969,7 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
                     bms=['A','B']
 
                     print("YCOL: ",ycol)
+
                     if ycol == "SLTA" or ycol=="ASLTA" or ycol=="BSLTA" or ycol=="SLTAERR" or ycol=="ASLTAERR" or ycol=="BSLTAERR" or ycol == "SRTA" or ycol=="ASRTA" or ycol=="BSRTA" or ycol == "SRTAERR" or ycol=="ASRTAERR" or ycol=="BSRTAERR":
                         
                         if ycol[0]=="A":
@@ -1968,34 +1985,47 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
 
                         print()
 
-                        try:
-                            hps=np.nan
-                            err_hps=np.nan
-                            hpn=self.df[f'N{pol}TA'].iloc[i]
-                            err_hpn=self.df[f'N{pol}TAERR'].iloc[i]
-                            on=self.df[f'O{pol}TA'].iloc[i]
-                            err_on=self.df[f'O{pol}TAERR'].iloc[i]
+                        # try:
+                        hps=np.nan
+                        err_hps=np.nan
 
-                            # single-beam
-                            # if "TAR" in self.df['OBJECTTYPE'].iloc[i]:
+                        b=''
+                        try:
+                            hpn=self.df[f'N{pol}TA'].iloc[i]
+                            b='s'
+                        except:
+                            hpn=self.df[f'{bms[k]}N{pol}TA'].iloc[i]
+                            b='d'
+
+                        try:
+                            err_hpn=self.df[f'N{pol}TAERR'].iloc[i]
+                            b='s'
+                        except:
+                            err_hpn=self.df[f'{bms[k]}N{pol}TAERR'].iloc[i]
+                            b='d'
+
+                        try:
+                            on=self.df[f'O{pol}TA'].iloc[i]
+                            b='s'
+                        except:
+                            on=self.df[f'{bms[k]}O{pol}TA'].iloc[i]
+                            b='d'
+
+                        try:
+                            err_on=self.df[f'O{pol}TAERR'].iloc[i]
+                            b='s'
+                        except:
+                            err_on=self.df[f'{bms[k]}O{pol}TAERR'].iloc[i]
+                            b='d'
+
+                        if b=='':
+                            print('something failed')
+                            sys.exit()
+                        elif b=='s':
+                            print('dct: ',dct)
                             print(f"Using - 'N{pol}TA': {hpn}, 'N{pol}TAERR': {err_hpn}, 'O{pol}TA': {on}, 'O{pol}TAERR': {err_on} to recalculate ")
-                            pc, corrTa, errCorrTa=cp.calc_pc(0, 0, 0, hpn, err_hpn, on, err_on, dct)
+                            pc, corrTa, errCorrTa=cp.calibrate( 0, 0, hpn, err_hpn, on, err_on, dct)
                             stmt=stmt+f"S{pol}TA='{hps}', S{pol}TAERR='{err_hps}', S{pol}S2N='{np.nan}', O{pol}PC='{pc}', CO{pol}TA='{corrTa}', CO{pol}TAERR='{errCorrTa}', "   
-                               
-                            # elif "CAL" in self.df['OBJECTTYPE'].iloc[i]:
-                            #     print(f"Using - 'N{pol}TA': {hpn}, 'N{pol}TAERR': {err_hpn}, 'O{pol}TA': {on}, 'O{pol}TAERR': {err_on} to recalculate ")
-                            #     pss, errPss, pc, corrTa, errCorrTa, appEff=cp.calc_pc_pss(0, 0, 0, hpn, err_hpn, on, err_on, self.df['FLUX'].iloc[i],dct)
-                            #     stmt=stmt+f"S{pol}TA='{hps}', S{pol}TAERR='{err_hps}', S{pol}S2N='{np.nan}', O{pol}PSS='{pss}', O{pol}DPSS='{errPss}', O{pol}PC='{pc}', CO{pol}TA='{corrTa}', CO{pol}TAERR='{errCorrTa}', O{pol}APPEFF='{appEff}', "
-                                 
-                            #     if pss==0.0:
-                            #         print(f'- setting O{pol}PSS=np.nan')
-                            #         pss=np.nan
-                            #     if errPss==0.0:
-                            #         errPss=np.nan
-                            #         print(f'- setting O{pol}DPSS=np.nan')
-                            #     if appEff==0.0:
-                            #         appEff=np.nan
-                            #         print(f'- setting O{pol}APPEFF=np.nan')
 
                             if pc==0.0:
                                 print(f'- setting O{pol}PC=np.nan')
@@ -2006,36 +2036,13 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
                             if errCorrTa==0.0:
                                 errCorrTa=np.nan
                                 print(f'- setting CO{pol}TAERR=np.nan')
-                            
-                        except:
-                                hps=np.nan
-                                err_hps=np.nan
-                                hpn=self.df[f'{bms[k]}N{pol}TA'].iloc[i]
-                                err_hpn=self.df[f'{bms[k]}N{pol}TAERR'].iloc[i]
-                                on=self.df[f'{bms[k]}O{pol}TA'].iloc[i]
-                                err_on=self.df[f'{bms[k]}O{pol}TAERR'].iloc[i]
 
+                        elif b=='d':
                                 # dual-beam
-                                # if "TAR" in self.df['OBJECTTYPE'].iloc[i]:
                                 print(f"Using - '{bms[k]}N{pol}TA': {hpn}, '{bms[k]}N{pol}TAERR': {err_hpn}, '{bms[k]}O{pol}TA': {on}, '{bms[k]}O{pol}TAERR': {err_on} to recalculate ")
-                                pc, corrTa, errCorrTa=cp.calc_pc(0, 0, 0, hpn, err_hpn, on, err_on, dct)
+                                pc, corrTa, errCorrTa=cp.calibrate(0, 0, hpn, err_hpn, on, err_on, dct)
                                 stmt=stmt+f"{bms[k]}S{pol}TA='{np.nan}', {bms[k]}S{pol}TAERR='{np.nan}', {bms[k]}S{pol}S2N='{np.nan}', {bms[k]}O{pol}PC='{pc:.3f}', {bms[k]}CO{pol}TA='{corrTa:.3f}', {bms[k]}CO{pol}TAERR='{errCorrTa:.3f}', "
                                 
-                                # elif "CAL" in self.df['OBJECTTYPE'].iloc[i]:
-                                #     print(f"Using - '{bms[k]}N{pol}TA': {hpn}, '{bms[k]}N{pol}TAERR': {err_hpn}, '{bms[k]}O{pol}TA': {on}, '{bms[k]}O{pol}TAERR': {err_on} to recalculate ")
-                                #     pss, errPss, pc, corrTa, errCorrTa, appEff=cp.calc_pc_pss(0, 0, 0, hpn, err_hpn, on, err_on, self.df['FLUX'].iloc[i],dct)
-                                #     stmt=stmt+f"{bms[k]}S{pol}TA='{np.nan}', {bms[k]}S{pol}TAERR='{np.nan}', {bms[k]}S{pol}S2N='{np.nan}', {bms[k]}O{pol}PSS='{pss}', {bms[k]}O{pol}DPSS='{errPss}', {bms[k]}O{pol}PC='{pc}', {bms[k]}CO{pol}TA='{corrTa}', {bms[k]}CO{pol}TAERR='{errCorrTa}', {bms[k]}O{pol}APPEFF='{appEff}', "
-                                
-                                #     if pss==0.0:
-                                #         print(f'- setting O{pol}PSS=np.nan')
-                                #         pss=np.nan
-                                #     if errPss==0.0:
-                                #         errPss=np.nan
-                                #         print(f'- setting O{pol}DPSS=np.nan')
-                                #     if appEff==0.0:
-                                #         appEff=np.nan
-                                #         print(f'- setting O{pol}APPEFF=np.nan')
-
                                 if pc==0.0:
                                     pc=np.nan
                                     print(f'- setting {bms[k]}O{pol}PC=np.nan')
@@ -2072,23 +2079,8 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
                                 # single-beam
                                 # if "TAR" in self.df['OBJECTTYPE'].iloc[i]:
                                 print(f"Using - 'S{pol}TA': {hps}, 'S{pol}TAERR': {err_hps}, 'O{pol}TA': {on}, 'O{pol}TAERR': {err_on} to recalculate ")
-                                pc, corrTa, errCorrTa=cp.calc_pc(0, hps, err_hps, 0, 0, on, err_on, dct)
+                                pc, corrTa, errCorrTa=cp.calibrate(hps, err_hps, 0, 0, on, err_on, dct)
                                 stmt=stmt+f"N{pol}TA='{hpn}', N{pol}TAERR='{err_hpn}', O{pol}PC='{pc}', CO{pol}TA='{corrTa}', CO{pol}TAERR='{errCorrTa}', "   
-
-                                # elif "CAL" in self.df['OBJECTTYPE'].iloc[i]:
-                                #     print(f"Using - 'S{pol}TA': {hps}, 'S{pol}TAERR': {err_hps}, 'O{pol}TA': {on}, 'O{pol}TAERR': {err_on} to recalculate ")
-                                #     pss, errPss, pc, corrTa, errCorrTa, appEff=cp.calc_pc_pss(0, hps, err_hps, 0, 0, on, err_on, self.df['FLUX'].iloc[i],dct)
-                                #     stmt=stmt+f"N{pol}TA='{hpn}', N{pol}TAERR='{err_hpn}', N{pol}S2N='{np.nan}', O{pol}PSS='{pss}', O{pol}DPSS='{errPss}', O{pol}PC='{pc}', CO{pol}TA='{corrTa}', CO{pol}TAERR='{errCorrTa}', O{pol}APPEFF='{appEff}', "
-                                
-                                #     if pss==0.0:
-                                #         print(f'- setting O{pol}PSS=np.nan')
-                                #         pss=np.nan
-                                #     if errPss==0.0:
-                                #         errPss=np.nan
-                                #         print(f'- setting O{pol}DPSS=np.nan')
-                                #     if appEff==0.0:
-                                #         appEff=np.nan
-                                #         print(f'- setting O{pol}APPEFF=np.nan')
 
                                 if pc==0.0:
                                     pc=np.nan
@@ -2101,6 +2093,7 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
                                     print(f'- setting CO{pol}TAERR=np.nan')
                             
                             except:
+                                
                                 hps=self.df[f'{bms[k]}S{pol}TA'].iloc[i]
                                 err_hps=self.df[f'{bms[k]}S{pol}TAERR'].iloc[i]
                                 hpn=np.nan
@@ -2111,23 +2104,9 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
                                 # dual-beam
                                 # if "TAR" in self.df['OBJECTTYPE'].iloc[i]:
                                 print(f"Using - '{bms[k]}S{pol}TA': {hps}, '{bms[k]}S{pol}TAERR': {err_hps}, '{bms[k]}O{pol}TA': {on}, '{bms[k]}O{pol}TAERR': {err_on} to recalculate ")
-                                pc, corrTa, errCorrTa=cp.calc_pc(0, hps, err_hps, 0, 0,  on, err_on, dct)  
+                                pc, corrTa, errCorrTa=cp.calibrate(hps, err_hps, 0, 0,  on, err_on, dct)  
                                 stmt=stmt+f"{bms[k]}N{pol}TA='{np.nan}', {bms[k]}N{pol}TAERR='{np.nan}', {bms[k]}N{pol}S2N='{np.nan}', {bms[k]}O{pol}PC='{pc}', {bms[k]}CO{pol}TA='{corrTa}', {bms[k]}CO{pol}TAERR='{errCorrTa}', "
-                                
-                                # elif "CAL" in self.df['OBJECTTYPE'].iloc[i]:
-                                #     print(f"Using - '{bms[k]}S{pol}TA': {hps}, '{bms[k]}S{pol}TAERR': {err_hps}, '{bms[k]}O{pol}TA': {on}, '{bms[k]}O{pol}TAERR': {err_on} to recalculate ")
-                                #     pss, errPss, pc, corrTa, errCorrTa, appEff=cp.calc_pc_pss(0, hps, err_hps, 0, 0, on, err_on, self.df['FLUX'].iloc[i],dct)
-                                #     stmt=stmt+f"{bms[k]}N{pol}TA='{np.nan}', {bms[k]}N{pol}TAERR='{np.nan}', {bms[k]}N{pol}S2N='{np.nan}', {bms[k]}O{pol}PSS='{pss}', {bms[k]}O{pol}DPSS='{errPss}', {bms[k]}O{pol}PC='{pc}', {bms[k]}CO{pol}TA='{corrTa}', {bms[k]}CO{pol}TAERR='{errCorrTa}', {bms[k]}O{pol}APPEFF='{appEff}', "
-                                    
-                                #     if pss==0.0:
-                                #         print(f'- setting O{pol}PSS=np.nan')
-                                #         pss=np.nan
-                                #     if errPss==0.0:
-                                #         errPss=np.nan
-                                #         print(f'- setting O{pol}DPSS=np.nan')
-                                #     if appEff==0.0:
-                                #         appEff=np.nan
-                                #         print(f'- setting O{pol}APPEFF=np.nan')
+                                print(pc, corrTa, errCorrTa)
 
                                 if pc==0.0:
                                     pc=np.nan
@@ -3504,6 +3483,8 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
             print(f"\nPlotting {xCol} vs {yCol} in table {self.table}\n")
 
             self.df[yCol]=self.df[yCol]#.apply(self.f)
+            self.df[yCol].fillna(value=np.nan, inplace=True)
+            
             try:
                 self.df[yErr]=self.df[yErr]#.apply(self.f)
                 self.Canvas.plot_fig(self.df[xCol],self.df[yCol],xCol,yCol,data=self.df,yerr=self.df[yErr]) #,title=f"Plot of {self.df['SOURCEDIR']} obs. {self.df['FILENAME'][:8]}")#,data=self.)
@@ -3512,7 +3493,6 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
 
             self.Canvas.draw()
             
-    
     # PLOTVIEWER OPERATIONS
     def open_db_path(self):
         # Open a database
@@ -3539,7 +3519,7 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
             # open db and get tables
             self.db = SQLiteDB(self.dbFilePath, log=self.log)
             self.db.create_db()
-            self.tables = list(set(sorted(self.db.get_table_names(self.dbFilePath))))
+            self.tables = sorted(list(set(sorted(self.db.get_table_names(self.dbFilePath)))))
 
             print('T2 :',self.tables)
 
@@ -3648,7 +3628,7 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
                         
         # create dataframe
         df = pd.DataFrame(list(rows), columns = colNames)
-        
+        df=df.sort_values('FILENAME')
         return df ,db
     
     def show_plot_browser(self):
@@ -3726,8 +3706,6 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
                                     print(f'std: {df[option].dropna().std():.3f}')
                                 print("*"*30,"\n")
 
-                            # print(df[option])
-
                             # sys.exit()
                             try:
                                 txt=float(txt)
@@ -3738,35 +3716,37 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
                                     
                                     txt=float(txt)
                                     df[option] = df[option].astype(float)
+                                    df=df.sort_values('FILENAME')
 
                                     if filter == ">":
                                         ndf = df[df[option] > txt]
-                                        print(len(ndf))
+                                        # print(len(ndf))
 
                                     elif filter == ">=":
                                         ndf = df[df[option] >= txt]
-                                        print(len(ndf))
+                                        # print(len(ndf))
 
                                     elif filter == "<":
                                         ndf = df[df[option] < txt]
-                                        print(len(ndf))
+                                        # print(len(ndf))
 
                                     elif filter == "<=":
                                         ndf = df[df[option] <= txt]
-                                        print(len(ndf))
+                                        # print(len(ndf))
 
                                     elif filter == "=":
                                         ndf = df[df[option] == txt]
-                                        print(len(ndf))
+                                        # print(len(ndf))
                             
                                     else:
                                         ndf=df
 
                                     #
-                                    print(len(df),len(ndf),option,txt)
+                                    # print(len(df),len(ndf),option,txt)
 
                                     if len(ndf) > 0:
                                         #print(ndf['FILENAME'])
+                                        ndf=ndf.sort_values('FILENAME')
                                         ndf['plot_tag']=ndf['FILENAME'].apply(lambda x:x[:18])
 
                                         plots=list(ndf['plot_tag'])
@@ -3784,7 +3764,7 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
                                         ls=os.listdir(imgDir)
                                      
                                         fln=(folderName.split("_")[0]).upper()
-                                        print(sorted(ls),fln)
+                                        # print(sorted(ls),fln)
                                        
                                         msg_wrapper("info", self.log.debug,"Plotting folder "+folderName)
 
@@ -3826,7 +3806,9 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
 
                                         # # get images for current point
                                         for i in range(len(plots)):
+
                                             print(imgPath,imageNames[i])
+                                            
                                             for j in range(len(imageNames)):
                                                 if plots[i] in imageNames[j]: #[:18]:
                                                     if "SL" in option and "HPS_LCP" in imageNames[j]:
@@ -4319,6 +4301,7 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
                                     else:
                                         ndf=df
 
+                        ndf=ndf.sort_values('FILENAME')
                         cols=list(ndf.columns)
                         files=list(ndf.FILENAME)
 
@@ -4340,23 +4323,11 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
 
                                     for k in ols:
                                         stmt=stmt+f"{k}='{np.nan}', "
-                                # elif "OR" in option:
-                                #         ols=[i for i in cols if 'OR' in i]
-                                #         print(ols)
 
-                                #         for k in ols:
-                                #             stmt=stmt+f"{k}='{np.nan}', "
-
-                                # for col in cols:
                                     print(stmt)
                                     sys.exit()
                                 else:
-                                    # if "SL" in option:
-                                    #     ols=[]
-                                    #     for i in cols:
-                                    #         if 'SL' in i:
-                                    #             ols.append(i)
-                                    #     for k in ols:
+
                                     stmt=stmt+f"{option}='{np.nan}', "
 
                                 print()
@@ -4368,7 +4339,9 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
                                 print('done')
                             # sys.exit()
                         else:
+
                             for j in files:
+                                print('\nprocessing_file : ',j)
                                 stmt=f"UPDATE '{folderName}' SET "
 
                                 # print(option)
@@ -4399,22 +4372,50 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
                                             stmt=stmt+f"{k}=200,  TSYS2='{np.nan}', "
                                         else:
                                             stmt=stmt+f"{k}='{np.nan}', "
-                                else:
-                                    print('else')
-                                    sys.exit()
-                                    for col in cols:
-                                        if 'SL' in col or 'SR' in col or  'OL' in col or  'OR' in col or  'NL' in col or  'NR' in col :
-                                            if "FLAG" in col:
-                                                stmt=stmt+f"{col}=200, "
+
+                                elif 'NL' in option:
+                                        nl=[i for i in cols if 'NL' in i]
+                                        print(nl)
+                                        # sys.exit()
+                                        for k in nl:
+                                            if "FLAG" in k:
+                                                stmt=stmt+f"{k}=200,  TSYS2='{np.nan}', "
                                             else:
-                                                stmt=stmt+f"{col}='{np.nan}', TSYS1='{np.nan}', TSYS2='{np.nan}', "
-                                        else:
-                                            pass
-                                        #or  'OBSTIME' in col or 'MJD' in col or  'OBJECT' in col or  'OBJECTTYPE' in col or  'CENTFREQ' in col or  'LOGFREQ' in col or  'FOCUS' in col or  'TILT' in col or  'HA' in col or  'ZA' in col or  'RADIOMETER' in col or  'BANDWDTH' in col or  'TCAL1' in col or 'TCAL2' in col or  'NOMTSYS' in col or 'TSYS1', 'TSYSERR1', 'TSYS2', 'TSYSERR2', 'TAMBIENT', 'PRESSURE', 'HUMIDITY', 'WINDSPD', 'HPBW', 'FNBW', 'ELEVATION', 'LONGITUDE', 'LATITUDE', 'SCANTYPE', 'BEAMTYPE', 'OBSERVER', 'OBSLOCAL', 'PROJNAME', 'PROPOSAL', 'TELESCOPE', 'UPGRADE', 'INSTFLAG', 'SCANDIST', 'SCANTIME', 'PWV', 'SVP', 'AVP', 'DPT', 'WVD', 'MEAN_ATMOS_CORRECTION', 'TAU10', 'TAU15', 'TBATMOS10', 'TBATMOS15', 'SLTA', 'SLDTA', 'SLS2N', 'SLTAPEAKLOC', 'SLFLAG', 'SLRMSB', 'SLRMSA', 'SLBSLOPE', 'SLBSRMS', 'NLTA', 'NLDTA', 'NLS2N', 'NLTAPEAKLOC', 'NLFLAG', 'NLRMSB', 'NLRMSA', 'NLBSLOPE', 'NLBSRMS', 'OLTA', 'OLDTA', 'OLPC', 'COLTA', 'COLDTA', 'OLS2N', 'OLTAPEAKLOC', 'OLFLAG', 'OLRMSB', 'OLRMSA', 'OLBSLOPE', 'OLBSRMS', 'SRTA', 'SRDTA', 'SRS2N', 'SRTAPEAKLOC', 'SRFLAG', 'SRRMSB', 'SRRMSA', 'SRBSLOPE', 'SRBSRMS', 'NRTA', 'NRDTA', 'NRS2N', 'NRTAPEAKLOC', 'NRFLAG', 'NRRMSB', 'NRRMSA', 'NRBSLOPE', 'NRBSRMS', 'ORTA', 'ORDTA', 'ORPC', 'CORTA', 'CORDTA', 'ORS2N', 'ORTAPEAKLOC', 'ORFLAG', 'ORRMSB', 'ORRMSA', 'ORBSLOPE', 'ORBSRMS'
+                                                stmt=stmt+f"{k}='{np.nan}', "
+
+                                elif 'SL' in option:
+                                        sl=[i for i in cols if 'SL' in i]
+                                        print(sl)
+                                        # sys.exit()
+                                        for k in sl:
+                                            if "FLAG" in k:
+                                                stmt=stmt+f"{k}=200,  TSYS2='{np.nan}', "
+                                            else:
+                                                stmt=stmt+f"{k}='{np.nan}', "
+
+                                elif 'SR' in option:
+                                        sr=[i for i in cols if 'SR' in i]
+                                        print(sr)
+                                        # sys.exit()
+                                        for k in sr:
+                                            if "FLAG" in k:
+                                                stmt=stmt+f"{k}=200,  TSYS2='{np.nan}', "
+                                            else:
+                                                stmt=stmt+f"{k}='{np.nan}', "
+
+                                elif 'NR' in option:
+                                        nr=[i for i in cols if 'NR' in i]
+                                        print(nr)
+                                        # sys.exit()
+                                        for k in nr:
+                                            if "FLAG" in k:
+                                                stmt=stmt+f"{k}=200,  TSYS2='{np.nan}', "
+                                            else:
+                                                stmt=stmt+f"{k}='{np.nan}', "
 
                                 stmt=stmt[:-2]+f" WHERE FILENAME='{j}'; \n"
 
-                                print(f'*** {stmt}')
+                                print(f'*** {stmt}\n')
                                 # sys.exit()
                                 db.c.execute(stmt)
                                 db.commit_changes()
@@ -4670,9 +4671,6 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
         self.Canvas.plot_residual()
         self.set_fit_parmeters()
         self.set_flags()
-    
-    
-
     
     def fit_data(self):
         """ Fit the drift scan. """
@@ -5366,9 +5364,6 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
 
     
 
-    
-    
-
     def choose_plot(self):
         """ Select the plot to work with. """
 
@@ -5441,8 +5436,6 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
     
         else:
             self.write("There are no scans provided. ",'info')
-
-    
 
     def popup_msg_dict(self):
         """ Message dictionary for popups."""
@@ -5772,3 +5765,10 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
         print("# Status: ",self.status)
 
 
+# # plottinf funcs
+# def plot_delete_filter(self,key,option,cols):
+#     # e.g('OL',option,cols)
+#     if key in option:
+#         ls=[]
+#         for i in cols:
+#             if key

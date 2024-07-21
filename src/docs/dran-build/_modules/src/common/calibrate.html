@@ -61,6 +61,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../extras/tuts/tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../extras/commands.html">Commands</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Resources:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/radio_sources.html">Radio sources</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">Guidelines:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../extras/changelog.html">Changelog</a></li>
@@ -93,7 +97,7 @@
              
   <h1>Source code for src.common.calibrate</h1><div class="highlight"><pre>
 <span></span><span class="c1"># =========================================================================== #</span>
-<span class="c1"># File: calc_pss.py                                                           #</span>
+<span class="c1"># File: calibrate.py                                                           #</span>
 <span class="c1"># Author: Pfesesani V. van Zyl                                                #</span>
 <span class="c1"># =========================================================================== #</span>
 
@@ -365,7 +369,7 @@
 
 <div class="viewcode-block" id="calc_pc_eq">
 <a class="viewcode-back" href="../../../docs/src.common.html#src.common.calibrate.calc_pc_eq">[docs]</a>
-<span class="k">def</span> <span class="nf">calc_pc_eq</span><span class="p">(</span><span class="n">Ta1</span><span class="p">,</span> <span class="n">Ta2</span><span class="p">,</span> <span class="n">term2</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">calc_pc_eq</span><span class="p">(</span><span class="n">Ta1</span><span class="p">,</span> <span class="n">Ta2</span><span class="p">,</span> <span class="n">term2</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="n">pol</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
 
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; Calculate the pointing correction and its derivatives.</span>
 <span class="sd">    The pointing equations are given in the method </span>
@@ -384,7 +388,10 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">term2</span><span class="o">==</span><span class="s2">&quot;&quot;</span><span class="p">:</span>
-        <span class="n">term1</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Ta1</span><span class="p">))</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Ta2</span><span class="p">))</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span>
+        <span class="k">if</span> <span class="n">pol</span><span class="o">==</span><span class="s1">&#39;s&#39;</span><span class="p">:</span>
+            <span class="n">term1</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Ta1</span><span class="p">))</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Ta2</span><span class="p">))</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span>
+        <span class="k">elif</span> <span class="n">pol</span><span class="o">==</span><span class="s1">&#39;n&#39;</span><span class="p">:</span>
+            <span class="n">term1</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Ta1</span><span class="p">))</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Ta2</span><span class="p">))</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span>
         <span class="n">term2</span> <span class="o">=</span> <span class="mi">4</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">term1</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Ta1</span><span class="p">))</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Ta2</span><span class="p">)))</span><span class="o">**</span><span class="mi">2</span>

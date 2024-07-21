@@ -10,9 +10,11 @@ from dataclasses import dataclass, field
 import numpy as np
 from datetime import datetime
 import argparse
-from config import __version__, __DBNAME__
+from config import __version__, __DBNAME__ #, dbCols, nbCols, sbCols
 import pandas as pd
 import sqlite3
+# from glob import glob
+# import fnmatch
 
 # Module imports
 # --------------------------------------------------------------------------- #
@@ -25,43 +27,355 @@ from common.logConfiguration import configure_logging
 from common.msgConfiguration import msg_wrapper, load_prog
 from common.sqlite_db import SQLiteDB
 from common.observation import Observation
+from common.contextManagers import open_database
 # =========================================================================== #
 
-def get_tables_from_database(dbName=__DBNAME__):
-    cnx = sqlite3.connect(dbName)
-    dbTables= pd.read_sql_query("SELECT name FROM sqlite_schema WHERE type='table'", cnx)
-    tables=list(dbTables['name'])
-    cnx.close()
-    return tables
-    
-def generate_table_name(files, folderPath,log):
-    """Use a random fits file to get the source name and 
-    frequency so you can generate a table name"""
+# column data to save
+dbCols={'FILENAME':'TEXT','FILEPATH':'TEXT','CURDATETIME':'TEXT','MJD':'REAL','OBSDATE':'TEXT','OBSTIME':'TEXT',
+                  'OBSDATETIME':'TEXT','FRONTEND':'TEXT','HDULENGTH':'INTEGER','OBJECT':'TEXT','SRC':'TEXT','OBSERVER':'TEXT',
+                  'OBSLOCAL':'TEXT','OBSNAME':'TEXT','PROJNAME':'TEXT','PROPOSAL':'TEXT','TELESCOP':'TEXT','UPGRADE':'TEXT',
+                    'CENTFREQ':'REAL','BANDWDTH':'REAL','LOGFREQ':'REAL','BEAMTYPE':'TEXT','HPBW':'REAL','FNBW':'REAL','SNBW':'REAL',
+                    'FEEDTYPE':'TEXT','LONGITUD':'REAL','LATITUDE':'REAL','COORDSYS':'REAL','EQUINOX':'REAL','RADECSYS':'TEXT',
+                    'FOCUS':'REAL','TILT':'REAL','TAMBIENT':'REAL','PRESSURE':'REAL','HUMIDITY':'REAL','WINDSPD':'REAL','SCANDIR':'TEXT',
+                    'POINTING':'INTEGER','BMOFFHA':'REAL','BMOFFDEC':'REAL','HABMSEP':'REAL',
+                    'DICHROIC':'TEXT','PHASECAL':'TEXT','NOMTSYS':'REAL','SCANDIST':'REAL','SCANTIME':'REAL','INSTRUME':'TEXT',
+                    'INSTFLAG':'TEXT','HZPERK1':'REAL','HZKERR1':'REAL','HZPERK2':'REAL','HZKERR2':'REAL',
+                    'TCAL1':'REAL','TCAL2':'REAL','TSYS1':'REAL','TSYSERR1':'REAL','TSYS2':'REAL','TSYSERR2':'REAL','ELEVATION':'REAL',
+                    'ZA':'REAL','HA':'REAL','PWV':'REAL','SVP':'REAL','AVP':'REAL','DPT':'REAL','WVD':'REAL','SEC_Z':'REAL','X_Z':'REAL',
+                    'DRY_ATMOS_TRANSMISSION':'REAL','ZENITH_TAU_AT_1400M':'REAL','ABSORPTION_AT_ZENITH':'REAL',
+                    
+                    'ANLTA':'REAL','ANLTAERR':'REAL','ANLMIDOFFSET':'REAL','ANLS2N':'REAL', 
+                    'BNLTA':'REAL','BNLTAERR':'REAL','BNLMIDOFFSET':'REAL','BNLS2N':'REAL',
+                    'NLFLAG':'REAL','NLBRMS':'REAL','NLSLOPE':'REAL',
+                    'ANLBASELOCS':'REAL','BNLBASELOCS':'REAL','NLRMSB':'REAL', 'NLRMSA':'REAL',
+                    
+                    'ASLTA':'REAL','ASLTAERR':'REAL','ASLMIDOFFSET':'REAL','ASLS2N':'REAL', 
+                    'BSLTA':'REAL','BSLTAERR':'REAL','BSLMIDOFFSET':'REAL','BSLS2N':'REAL',
+                    'SLFLAG':'REAL','SLBRMS':'REAL','SLSLOPE':'REAL','ASLBASELOCS':'REAL','BSLBASELOCS':'REAL', 'SLRMSB':'REAL', 'SLRMSA':'REAL',
+                    
+                    'AOLTA':'REAL','AOLTAERR':'REAL','AOLMIDOFFSET':'REAL','AOLS2N':'REAL',
+                    'BOLTA':'REAL','BOLTAERR':'REAL','BOLMIDOFFSET':'REAL','BOLS2N':'REAL',
+                    'OLFLAG':'REAL','OLBRMS':'REAL','OLSLOPE':'REAL','AOLBASELOCS':'REAL','BOLBASELOCS':'REAL', 'OLRMSB':'REAL', 'OLRMSA':'REAL',
+                    'AOLPC':'REAL','ACOLTA':'REAL','ACOLTAERR':'REAL','BOLPC':'REAL','BCOLTA':'REAL','BCOLTAERR':'REAL',
+                    
+                    'ANRTA':'REAL','ANRTAERR':'REAL','ANRMIDOFFSET':'REAL','ANRS2N':'REAL',
+                    'BNRTA':'REAL','BNRTAERR':'REAL','BNRMIDOFFSET':'REAL','BNRS2N':'REAL',
+                    'NRFLAG':'REAL','NRBRMS':'REAL','NRSLOPE':'REAL','ANRBASELOCS':'REAL','BNRBASELOCS':'REAL','NRRMSB':'REAL', 'NRRMSA':'REAL',
 
-    # check file is not a symlink
-    for file in files:
+                    'ASRTA':'REAL','ASRTAERR':'REAL','ASRMIDOFFSET':'REAL','ASRS2N':'REAL',
+                    'BSRTA':'REAL','BSRTAERR':'REAL','BSRMIDOFFSET':'REAL','BSRS2N':'REAL',
+                    'SRFLAG':'REAL','SRBRMS':'REAL','SRSLOPE':'REAL','ASRBASELOCS':'REAL','BSRBASELOCS':'REAL','SRRMSB':'REAL', 'SRRMSA':'REAL',
 
-        # try and sneak into first file and check frequency
-        pathToFile = os.path.join(folderPath,file)
-        isSymlink=os.path.islink(f'{pathToFile}')
-        if not isSymlink:
-            print(f'Processing file: {pathToFile}')
-            
-            obs=Observation(FILEPATH=pathToFile, theoFit='',autoFit='',log=log)
-            obs.get_data_only()
-            freq=int(obs.__dict__['CENTFREQ']['value'])
-            src=obs.__dict__['OBJECT']['value']
-            del obs  
-            break
+                    'AORTA':'REAL','AORTAERR':'REAL','AORMIDOFFSET':'REAL','AORS2N':'REAL',
+                    'BORTA':'REAL','BORTAERR':'REAL','BORMIDOFFSET':'REAL','BORS2N':'REAL',
+                    'ORFLAG':'REAL','ORBRMS':'REAL','ORSLOPE':'REAL','AORBASELOCS':'REAL','BORBASELOCS':'REAL','ORRMSB':'REAL', 'ORRMSA':'REAL',
+                    'AORPC':'REAL','ACORTA':'REAL','ACORTAERR':'REAL','BORPC':'REAL','BCORTA':'REAL','BCORTAERR':'REAL'}
+
+nbCols={'FILENAME':'TEXT','FILEPATH':'TEXT','CURDATETIME':'TEXT','MJD':'REAL','OBSDATE':'TEXT','OBSTIME':'TEXT',
+                  'OBSDATETIME':'TEXT','FRONTEND':'TEXT','HDULENGTH':'INTEGER','OBJECT':'TEXT','SRC':'TEXT','OBSERVER':'TEXT',
+                  'OBSLOCAL':'TEXT','OBSNAME':'TEXT','PROJNAME':'TEXT','PROPOSAL':'TEXT','TELESCOP':'TEXT','UPGRADE':'TEXT',
+                    'CENTFREQ':'REAL','BANDWDTH':'REAL','LOGFREQ':'REAL','BEAMTYPE':'TEXT','HPBW':'REAL','FNBW':'REAL','SNBW':'REAL',
+                    'FEEDTYPE':'TEXT','LONGITUD':'REAL','LATITUDE':'REAL','COORDSYS':'REAL','EQUINOX':'REAL','RADECSYS':'TEXT',
+                    'FOCUS':'REAL','TILT':'REAL','TAMBIENT':'REAL','PRESSURE':'REAL','HUMIDITY':'REAL','WINDSPD':'REAL','SCANDIR':'TEXT',
+                    'POINTING':'INTEGER','BMOFFHA':'REAL','BMOFFDEC':'REAL','HABMSEP':'REAL',
+                    'DICHROIC':'TEXT','PHASECAL':'TEXT','NOMTSYS':'REAL','SCANDIST':'REAL','SCANTIME':'REAL','INSTRUME':'TEXT',
+                    'INSTFLAG':'TEXT','HZPERK1':'REAL','HZKERR1':'REAL','HZPERK2':'REAL','HZKERR2':'REAL',
+                    'TCAL1':'REAL','TCAL2':'REAL','TSYS1':'REAL','TSYSERR1':'REAL','TSYS2':'REAL','TSYSERR2':'REAL','ELEVATION':'REAL',
+                    'ZA':'REAL','HA':'REAL','PWV':'REAL','SVP':'REAL','AVP':'REAL','DPT':'REAL','WVD':'REAL',
+
+                    'MEAN_ATMOS_CORRECTION':'REAL','TAU10':'REAL','TAU15':'REAL','TBATMOS10':'REAL','TBATMOS15':'REAL',
+                    
+                    'NLTA':'REAL','NLTAERR':'REAL','NLMIDOFFSET':'REAL','NLS2N':'REAL', 
+                    'NLFLAG':'REAL','NLBRMS':'REAL','NLSLOPE':'REAL',
+                    'NLBASELEFT':'REAL','NLBASERIGHT':'REAL',
+                    'NLRMSB':'REAL', 'NLRMSA':'REAL',
+                    
+                    'SLTA':'REAL','SLTAERR':'REAL','SLMIDOFFSET':'REAL','SLS2N':'REAL', 
+                    'SLFLAG':'REAL','SLBRMS':'REAL','SLSLOPE':'REAL',
+                    'SLBASELEFT':'REAL','SLBASERIGHT':'REAL',
+                    'SLRMSB':'REAL', 'SLRMSA':'REAL',
+                    
+                    'OLTA':'REAL','OLTAERR':'REAL','OLMIDOFFSET':'REAL','OLS2N':'REAL',
+                    'OLFLAG':'REAL','OLBRMS':'REAL','OLSLOPE':'REAL',
+                    'OLBASELEFT':'REAL','OLBASERIGHT':'REAL',
+                    'OLRMSB':'REAL', 'OLRMSA':'REAL',
+                    'OLPC':'REAL','COLTA':'REAL','COLTAERR':'REAL',
+                    
+                    'NRTA':'REAL','NRTAERR':'REAL','NRMIDOFFSET':'REAL','NRS2N':'REAL',
+                    'NRFLAG':'REAL','NRBRMS':'REAL','NRSLOPE':'REAL',
+                    'NRBASELEFT':'REAL','NRBASERIGHT':'REAL',
+                    'NRRMSB':'REAL', 'NRRMSA':'REAL',
+
+                    'SRTA':'REAL','SRTAERR':'REAL','SRMIDOFFSET':'REAL','SRS2N':'REAL',
+                    'SRFLAG':'REAL','SRBRMS':'REAL','SRSLOPE':'REAL',
+                    'SRBASELEFT':'REAL','SRBASERIGHT':'REAL',
+                    'SRRMSB':'REAL', 'SRRMSA':'REAL',
+
+                    'ORTA':'REAL','ORTAERR':'REAL','ORMIDOFFSET':'REAL','ORS2N':'REAL',
+                    'ORFLAG':'REAL','ORBRMS':'REAL','ORSLOPE':'REAL',
+                    'ORBASELEFT':'REAL','ORBASERIGHT':'REAL',
+                    'ORRMSB':'REAL', 'ORRMSA':'REAL',
+                    'ORPC':'REAL','CORTA':'REAL','CORTAERR':'REAL'}
+
+nbCols22jup={'FILENAME':'TEXT','FILEPATH':'TEXT','CURDATETIME':'TEXT','MJD':'REAL','OBSDATE':'TEXT','OBSTIME':'TEXT',
+                  'OBSDATETIME':'TEXT','FRONTEND':'TEXT','HDULENGTH':'INTEGER','OBJECT':'TEXT','SRC':'TEXT','OBSERVER':'TEXT',
+                  'OBSLOCAL':'TEXT','OBSNAME':'TEXT','PROJNAME':'TEXT','PROPOSAL':'TEXT','TELESCOP':'TEXT','UPGRADE':'TEXT',
+                    'CENTFREQ':'REAL','BANDWDTH':'REAL','LOGFREQ':'REAL','BEAMTYPE':'TEXT','HPBW':'REAL','FNBW':'REAL','SNBW':'REAL',
+                    'FEEDTYPE':'TEXT','LONGITUD':'REAL','LATITUDE':'REAL','COORDSYS':'REAL','EQUINOX':'REAL','RADECSYS':'TEXT',
+                    'FOCUS':'REAL','TILT':'REAL','TAMBIENT':'REAL','PRESSURE':'REAL','HUMIDITY':'REAL','WINDSPD':'REAL','SCANDIR':'TEXT',
+                    'POINTING':'INTEGER','BMOFFHA':'REAL','BMOFFDEC':'REAL','HABMSEP':'REAL',
+                    'DICHROIC':'TEXT','PHASECAL':'TEXT','NOMTSYS':'REAL','SCANDIST':'REAL','SCANTIME':'REAL','INSTRUME':'TEXT',
+                    'INSTFLAG':'TEXT','HZPERK1':'REAL','HZKERR1':'REAL','HZPERK2':'REAL','HZKERR2':'REAL',
+                    'TCAL1':'REAL','TCAL2':'REAL','TSYS1':'REAL','TSYSERR1':'REAL','TSYS2':'REAL','TSYSERR2':'REAL','ELEVATION':'REAL',
+                    'ZA':'REAL','HA':'REAL','PWV':'REAL','SVP':'REAL','AVP':'REAL','DPT':'REAL','WVD':'REAL',
+
+                    'HPBW_ARCSEC':'REAL','ADOPTED_PLANET_TB':'REAL','PLANET_ANG_DIAM':'REAL','JUPITER_DIST_AU':'REAL',
+                    'SYNCH_FLUX_DENSITY':'REAL','PLANET_ANG_EQ_RAD':'REAL','PLANET_SOLID_ANG':'REAL','THERMAL_PLANET_FLUX_D':'REAL',
+                    'TOTAL_PLANET_FLUX_D':'REAL','TOTAL_PLANET_FLUX_D_WMAP':'REAL','SIZE_FACTOR_IN_BEAM':'REAL','SIZE_CORRECTION_FACTOR':'REAL',
+                    'MEASURED_TCAL1':'REAL','MEASURED_TCAL2':'REAL','MEAS_TCAL1_CORR_FACTOR':'REAL','MEAS_TCAL2_CORR_FACTOR':'REAL',
+                    'ATMOS_ABSORPTION_CORR':'REAL','ZA_RAD':'REAL','TAU221':'REAL','TAU2223':'REAL',
+                    'TBATMOS221':'REAL','TBATMOS2223':'REAL',
+
+                    'NLTA':'REAL','NLTAERR':'REAL','NLMIDOFFSET':'REAL','NLS2N':'REAL', 
+                    'NLFLAG':'REAL','NLBRMS':'REAL','NLSLOPE':'REAL',
+                    'NLBASELEFT':'REAL','NLBASERIGHT':'REAL',
+                    'NLRMSB':'REAL', 'NLRMSA':'REAL',
+                    
+                    'SLTA':'REAL','SLTAERR':'REAL','SLMIDOFFSET':'REAL','SLS2N':'REAL', 
+                    'SLFLAG':'REAL','SLBRMS':'REAL','SLSLOPE':'REAL',
+                    'SLBASELEFT':'REAL','SLBASERIGHT':'REAL',
+                    'SLRMSB':'REAL', 'SLRMSA':'REAL',
+                    
+                    'OLTA':'REAL','OLTAERR':'REAL','OLMIDOFFSET':'REAL','OLS2N':'REAL',
+                    'OLFLAG':'REAL','OLBRMS':'REAL','OLSLOPE':'REAL',
+                    'OLBASELEFT':'REAL','OLBASERIGHT':'REAL',
+                    'OLRMSB':'REAL', 'OLRMSA':'REAL',
+                    'OLPC':'REAL','COLTA':'REAL','COLTAERR':'REAL',
+                    
+                    'NRTA':'REAL','NRTAERR':'REAL','NRMIDOFFSET':'REAL','NRS2N':'REAL',
+                    'NRFLAG':'REAL','NRBRMS':'REAL','NRSLOPE':'REAL',
+                    'NRBASELEFT':'REAL','NRBASERIGHT':'REAL',
+                    'NRRMSB':'REAL', 'NRRMSA':'REAL',
+
+                    'SRTA':'REAL','SRTAERR':'REAL','SRMIDOFFSET':'REAL','SRS2N':'REAL',
+                    'SRFLAG':'REAL','SRBRMS':'REAL','SRSLOPE':'REAL',
+                    'SRBASELEFT':'REAL','SRBASERIGHT':'REAL',
+                    'SRRMSB':'REAL', 'SRRMSA':'REAL',
+
+                    'ORTA':'REAL','ORTAERR':'REAL','ORMIDOFFSET':'REAL','ORS2N':'REAL',
+                    'ORFLAG':'REAL','ORBRMS':'REAL','ORSLOPE':'REAL',
+                    'ORBASELEFT':'REAL','ORBASERIGHT':'REAL',
+                    'ORRMSB':'REAL', 'ORRMSA':'REAL',
+                    'ORPC':'REAL','CORTA':'REAL','CORTAERR':'REAL'}
+
+nbCols22={'FILENAME':'TEXT','FILEPATH':'TEXT','CURDATETIME':'TEXT','MJD':'REAL','OBSDATE':'TEXT','OBSTIME':'TEXT',
+                  'OBSDATETIME':'TEXT','FRONTEND':'TEXT','HDULENGTH':'INTEGER','OBJECT':'TEXT','SRC':'TEXT','OBSERVER':'TEXT',
+                  'OBSLOCAL':'TEXT','OBSNAME':'TEXT','PROJNAME':'TEXT','PROPOSAL':'TEXT','TELESCOP':'TEXT','UPGRADE':'TEXT',
+                    'CENTFREQ':'REAL','BANDWDTH':'REAL','LOGFREQ':'REAL','BEAMTYPE':'TEXT','HPBW':'REAL','FNBW':'REAL','SNBW':'REAL',
+                    'FEEDTYPE':'TEXT','LONGITUD':'REAL','LATITUDE':'REAL','COORDSYS':'REAL','EQUINOX':'REAL','RADECSYS':'TEXT',
+                    'FOCUS':'REAL','TILT':'REAL','TAMBIENT':'REAL','PRESSURE':'REAL','HUMIDITY':'REAL','WINDSPD':'REAL','SCANDIR':'TEXT',
+                    'POINTING':'INTEGER','BMOFFHA':'REAL','BMOFFDEC':'REAL',#'HABMSEP':'REAL',
+                    'DICHROIC':'TEXT','PHASECAL':'TEXT','NOMTSYS':'REAL','SCANDIST':'REAL','SCANTIME':'REAL','INSTRUME':'TEXT',
+                    'INSTFLAG':'TEXT','HZPERK1':'REAL','HZKERR1':'REAL','HZPERK2':'REAL','HZKERR2':'REAL',
+                    'TCAL1':'REAL','TCAL2':'REAL','TSYS1':'REAL','TSYSERR1':'REAL','TSYS2':'REAL','TSYSERR2':'REAL','ELEVATION':'REAL',
+                    'ZA':'REAL','HA':'REAL','PWV':'REAL','SVP':'REAL','AVP':'REAL','DPT':'REAL','WVD':'REAL',
+
+                    #'HPBW_ARCSEC':'REAL',
+                    #'ADOPTED_PLANET_TB':'REAL','PLANET_ANG_DIAM':'REAL','JUPITER_DIST_AU':'REAL',
+                    #'SYNCH_FLUX_DENSITY':'REAL','PLANET_ANG_EQ_RAD':'REAL','PLANET_SOLID_ANG':'REAL','THERMAL_PLANET_FLUX_D':'REAL',
+                    #'TOTAL_PLANET_FLUX_D':'REAL','TOTAL_PLANET_FLUX_D_WMAP':'REAL','SIZE_FACTOR_IN_BEAM':'REAL','SIZE_CORRECTION_FACTOR':'REAL',
+                    # 'MEASURED_TCAL1':'REAL','MEASURED_TCAL2':'REAL','MEAS_TCAL1_CORR_FACTOR':'REAL','MEAS_TCAL2_CORR_FACTOR':'REAL',
+                    
+                    #'ATMOS_ABSORPTION_CORR':'REAL','ZA_RAD':'REAL',
+                    'TAU221':'REAL','TAU2223':'REAL',
+                    'TBATMOS221':'REAL','TBATMOS2223':'REAL',
+
+                    'NLTA':'REAL','NLTAERR':'REAL','NLMIDOFFSET':'REAL','NLS2N':'REAL', 
+                    'NLFLAG':'REAL','NLBRMS':'REAL','NLSLOPE':'REAL',
+                    'NLBASELEFT':'REAL','NLBASERIGHT':'REAL',
+                    'NLRMSB':'REAL', 'NLRMSA':'REAL',
+                    
+                    'SLTA':'REAL','SLTAERR':'REAL','SLMIDOFFSET':'REAL','SLS2N':'REAL', 
+                    'SLFLAG':'REAL','SLBRMS':'REAL','SLSLOPE':'REAL',
+                    'SLBASELEFT':'REAL','SLBASERIGHT':'REAL',
+                    'SLRMSB':'REAL', 'SLRMSA':'REAL',
+                    
+                    'OLTA':'REAL','OLTAERR':'REAL','OLMIDOFFSET':'REAL','OLS2N':'REAL',
+                    'OLFLAG':'REAL','OLBRMS':'REAL','OLSLOPE':'REAL',
+                    'OLBASELEFT':'REAL','OLBASERIGHT':'REAL',
+                    'OLRMSB':'REAL', 'OLRMSA':'REAL',
+                    'OLPC':'REAL','COLTA':'REAL','COLTAERR':'REAL',
+                    
+                    'NRTA':'REAL','NRTAERR':'REAL','NRMIDOFFSET':'REAL','NRS2N':'REAL',
+                    'NRFLAG':'REAL','NRBRMS':'REAL','NRSLOPE':'REAL',
+                    'NRBASELEFT':'REAL','NRBASERIGHT':'REAL',
+                    'NRRMSB':'REAL', 'NRRMSA':'REAL',
+
+                    'SRTA':'REAL','SRTAERR':'REAL','SRMIDOFFSET':'REAL','ASRS2N':'REAL',
+                    'SRFLAG':'REAL','SRBRMS':'REAL','SRSLOPE':'REAL',
+                    'SRBASELEFT':'REAL','SRBASERIGHT':'REAL',
+                    'SRRMSB':'REAL', 'SRRMSA':'REAL',
+
+                    'ORTA':'REAL','ORTAERR':'REAL','ORMIDOFFSET':'REAL','AORS2N':'REAL',
+                    'ORFLAG':'REAL','ORBRMS':'REAL','ORSLOPE':'REAL',
+                    'ORBASELEFT':'REAL','ORBASERIGHT':'REAL',
+                    'ORRMSB':'REAL', 'ORRMSA':'REAL',
+                    'ORPC':'REAL','CORTA':'REAL','CORTAERR':'REAL'}
+
+sbCols={'FILENAME':'TEXT','FILEPATH':'TEXT','CURDATETIME':'TEXT','MJD':'REAL','OBSDATE':'TEXT','OBSTIME':'TEXT',
+        'OBSDATETIME':'TEXT','FRONTEND':'TEXT','HDULENGTH':'INTEGER','OBJECT':'TEXT','SRC':'TEXT','OBSERVER':'TEXT',
+        'OBSLOCAL':'TEXT','OBSNAME':'TEXT','PROJNAME':'TEXT','PROPOSAL':'TEXT','TELESCOP':'TEXT','UPGRADE':'TEXT',
+        'CENTFREQ':'REAL','BANDWDTH':'REAL','LOGFREQ':'REAL','BEAMTYPE':'TEXT','HPBW':'REAL','FNBW':'REAL','SNBW':'REAL',
+        'FEEDTYPE':'TEXT','LONGITUD':'REAL','LATITUDE':'REAL','COORDSYS':'REAL','EQUINOX':'REAL','RADECSYS':'TEXT',
+        'FOCUS':'REAL','TILT':'REAL','TAMBIENT':'REAL','PRESSURE':'REAL',
+        'HUMIDITY':'REAL','WINDSPD':'REAL','SCANDIR':'TEXT',
+        'POINTING':'INTEGER','BMOFFHA':'REAL','BMOFFDEC':'REAL', 
+                    #'HABMSEP':'REAL',
+        'DICHROIC':'TEXT','PHASECAL':'TEXT','NOMTSYS':'REAL','SCANDIST':'REAL','SCANTIME':'REAL','INSTRUME':'TEXT',
+        'INSTFLAG':'TEXT','HZPERK1':'REAL','HZKERR1':'REAL','HZPERK2':'REAL','HZKERR2':'REAL',
+        'TCAL1':'REAL','TCAL2':'REAL','TSYS1':'REAL','TSYSERR1':'REAL','TSYS2':'REAL','TSYSERR2':'REAL','ELEVATION':'REAL',
+        'ZA':'REAL','HA':'REAL', 'ATMOSABS':'REAL',
+                    
+        'PWV':'REAL', 'SVP':'REAL','AVP':'REAL','DPT':'REAL','WVD':'REAL',
+                    
+                    #'SEC_Z':'REAL','X_Z':'REAL',
+                    #'DRY_ATMOS_TRANSMISSION':'REAL','ZENITH_TAU_AT_1400M':'REAL','ABSORPTION_AT_ZENITH':'REAL',
+                    
+        'OLTA':'REAL','OLTAERR':'REAL','OLMIDOFFSET':'REAL','OLS2N':'REAL',
+        'OLFLAG':'REAL','OLBRMS':'REAL','OLSLOPE':'REAL',
+        'OLBASELEFT':'REAL','OLBASERIGHT':'REAL',
+        'OLRMSB':'REAL','OLRMSA':'REAL',
+        
+        'ORTA':'REAL','ORTAERR':'REAL','ORMIDOFFSET':'REAL','ORS2N':'REAL',
+        'ORFLAG':'REAL','ORBRMS':'REAL','ORSLOPE':'REAL',
+        'ORBASELEFT':'REAL','ORBASERIGHT':'REAL',
+        'ORRMSB':'REAL','ORRMSA':'REAL'}
+                   
+def check_freqs(freq:int,log,src=''):
+    # HartRAO frequency limits: https://www.sarao.ac.za/about/hartrao/hartrao-research-programmes/hartrao-26m-radio-telescope-details/
+    # NASA limits: https://www.nasa.gov/general/what-are-the-spectrum-band-designators-and-bandwidths/
+
+
+    # 18, 13,6,4.5,3.5,2.5,1.3 cm
+    cols=[]
+    colTypes=[]
+
+    # CREATE TABLE HYDRAA_4600 (id INTEGER PRIMARY KEY AUTOINCREMENT, FILENAME TEXT UNIQUE , FILEPATH TEXT , HDULENGTH INTEGER , CURDATETIME TEXT , OBSDATE TEXT , OBSTIME TEXT , OBSDATETIME TEXT , OBJECT TEXT , LONGITUD REAL , LATITUDE REAL , COORDSYS TEXT , EQUINOX REAL , RADECSYS TEXT , OBSERVER TEXT , OBSLOCAL TEXT , PROJNAME TEXT , PROPOSAL TEXT , TELESCOP TEXT , UPGRADE TEXT , FOCUS REAL , TILT REAL , TAMBIENT REAL , PRESSURE REAL , HUMIDITY REAL , WINDSPD REAL , SCANDIR TEXT , POINTING INTEGER , FEEDTYPE TEXT , BMOFFHA REAL , BMOFFDEC REAL , HABMSEP REAL , HPBW REAL , FNBW REAL , SNBW REAL , DICHROIC TEXT , PHASECAL TEXT , NOMTSYS REAL , FRONTEND TEXT , TCAL1 REAL , TCAL2 REAL , HZPERK1 REAL , HZKERR1 REAL , HZPERK2 REAL , HZKERR2 REAL , CENTFREQ REAL , BANDWDTH REAL , INSTRUME TEXT , INSTFLAG TEXT , SCANDIST REAL , SCANTIME REAL , TSYS1 REAL , TSYSERR1 REAL , TSYS2 REAL , TSYSERR2 REAL , BEAMTYPE TEXT , LOGFREQ REAL , ELEVATION REAL , ZA REAL , MJD REAL , HA REAL , PWV REAL , SVP REAL , AVP REAL , DPT REAL , WVD REAL , SEC_Z REAL , X_Z REAL , DRY_ATMOS_TRANSMISSION REAL , ZENITH_TAU_AT_1400M REAL , ABSORPTION_AT_ZENITH REAL , OBSNAME TEXT , NLBRMS REAL , NLSLOPE REAL , ANLBASELOCS TEXT , BNLBASELOCS TEXT , ANLTA REAL , ANLTAERR REAL , BNLTA REAL , BNLTAERR REAL , ANLMIDOFFSET REAL , BNLMIDOFFSET REAL , NLFLAG INTEGER , ANLS2N REAL , BNLS2N REAL , SLBRMS REAL , SLSLOPE REAL , ASLBASELOCS TEXT , BSLBASELOCS TEXT , ASLTA REAL , ASLTAERR REAL , BSLTA REAL , BSLTAERR REAL , ASLMIDOFFSET REAL , BSLMIDOFFSET REAL , SLFLAG INTEGER , ASLS2N REAL , BSLS2N REAL , OLBRMS REAL , OLSLOPE REAL , AOLBASELOCS TEXT , BOLBASELOCS TEXT , AOLTA REAL , AOLTAERR REAL , BOLTA REAL , BOLTAERR REAL , AOLMIDOFFSET REAL , BOLMIDOFFSET REAL , OLFLAG INTEGER , AOLS2N REAL , BOLS2N REAL , NRBRMS REAL , NRSLOPE REAL , ANRBASELOCS TEXT , BNRBASELOCS TEXT , ANRTA REAL , ANRTAERR REAL , BNRTA REAL , BNRTAERR REAL , ANRMIDOFFSET REAL , BNRMIDOFFSET REAL , NRFLAG INTEGER , ANRS2N REAL , BNRS2N REAL , SRBRMS REAL , SRSLOPE REAL , ASRBASELOCS TEXT , BSRBASELOCS TEXT , ASRTA REAL , ASRTAERR REAL , BSRTA REAL , BSRTAERR REAL , ASRMIDOFFSET REAL , BSRMIDOFFSET REAL , SRFLAG INTEGER , ASRS2N REAL , BSRS2N REAL , ORBRMS REAL , ORSLOPE REAL , AORBASELOCS TEXT , BORBASELOCS TEXT , AORTA REAL , AORTAERR REAL , BORTA REAL , BORTAERR REAL , AORMIDOFFSET REAL , BORMIDOFFSET REAL , ORFLAG INTEGER , AORS2N REAL , BORS2N REAL , AOLPC REAL , ACOLTA REAL , ACOLTAERR REAL , BOLPC REAL , BCOLTA REAL , BCOLTAERR REAL , AORPC REAL , ACORTA REAL , ACORTAERR REAL , BORPC REAL , BCORTA REAL , BCORTAERR REAL , SRC TEXT )
+    if freq >= 1000 and freq<= 2000: # 1662
+        msg_wrapper('debug',log.debug,'Preparing 18cm column labels')
+        colTypes=sbCols
+
+    elif freq > 2000 and freq<= 4000: # 2280
+        msg_wrapper('debug',log.debug,'Preparing 13cm column labels')
+        colTypes=sbCols
+
+    elif freq > 4000 and freq<= 6000: # 5000
+        msg_wrapper('debug',log.debug,'Preparing 6cm column labels')
+        colTypes=dbCols
+
+    elif freq > 6000 and freq<= 8000: # 6670, maser science
+        msg_wrapper('debug',log.debug,'Preparing 4.5cm column labels')
+        colTypes=nbCols
+
+    elif freq > 8000 and freq<= 12000: # 8580
+        msg_wrapper('debug',log.debug,'Preparing 3.5cm column labels')
+        colTypes=dbCols
+
+    elif freq > 12000 and freq<= 18000: # 12180
+        msg_wrapper('debug',log.debug,'Preparing 2.5cm column labels')
+        colTypes=nbCols
+
+    elif freq >= 18000 and freq<= 27000: # 23000
+        if src.upper()=='JUPITER':
+            msg_wrapper('debug',log.debug,'Preparing 1.3cm column labels')
+            colTypes=nbCols22jup
         else:
-            pass
+            colTypes=nbCols22
 
-    # use freq and src name to create table
-    table=f'{src}_{freq}'.replace(' ','')
-    print(f'\n>>>> Working on table: {table}\n')
+    return colTypes
 
-    return src, freq, table, pathToFile
+def create_table_cols(freq:int,log,src=''):
+    # HartRAO frequency limits: https://www.sarao.ac.za/about/hartrao/hartrao-research-programmes/hartrao-26m-radio-telescope-details/
+    # NASA limits: https://www.nasa.gov/general/what-are-the-spectrum-band-designators-and-bandwidths/
+
+    # 18, 13,6,4.5,3.5,2.5,1.3 cm
+    cols=[]
+    colTypes=[]
+
+    # CREATE TABLE HYDRAA_4600 (id INTEGER PRIMARY KEY AUTOINCREMENT, FILENAME TEXT UNIQUE , FILEPATH TEXT , HDULENGTH INTEGER , CURDATETIME TEXT , OBSDATE TEXT , OBSTIME TEXT , OBSDATETIME TEXT , OBJECT TEXT , LONGITUD REAL , LATITUDE REAL , COORDSYS TEXT , EQUINOX REAL , RADECSYS TEXT , OBSERVER TEXT , OBSLOCAL TEXT , PROJNAME TEXT , PROPOSAL TEXT , TELESCOP TEXT , UPGRADE TEXT , FOCUS REAL , TILT REAL , TAMBIENT REAL , PRESSURE REAL , HUMIDITY REAL , WINDSPD REAL , SCANDIR TEXT , POINTING INTEGER , FEEDTYPE TEXT , BMOFFHA REAL , BMOFFDEC REAL , HABMSEP REAL , HPBW REAL , FNBW REAL , SNBW REAL , DICHROIC TEXT , PHASECAL TEXT , NOMTSYS REAL , FRONTEND TEXT , TCAL1 REAL , TCAL2 REAL , HZPERK1 REAL , HZKERR1 REAL , HZPERK2 REAL , HZKERR2 REAL , CENTFREQ REAL , BANDWDTH REAL , INSTRUME TEXT , INSTFLAG TEXT , SCANDIST REAL , SCANTIME REAL , TSYS1 REAL , TSYSERR1 REAL , TSYS2 REAL , TSYSERR2 REAL , BEAMTYPE TEXT , LOGFREQ REAL , ELEVATION REAL , ZA REAL , MJD REAL , HA REAL , PWV REAL , SVP REAL , AVP REAL , DPT REAL , WVD REAL , SEC_Z REAL , X_Z REAL , DRY_ATMOS_TRANSMISSION REAL , ZENITH_TAU_AT_1400M REAL , ABSORPTION_AT_ZENITH REAL , OBSNAME TEXT , NLBRMS REAL , NLSLOPE REAL , ANLBASELOCS TEXT , BNLBASELOCS TEXT , ANLTA REAL , ANLTAERR REAL , BNLTA REAL , BNLTAERR REAL , ANLMIDOFFSET REAL , BNLMIDOFFSET REAL , NLFLAG INTEGER , ANLS2N REAL , BNLS2N REAL , SLBRMS REAL , SLSLOPE REAL , ASLBASELOCS TEXT , BSLBASELOCS TEXT , ASLTA REAL , ASLTAERR REAL , BSLTA REAL , BSLTAERR REAL , ASLMIDOFFSET REAL , BSLMIDOFFSET REAL , SLFLAG INTEGER , ASLS2N REAL , BSLS2N REAL , OLBRMS REAL , OLSLOPE REAL , AOLBASELOCS TEXT , BOLBASELOCS TEXT , AOLTA REAL , AOLTAERR REAL , BOLTA REAL , BOLTAERR REAL , AOLMIDOFFSET REAL , BOLMIDOFFSET REAL , OLFLAG INTEGER , AOLS2N REAL , BOLS2N REAL , NRBRMS REAL , NRSLOPE REAL , ANRBASELOCS TEXT , BNRBASELOCS TEXT , ANRTA REAL , ANRTAERR REAL , BNRTA REAL , BNRTAERR REAL , ANRMIDOFFSET REAL , BNRMIDOFFSET REAL , NRFLAG INTEGER , ANRS2N REAL , BNRS2N REAL , SRBRMS REAL , SRSLOPE REAL , ASRBASELOCS TEXT , BSRBASELOCS TEXT , ASRTA REAL , ASRTAERR REAL , BSRTA REAL , BSRTAERR REAL , ASRMIDOFFSET REAL , BSRMIDOFFSET REAL , SRFLAG INTEGER , ASRS2N REAL , BSRS2N REAL , ORBRMS REAL , ORSLOPE REAL , AORBASELOCS TEXT , BORBASELOCS TEXT , AORTA REAL , AORTAERR REAL , BORTA REAL , BORTAERR REAL , AORMIDOFFSET REAL , BORMIDOFFSET REAL , ORFLAG INTEGER , AORS2N REAL , BORS2N REAL , AOLPC REAL , ACOLTA REAL , ACOLTAERR REAL , BOLPC REAL , BCOLTA REAL , BCOLTAERR REAL , AORPC REAL , ACORTA REAL , ACORTAERR REAL , BORPC REAL , BCORTA REAL , BCORTAERR REAL , SRC TEXT )
+    if freq >= 1000 and freq<= 2000: # 1662
+        msg_wrapper('debug',log.debug,'Preparing 18cm column labels')
+        colTypes=sbCols
+
+    elif freq > 2000 and freq<= 4000: # 2280
+        msg_wrapper('debug',log.debug,'Preparing 13cm column labels')
+        colTypes=sbCols
+
+    elif freq > 4000 and freq<= 6000: # 5000
+        msg_wrapper('debug',log.debug,'Preparing 6cm column labels')
+        colTypes=dbCols
+
+    elif freq > 6000 and freq<= 8000: # 6670, maser science
+        msg_wrapper('debug',log.debug,'Preparing 4.5cm column labels')
+        colTypes=nbCols
+
+    elif freq > 8000 and freq<= 12000: # 8580
+        msg_wrapper('debug',log.debug,'Preparing 3.5cm column labels')
+        colTypes=dbCols
+
+    elif freq > 12000 and freq<= 18000: # 12180
+        msg_wrapper('debug',log.debug,'Preparing 2.5cm column labels')
+        colTypes=nbCols
+
+    elif freq >= 18000 and freq<= 27000: # 23000
+        if src.upper()=='JUPITER':
+            msg_wrapper('debug',log.debug,'Preparing 1.3cm column labels')
+            colTypes=nbCols22jup
+        else:
+            colTypes=nbCols22
+
+    return colTypes
+
+def get_tables_from_database(dbName=__DBNAME__):
+
+    with open_database(dbName) as f:
+        # cnx = sqlite3.connect(dbName)
+        dbTables= pd.read_sql_query("SELECT name FROM sqlite_schema WHERE type='table'", f)
+        tables=list(dbTables['name'])
+        # cnx.close()
+    return tables
+
+def get_files_and_folders(dirList):
+
+    data={'files':'', 'folders':''}
     
+    if len(dirList)>0:
+        for dirItem in dirList:
+            if dirItem.endswith('.fits'):
+                data['files']+=f'{dirItem},'
+            else:
+                if '.DS_Store' in dirItem:
+                    pass
+                else:
+                    data['folders']+=f'{dirItem},'
+    
+    return data['files'].split(',')[:-1], data['folders'].split(',')[:-1]
+  
+def generate_table_name_from_path(pathToFolder):
+    try:
+        if pathToFolder.endswith('/'):
+            freq=int(pathToFolder.split('/')[-2])
+            src=pathToFolder.split('/')[-3]
+        else:
+            freq=int(pathToFolder.split('/')[-1])
+            src=pathToFolder.split('/')[-2]
+    except Exception as e:
+        print(e)
+        sys.exit()
+
+    tableName=f'{src}_{freq}'
+    return tableName.upper(),freq,src
+
 def run(args):
     """
         # TODO: update this to be more representative of whats going on here
@@ -171,9 +485,14 @@ def run(args):
             # split path into subdirectories
             src=(args.f).split('/')
 
+            # print(readFile)
+            # print(readFolder)
+
+            # sys.exit()
+
             if readFile:
 
-                print(f'\nWorking on folder: {args.f}')
+                print(f'\nWorking on file: {args.f}')
                 print('*'*50)
 
                 # check if file has been processed already
@@ -181,6 +500,9 @@ def run(args):
                 fileName: str = args.f.split('/')[-1]
                 freq: int = args.f.split('/')[-2]
                 src: str = (args.f.split('/')[-3]).upper()
+
+                # get table columns
+                myCols=create_table_cols(freq,log)
 
                 assert pathToFile.endswith('.fits'), f'The program requires a fits file to work, got: {fileName}'
                 
@@ -203,7 +525,7 @@ def run(args):
                         # check if symlink
                         isSymlink=os.path.islink(f'{pathToFile}')
                         if not isSymlink:
-                            obs=Observation(FILEPATH=pathToFile, theoFit='',autoFit='',log=log)
+                            obs=Observation(FILEPATH=pathToFile, theoFit='',autoFit='',log=log,dbCols=myCols)
                             obs.get_data()
                             del obs  
                             sys.exit()
@@ -225,19 +547,132 @@ def run(args):
                 
                 # Ok! we're reading from a folder
                 # 1. Check if there are existing files in the folder
-
                 print(f'\nWorking on folder: {args.f}')
                 print('*'*50)
 
                 # search for files
-                files = sorted(os.listdir(args.f))
-
-                # print(files)
+                dirList = sorted(os.listdir(args.f))
+                filesInDir,foldersInDir = get_files_and_folders(dirList)
+                filesInDir = sorted(filesInDir)
+                # print(filesInDir,foldersInDir)
                 # sys.exit()
-                if len(files)>0:
-                    src, freq, table, pathToFile = generate_table_name(files, args.f,log)
-                    # print(src, freq, table, pathToFile)
 
+                # process files in directory
+                # -----------------------------
+                if len(foldersInDir)==0:
+
+                    # Reading the files in the folder
+                    # --------------------------------
+
+                    # Check if table for this file exists
+                    tables = get_tables_from_database()
+                    tables=[d for d in tables if 'sqlite_sequence' not in d]
+                                
+                    tableName,freq,src = generate_table_name_from_path(args.f)
+
+                    # print(tables,tableName)
+                    # sys.exit()
+                    if tableName in tables:
+
+                        myCols=create_table_cols(freq,log,src)
+                        
+                        print('Found table\n')
+                        cnx = sqlite3.connect(__DBNAME__)
+                        tableData = pd.read_sql_query(f"SELECT * FROM {tableName}", cnx)
+                        tableFilenames=sorted(list(tableData['FILENAME']))
+                        print(tableFilenames)
+                        
+                        for file in filesInDir:
+                            if file in tableFilenames:
+                                print(f'Already processed: {file}')
+                            else:
+                                if file.endswith('.fits'):
+                                    pathToFile = os.path.join(args.f,file).replace(' ','')
+                                    # check if symlink
+                                    isSymlink=os.path.islink(f'{pathToFile}')
+                                    if not isSymlink:
+                                        print(f'Processing file: {file}')
+                                        obs=Observation(FILEPATH=pathToFile, theoFit='',autoFit='',log=log,dbCols=myCols)
+                                        obs.get_data()
+                                        del obs  
+                                        # sys.exit()
+                                    else:
+                                        print(f'File is a symlink: {file}. Stopped processing')
+                                else:
+                                    print(f'File : {file} is not a valid observing file')
+
+                        # sys.exit()
+
+                    else:
+                        print(f'Table not found, creating new table {tableName}')
+                        myCols=create_table_cols(freq,log,src)
+
+                        # Test file hasn't been processed elsewhere
+                        # search from previously processed tables if this source data 
+                        # has been previously processed.
+                        # print(freq,tables)
+                        # sys.exit()
+                        
+                        tableList=[]
+                        for table in tables:
+                            # print('---',table)
+                            # sys.exit()
+                            cnx = sqlite3.connect(__DBNAME__)
+                            tableData = pd.read_sql_query(f"SELECT * FROM {table}", cnx)
+                            cnx.close()
+                            tableFilenames=sorted(list(tableData['FILENAME']))
+                            tableList=tableList+tableFilenames
+                            # print(len(tableFilenames))
+                        # print(len(tableList))
+
+                        # sys.exit()
+                        # Loop through files
+                        for file in filesInDir:
+                            if file in tableFilenames:
+                                print(f'Already processed: {file} in table {table}')
+                            else:
+                                if file.endswith('.fits'):
+                                    pathToFile = os.path.join(args.f,file).replace(' ','')
+
+                                    # check if symlink
+                                    isSymlink=os.path.islink(f'{pathToFile}')
+
+                                    # print(pathToFile)
+                                    if not isSymlink:
+                                        obs=Observation(FILEPATH=pathToFile, theoFit='',autoFit='',log=log,dbCols=myCols)
+                                        obs.get_data()    
+                                        del obs  
+                                        # sys.exit()
+                                    else:
+                                        print(f'File is a symlink: {file}. Stopped processing')
+                
+                else:
+                    print('folders: ', foldersInDir)
+                    sys.exit()
+                    for folder in foldersInDir:
+                        path = "".join([args.f,folder]).replace(' ','')
+
+                        # print(glob(path, recursive=True),'\n')
+                        for dirpath, dirs, files in os.walk(path):
+                            for filename in files: 
+                                fname = os.path.join(dirpath,filename)  
+                                
+                                if fname.endswith('.fits'):
+
+                                    print(fname)
+                                sys.exit()
+                            print()
+                        # print(path) 
+                        # sys.exit()
+                        # for root, dirnames, filenames in os.walk(myDir):
+
+                sys.exit()
+                if len(files)>0:
+
+                    src, freq, table, pathToFile = generate_table_name(files, args.f,log)
+                    print(src, freq, table, pathToFile)
+
+                    sys.exit()
                     # check if table exists in database
                     cnx = sqlite3.connect(__DBNAME__)
                     dbTables= pd.read_sql_query("SELECT name FROM sqlite_schema WHERE type='table'", cnx)
@@ -362,6 +797,7 @@ def run(args):
                 else:
                     print('no files found')
                     sys.exit()
+
                 # print(files)
                 sys.exit()
                 # check if file ends with frequency

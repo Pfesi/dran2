@@ -24,4 +24,5 @@ dran.py
 src/_cli.py
 quickview*
 temp.html
-HART26DATA-.db
+# HART26DATA-.db
+*.db

@@ -294,8 +294,6 @@ class DriftScanData(object):
             self.__dict__['ATMOSABS']={'value':atmabs, 'description':'Atmospheric absorption'}
             self.log_multiple_entries('ATMOSABS')
 
-      
-
         elif 'D' in frontend:
             msg_wrapper("debug",self.log.debug,"Calculate zenith absorption")
 
@@ -443,17 +441,6 @@ class DriftScanData(object):
         msg_wrapper("debug", self.log.debug,
                     'Get Jupiter AU distance from calsky data or calculation')
 
-        # # Get observation date and split it
-        # year = int(self.data["OBSDATE"][:4])
-        # month = int(self.data["OBSDATE"][5:7])
-        # day = int(self.data["OBSDATE"][8:])
-
-        # ls
-        
-        # Get month of date in words
-        # myDate = datetime.date(year, month, day)
-        # myMonth=myDate.strftime("%b")
-
         # convert 1 arcsec to radians
         rad=1/206264 
 
@@ -468,13 +455,3 @@ class DriftScanData(object):
         set_dict_item(self.__dict__,"JUPITER_DIST_AU",np.nan,f'Distance to Jupiter in astronomical units')
         self.__dict__["JUPITER_DIST_AU"]['value']=JUPITER_DIST_AU
         self.log_multiple_entries('JUPITER_DIST_AU','PLANET_ANG_DIAM')
-        # print(jupDistancs, JUPITER_DIST_AU)
-        # sys.exit()
-        # Get AU distance / radius
-        # try:
-        #     # calskyRes=get_calsky_results(year)
-        #     # row=calskyRes[(calskyRes['month']==myMonth) & (calskyRes['day']==day)]
-        #     self.data["JUPITER_DIST_AU"] = row['radius'].iloc[0]
-        # except ex.ValueOutOfRangeException:
-        #     print(f"\nValueOutOfRangeException: The date {myDate} has not been accounted for, contact mantainer")
-        #     sys.exit()

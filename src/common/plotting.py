@@ -229,4 +229,3 @@ def plotDualBeamFit(x1,y1,x2,y2,x3,y3,title,plotLab1,plotLab2,plotLab3,saveTo,xl
         # plt.show()
         plt.close()
         # sys.exit()
-

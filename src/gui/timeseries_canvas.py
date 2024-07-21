@@ -17,6 +17,7 @@ import webbrowser
 import numpy as np
 import pandas as pd
 
+
 # Local imports
 # --------------------------------------------------------------------------- #
 # sys.path.append("src/")
@@ -178,6 +179,9 @@ class TimeCanvas(FigureCanvas):
         """
 
         self.data=data # drift scan data
+
+        # print(type(x))
+        # sys.exit()
 
         if len(x) == 0:
             self.clear_figure()
@@ -383,8 +387,10 @@ class TimeCanvas(FigureCanvas):
         freq=int(self.data.iloc[ind,]["CENTFREQ"])
 
         imgDir = f"plots/{obj}/{freq}"
-        plotFolderList = os.listdir(imgDir)
-        plotFolderName = self.data.iloc[ind,]["FILEPATH"]
+        print(imgDir)
+        # sys.exit()
+        # plotFolderList = os.listdir(imgDir)
+        # plotFolderName = self.data.iloc[ind,]["FILEPATH"]
         
         plotFileName = (self.data.iloc[ind,]["FILENAME"])
         plotMJD = f'{(self.data.iloc[ind,]["MJD"]):.1f}'

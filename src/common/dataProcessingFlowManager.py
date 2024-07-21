@@ -176,6 +176,7 @@ class DataProcessingFlowManager:
                 # 4. Correct baseline and Create a new data set with no drift
                 # =============================================================
                 if 'S' in self.frontend:
+                    # sys.exit()
 
                     # fit the data using a gaussian
                     # set initial parameters for data fitting
@@ -185,10 +186,14 @@ class DataProcessingFlowManager:
                     #     self.flag,  self.baseLeft, self.baseRight, self.base, self.peakLoc, \
                     #     self.lb,self.rb = 
                     saveTag=f'{saveTo}/{self.plotName}_{tag}_'
-                    ret = fit_beam(self.xCleaned, self.yCleaned, p0, self.FNBW, self.force, self.log, saveTag, self.theoFit, self.autoFit)
+                    #fit_beam(x, y, p, fnbw, force, log, saveTag, fitTheoretical, autoFit=None)
+                    # print(self.autoFit)
+                    # sys.exit()
+                    ret = fit_beam(self.xCleaned, self.yCleaned, p0, self.FNBW, self.force, self.log, saveTag, self.theoFit['value'], self.autoFit['value'])
 
                     # print(len(ret['correctedData'])>1)
-                    # print(ret.keys())
+                    print(ret.keys())
+                    # sys.exit()
                     if len(ret['correctedData'])>1:
                         if max(ret['peakModel']) < 0:
                             # self.flag=12

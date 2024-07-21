@@ -1,5 +1,5 @@
 # =========================================================================== #
-# File: calc_pss.py                                                           #
+# File: calibrate.py                                                           #
 # Author: Pfesesani V. van Zyl                                                #
 # =========================================================================== #
 
@@ -57,7 +57,7 @@ def calc_tcorr(Ta, pc, data):
 
     # print(data['FRONTEND'],data['BEAMTYPE'],data['OBJECT'])
     # sys.exit()
-
+    # print(data.columns)
     if data["FRONTEND"] == "01.3S":
         if data["OBJECT"].upper() == "JUPITER":
                 # Only applying a size correction factor and atmospheric correction to Jupiter
@@ -188,7 +188,7 @@ def calc_pc_pss(scanNum, hpsTa, errHpsTa, hpnTa, errHpnTa, onTa, errOnTa, flux,d
 
         return pss, errPss, pc, corrTa, errCorrTa, appEff
 
-def calibrate(  hpsTa, errHpsTa, hpnTa, errHpnTa, onTa, errOnTa, data, log):
+def calibrate(hpsTa, errHpsTa, hpnTa, errHpnTa, onTa, errOnTa, data, log=''):
         """
             Calculate the pointing corrected antenna temperature.
     
@@ -206,30 +206,34 @@ def calibrate(  hpsTa, errHpsTa, hpnTa, errHpnTa, onTa, errOnTa, data, log):
                 corrTa: the corrected antenna temperature 
                 errCorrTa: the error in the corrected antenna temperature
         """
-        # # Check if data has nans
+        
+        # Check if data has nans
         onTa, errOnTa = test_for_nans(onTa, errOnTa)
         hpsTa, errHpsTa = test_for_nans(hpsTa, errHpsTa)
         hpnTa, errHpnTa = test_for_nans(hpnTa, errHpnTa)
-        
+
+        # print(hpsTa, errHpsTa )
         if onTa != 0.0:
 
             #if no hpnTa
             if((hpnTa == 0) and (hpsTa != 0)):
+                # missing north
                 #pc = exp[((ln(hpsTa) - ln(Ton) + ln(2))**2)/4ln(2)]
                 #corrTa = Ton x pc
-
+                term2 = 4*np.log(2)
                 # calculate the pointing and corrected antenna temp and its error
-                pc, der1, der2 = calc_pc_eq(hpsTa, onTa)
+                pc, der1, der2 = calc_pc_eq(hpsTa, onTa,term2,'n')
                 corrTa = calc_tcorr( onTa, pc, data)
                 errCorrTa = np.sqrt((errOnTa**2)*(der2**2) + (errHpsTa**2)*(der1**2))
 
             #if no hpsTa
             elif((hpnTa != 0) and (hpsTa == 0)):
+                # missing south
                 # pc = exp[((ln(Ton) - ln(hpnTa) + ln(2))**2)/4ln(2)]
                 # corrTa = Ton x pc
-
+                term2 = 4*np.log(2)
                 # calculate the pointing and corrected antenna temp and its error
-                pc, der1, der2 = calc_pc_eq(onTa, hpnTa)
+                pc, der1, der2 = calc_pc_eq(onTa, hpnTa,term2,'s')
                 corrTa = calc_tcorr(onTa, pc, data)
                 errCorrTa = np.sqrt((errOnTa**2)*(der1**2) + (errHpnTa**2)*(der2**2))
 
@@ -273,12 +277,15 @@ def calc_pc_eq(Ta1, Ta2, term2="",pol=''):
     """
 
     if term2=="":
-        if pol=='s':
+        if pol=='n':
+            # missing north
             term1 = (np.log(abs(Ta1)) - np.log(abs(Ta2)) + np.log(2))**2
-        elif pol=='n':
+        elif pol=='s':
+            # missing south
             term1 = (np.log(abs(Ta1)) - np.log(abs(Ta2)) - np.log(2))**2
         term2 = 4*np.log(2)
     else:
+        print(Ta1,Ta2)
         term1 = (np.log(abs(Ta1)) - np.log(abs(Ta2)))**2
     term3 = term1/term2
     pc = np.exp(term3)
