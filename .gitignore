@@ -26,3 +26,10 @@ quickview*
 temp.html
 # HART26DATA-.db
 *.db
+tables/
+results/
+done/
+moveToBootes.py
+source_data.zip
+source_data/
+dran-workflow.key

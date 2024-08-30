@@ -12,6 +12,7 @@ from .calibrate import calibrate
 import pandas as pd
 import matplotlib.pyplot as plt
 from config import __DBNAME__
+import sqlite3
 
 @dataclass
 class DriftScans(DriftScanAttributes):
@@ -111,10 +112,12 @@ class DriftScans(DriftScanAttributes):
         """
         create_current_scan_directory()
 
+        
         frontend=self.__dict__['FRONTEND']['value']
         theoFit=self.__dict__['theoFit']
         autoFit=self.__dict__['autoFit']
         frq=int(self.__dict__['CENTFREQ']['value'])
+        
         
         hpbw=self.__dict__['HPBW']['value']
         fnbw=self.__dict__['FNBW']['value']
@@ -139,6 +142,8 @@ class DriftScans(DriftScanAttributes):
             # Get driftscan data
             data=DriftScanData(self.__dict__) # get the driftscan data
             
+            # print(frontend)
+            # sys.exit()
             if frontend == '13.0S' or frontend == "18.0S":
                 onOffset=self.getScanData('ON_OFFSET') #self.__dict__['ON_OFFSET']['value']
                 lcpOnScan=self.getScanData('ON_TA_LCP') #self.__dict__['ON_TA_LCP']['value']
@@ -167,6 +172,7 @@ class DriftScans(DriftScanAttributes):
             tableData={} 
 
             # print(lcpHpsScan)
+            # print(data)
             # sys.exit()
 
             if len(dataScans)==3:
@@ -388,6 +394,7 @@ class DriftScans(DriftScanAttributes):
             freq=int(tableData['CENTFREQ'])
             dbTable = f"{tableData['SRC']}_{freq}"#.replace('-','m').replace('+','p')
             dbTable=set_table_name(dbTable,self.log)
+
             try:
                 int(dbTable[0])
                 dbTable=f"_{dbTable}"
@@ -404,6 +411,17 @@ class DriftScans(DriftScanAttributes):
             # df=pd.DataFrame(tableData)
             # print(df)
 
+            # if 'S' in tableData['FRONTEND']: #=='13.0S':
+            #     tableData.pop('HABMSEP',None)
+            #     tableData.pop('SEC_Z',None)
+            #     tableData.pop('X_Z',None)
+            #     tableData.pop('DRY_ATMOS_TRANSMISSION',None)
+            #     tableData.pop('ZENITH_TAU_AT_1400M',None)
+            #     tableData.pop('ABSORPTION_AT_ZENITH',None)
+
+            # print(tableData.keys())
+            # sys.exit()
+
             finalDict={}
             for m in tableData['keys']:
                 # print('\n',m)
@@ -412,7 +430,11 @@ class DriftScans(DriftScanAttributes):
                         if m=='keys' or m=='values':
                             pass
                         else:
-                            # print(m,k)
+                            # print(m,k,v)
+                            # if tableData['FRONTEND']=='13.0S' and tableData['']:
+                            #     print(m,k,v)
+                            #     print(tableData)
+                            #     sys.exit()
                             try:
                                 # print(m,k,v['value'])
                                 finalDict[k]=v['value']
@@ -532,7 +554,7 @@ class DriftScans(DriftScanAttributes):
             for pol in pols:
                 print()
                 for tag in tags:
-                    print('\nWorking on:', tag,pol)
+                    # print('\nWorking on:', tag,pol)
                     # print(f'{tag.upper()}_{pol.upper()}')
                     # print(scanData.keys())
                     scan=scanData[f'{tag}'][pol].__dict__
@@ -597,10 +619,10 @@ class DriftScans(DriftScanAttributes):
                                         tableData[f'{beams[1]}{tg}{pol[0]}{div}midoffset'.upper()]=t
                                     
                                     elif s=='driftRms':
-                                            print('drift rms: ', f'{tg}{pol[0]}{div}BRMS'.upper(),t)
+                                            # print('drift rms: ', f'{tg}{pol[0]}{div}BRMS'.upper(),t)
                                             tableData[f'{tg}{pol[0]}{div}BRMS'.upper()]=t
                                     elif 'driftCoeffs' in s:
-                                        print('driftCoeffs: ', f'{tg}{pol[0]}{div}BRMS'.upper(),t)
+                                        # print('driftCoeffs: ', f'{tg}{pol[0]}{div}BRMS'.upper(),t)
                                         # print(f'{tg}{pol[0]}{div}SLOPE'.upper(),t[0])
 
                                         # coeff=t #.split()
@@ -668,12 +690,12 @@ class DriftScans(DriftScanAttributes):
                                 if pol=='rcp' :
                                     tg=f'{tg}R'.upper()
                                     k=k.replace('L','R')
-                                    print(k,v,tg)
+                                    # print(k,v,tg)
                                     tableData[f'{k}'.upper()]=v
                                 else:
                                     if tg in k:
                                         # print(pol,tag,k,v, 'L')
-                                        print(k,v)
+                                        # print(k,v)
                                         tableData[f'{k}'.upper()]=v
                                     else:
                                         pass
@@ -788,7 +810,7 @@ class DriftScans(DriftScanAttributes):
                     if k=='RMSA' or k=='RMSB':
                         pass
                     else:
-                        print('* ',k,': ',v)
+                        # print('* ',k,': ',v)
                         finalData[k]=v
                 # if 'RMS' in k:
                 # #     print(k)
@@ -808,7 +830,10 @@ class DriftScans(DriftScanAttributes):
             except:
                 pass
 
-            # print(f'Table: {dbTable}', freq)
+            print(f'Table: {dbTable}', freq, frq)
+            print(self.__dict__['FILEPATH']['value'])
+
+            # sys.exit()
             # dbTable=set_table_name(dbTable, self.log)
 
             # Get data to save to dictionary
@@ -817,33 +842,38 @@ class DriftScans(DriftScanAttributes):
             db= SQLiteDB(__DBNAME__,self.log)
             db.create_db()
             table=db.create_table(finalData,dbTable)
+
+            # print(table)
+
+            # if str(int(freq)) in self.__dict__['FILEPATH']['value']:
+            #     print('same freq')
             db.populate_table(finalData, table)
             db.close_db()
+            # else:
+            #     print("Frequency of source doesn't match path frequency")
+            #     # open database and match
+            #     # check if table exists in database
+            #     cnx = sqlite3.connect(__DBNAME__)
+            #     # dbTables= pd.read_sql_query("SELECT name FROM sqlite_schema WHERE type='table'", cnx)
+            #     # tables=list(dbTables['name'])
+            #     tableData = pd.read_sql_query(f"SELECT * FROM {table}", cnx)
+            #     tableFilenames=sorted(list(tableData['FILENAME']))
+
+            #     for file in tableFilenames:
+            #         if self.__dict__['FILENAME'] in file:
+            #             print('Already processed file: ',self.__dict__['FILEPATH']['value'], 'in table: ', table)
+                    # else:
+                    #     print('--')
+                        # sys.exit()
+                # print(tableFilenames, self.__dict__['FILENAME'])
+                # if '+' in tables
+                # sys.exit()
+        
+            
+            
         else:
             print(f"Unknown source frontend value : {self.__dict__[frontend]['value']}. Contact author to have it included.")
             sys.exit()
-
-    # def get_table_cols(self,frq:int):
-    #     if frq >= 4000 and frq<=9000:
-    #         cols=['id','FILENAME','FILEPATH','FRONTEND','HDULENGTH','CURDATETIME','MJD','OBSDATE','OBSTIME','OBSDATETIME',
-    #                 'OBJECT','SRC','OBSERVER','OBSLOCAL','OBSNAME','PROJNAME','PROPOSAL','TELESCOP','UPGRADE',
-    #                 'CENTFREQ','BANDWDTH','LOGFREQ','BEAMTYPE','HPBW','FNBW','SNBW','FEEDTYPE',
-    #                 'LONGITUD','LATITUDE','COORDSYS','EQUINOX','RADECSYS',
-    #                 'FOCUS','TILT','TAMBIENT','PRESSURE','HUMIDITY','WINDSPD','SCANDIR','POINTING','BMOFFHA','BMOFFDEC','HABMSEP',
-    #                 'DICHROIC','PHASECAL','NOMTSYS','SCANDIST','SCANTIME',
-    #                 'HZPERK1','HZKERR1','HZPERK2','HZKERR2','INSTRUME','INSTFLAG',
-    #                 'TCAL1','TCAL2','TSYS1','TSYSERR1','TSYS2','TSYSERR2','ELEVATION',
-    #                 'ZA','HA','PWV','SVP','AVP','DPT','WVD','SEC_Z','X_Z','DRY_ATMOS_TRANSMISSION','ZENITH_TAU_AT_1400M','ABSORPTION_AT_ZENITH',
-                    
-    #                 'ANLTA','ANLTAERR','ANLMIDOFFSET','ANLS2N','BNLTA','BNLTAERR','BNLMIDOFFSET','BNLS2N','NLFLAG','NLBRMS','NLSLOPE','ANLBASELOCS','BNLBASELOCS',
-    #                 'ASLTA','ASLTAERR','ASLMIDOFFSET','ASLS2N','BSLTA','BSLTAERR','BSLMIDOFFSET','BSLS2N','SLFLAG','SLBRMS','SLSLOPE','ASLBASELOCS','BSLBASELOCS',
-    #                 'AOLTA','AOLTAERR','AOLMIDOFFSET','AOLS2N','BOLTA','BOLTAERR','BOLMIDOFFSET','BOLS2N','OLFLAG','OLBRMS','OLSLOPE','AOLBASELOCS','BOLBASELOCS',
-    #                 'AOLPC','ACOLTA','ACOLTAERR','BOLPC','BCOLTA','BCOLTAERR',
-                    
-    #                 'ANRTA','ANRTAERR','ANRMIDOFFSET','ANRS2N','BNRTA','BNRTAERR','BNRMIDOFFSET','BNRS2N','NRFLAG','NRBRMS','NRSLOPE','ANRBASELOCS','BNRBASELOCS',
-    #                 'ASRTA','ASRTAERR','ASRMIDOFFSET','ASRS2N','BSRTA','BSRTAERR','BSRMIDOFFSET','BSRS2N','SRFLAG','SRBRMS','SRSLOPE','ASRBASELOCS','BSRBASELOCS',
-    #                 'AORTA','AORTAERR','AORMIDOFFSET','AORS2N','BORTA','BORTAERR','BORMIDOFFSET','BORS2N','ORFLAG','ORBRMS','ORSLOPE','AORBASELOCS','BORBASELOCS',
-    #                 'AORPC','ACORTA','ACORTAERR','BORPC','BCORTA','BCORTAERR']
         
     def process_data_only(self,qv='no'):
         """
@@ -857,8 +887,6 @@ class DriftScans(DriftScanAttributes):
         theoFit=self.__dict__['theoFit']
         autoFit=self.__dict__['autoFit']
         frq=int(self.__dict__['CENTFREQ']['value'])
-
-
         
         hpbw=self.__dict__['HPBW']['value']
         fnbw=self.__dict__['FNBW']['value']

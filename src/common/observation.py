@@ -53,9 +53,14 @@ class Observation:
 
         # TODO: remember to include the value and description for these items when you're done
 
+        # print('\n dbCol: ',self.dbCols)
+        # sys.exit()
         if len(self.dbCols)==0:
-            print('probably change this too')
-            sys.exit()
+            # probably gui self processing tool 
+
+            # print(self.__dict__)
+            # setup a dictionary with all the parameters pre-set  
+            
             try:
                 msg_wrapper("info",self.log.info,f"Opening file {self.FILEPATH}")
 
@@ -74,6 +79,9 @@ class Observation:
                 # TODO:  put in proper file exception handling
                 # see context manager
                 return f'{self.FILEPATH} is corrupt'
+                sys.exit()
+            
+            
         else:
             msg_wrapper('info',self.log.info,'Using predefined cols')
             
@@ -84,6 +92,9 @@ class Observation:
             self.dbCols['theoFit']={'value':self.theoFit, 'description':'Theoretical fit to be used'}
             self.dbCols['autoFit']={'value':self.autoFit, 'description':'Automated fitting to be used'}
             self.dbCols['log']=self.log
+
+            # print('--++--\n',self.dbCols)
+            # sys.exit()
 
             try:
                 msg_wrapper("info",self.log.info,f"Opening file {self.FILEPATH}")
@@ -217,8 +228,6 @@ class Observation:
         msg_wrapper("debug",self.log.debug,f"Getting data from fits file hdulist")
         msg_wrapper("debug",self.log.debug,f"Create dict object to store read parameters")
         self.__dict__['CARDS']={} #{'value':[], 'description':"Placeholder for hdu card titles or names"} # holds hdu card titles or names
-
-        # 
         
         CURDATETIME = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         msg_wrapper("info",self.log.info,f"Date and time of data processing: {CURDATETIME}")
@@ -255,7 +264,8 @@ class Observation:
         # create_current_scan_directory()
         self.create_final_plot_directory(src,freq)
         
-        
+        # print(frontend)
+        # sys.exit()
         if 'S' in (frontend):
             if '13.0S' in frontend or '18.0S' in frontend:
                 set_dict_item(self.__dict__,'BEAMTYPE',ScanType.SBW.name, 'wide single beam drift scan')
@@ -268,7 +278,6 @@ class Observation:
             # get driftscan data from file
             for k,v in self.__dict__.items():
                 if 'CENTFREQ' in k:
-                    
                     freq=int(v['value'])
                 if 'FILEPATH' in k:
                     fpath=v['value']
@@ -537,8 +546,6 @@ class Observation:
                     
                     msg_wrapper("debug",self.log.debug,f"{column}: {str(self.__dict__[f'{column}'])}")
 
-        # sys.exit()
-
     def create_final_plot_directory(self, src: str,freq: float):
         """
         Create directory where final plots will be saved. The function takes 
@@ -554,6 +561,7 @@ class Observation:
             None
         """
 
+        print(src, freq)
         self.plotDir=(f'plots/{src}/{int(freq)}').replace(' ','')
         msg_wrapper("info",self.log.debug,f"Creating directory to store processed plots: {self.plotDir}")
         try:

@@ -137,18 +137,18 @@ class SQLiteDB:
 
         sqlStmt, values = self.insert_into_table_stmt_with_pk(data, tableName)
         # for i in range(len(values)):
-        print(sqlStmt)
+        # print(sqlStmt)
         # sys.exit()
-        # print(values)
 
-        # self.c.execute(sqlStmt, values)
-        # self.commit_changes()
         try:
             self.c.execute(sqlStmt, values)
             self.commit_changes()
         except Exception as e:
             # TODO: fix this exception
             msg_wrapper('debug',self.log.debug,f"issue: {e}")
+
+            if 'UNIQUE constraint failed:' in str(e):
+                print('--',str(e))
             print(e)
             sys.exit()
             s=sqlStmt.split(' ')

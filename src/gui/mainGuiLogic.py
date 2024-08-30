@@ -720,8 +720,8 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
         # Initialize fit parameters
         self.set_fit_parmeters()
         
-        # self.filePath = self.open_file_name_dialog("*.fits")
-        self.filePath= '/Users/pfesesanivanzyl/data/Calibrators/HydraA/2280/2021d365_00h28m13s_Cont_mike_HYDRA_A.fits'
+        self.filePath = self.open_file_name_dialog("*.fits")
+        # self.filePath= '/Users/pfesesanivanzyl/data/Calibrators/HydraA/2280/2021d365_00h28m13s_Cont_mike_HYDRA_A.fits'
 
         if self.filePath == None:
             self.write("You need to select a file to open",'info')
@@ -737,7 +737,7 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
             self.drift_ui.pss_values_groupbox.setVisible(False)
 
             # Get data from file
-            self.obs=Observation(FILEPATH=self.filePath, theoFit='',autoFit='',log=self.log)
+            self.obs=Observation(FILEPATH=self.filePath, theoFit='',autoFit='',log=self.log, dbCols={})
             self.obs.get_data_only()
 
             self.data, self.scans = {},{}
@@ -1309,7 +1309,15 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
         self.orig_df=self.df # copy of df
         # try:
             
-        self.df["OBSDATE"]=pd.to_datetime(self.df["OBSDATE"],format="%Y-%m-%d")
+        
+        try:
+            self.df["OBSDATE"]=pd.to_datetime(self.df["OBSDATE"],format="%Y-%m-%d")
+        except:
+            # print(self.df['OBSDATE'])
+            self.df["OBSDATE"] = pd.to_datetime(self.df["OBSDATE"]).dt.date 
+            print(self.df['OBSDATE'])
+            # sys.exit()
+
         # except:
         #     pass
         # self.df.fillna(value=np.nan, inplace=True)
@@ -1320,6 +1328,7 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
 
         # print(self.colNames)
         # sys.exit()
+
         plotCols=[]
         for name in self.colNames:
             #'id', 'FILENAME', 'FILEPATH', 'HDULENGTH', 'CURDATETIME', 'OBSDATE', 'OBSTIME', 
@@ -1920,14 +1929,14 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
 
                     print('\n-mjd: ',mjd,'\n-file: ',FN) #date_str
                     print(f"\n-id: {self.df['id'].iloc[i]}, \n-index: {i}")
-                    print(f'\n> Setting {yCol}: {self.df.iloc[i][yCol]:.3f}, to np.nan')
+                    print(f'\n> Setting {yCol}:  {self.df.iloc[i][yCol]}, to np.nan')
                     
                     try:
                         self.df.at[i,yCol]=np.nan
                     except ValueError:
                         self.df.at[i,yCol]=0.0
 
-                    print(f'\n+ New {yCol}: {self.df.iloc[i][yCol]}')
+                    print(f'\n+ New {yCol}: {self.df.iloc[i][yCol]}\n')
                     # change plot
                     tablename = self.time_ui.comboBoxTables.currentText()
                   
@@ -1935,8 +1944,11 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
                     ycol=self.time_ui.comboBoxColsY.currentText()
 
                     #self.dbFile
-                    self.db = SQLiteDB(self.dbFile, log=self.log)
-                    self.db.create_db()
+                    # self.db = SQLiteDB(self.dbFile, log=self.log)
+                    # self.db.create_db()
+
+                    db = SQLiteDB(self.dbFile, log=self.log)
+                    db.create_db()
 
                     try:
                         # srcType=self.df['OBJECTTYPE'].iloc[i]
@@ -1953,7 +1965,7 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
                     print(list(self.df.columns))
 
                     dct['OBJECT'] = self.df['OBJECT'].iloc[i]
-                    
+
                     try:
                         dct['FRONTEND']=self.df['FRONTEND'].iloc[i]
                     except:
@@ -2164,11 +2176,16 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
                         stmt=stmt+f"{ycol}='{np.nan}', "
 
                     stmt=stmt[:-3]+f"'  WHERE FILENAME = '{FN}' ;"
-                    print(stmt,'\n')   
+                    print(stmt,'\n')  
+                    # stmt=stmt[:-3]+f"'  WHERE FILENAME = '{FN}' ;"
+                    # print(stmt) 
                     # sys.exit()
-                    self.db.c.execute(stmt)
-                    self.db.commit_changes()
-                    self.db.close_db()
+                    # self.db.c.execute(stmt)
+                    # self.db.commit_changes()
+                    # self.db.close_db()
+                    db.c.execute(stmt)
+                    db.commit_changes()
+                    db.close_db()
 
                     self.Canvas.clear_figure()
                     self.plot_cols_df()
@@ -2187,12 +2204,13 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
                     print(f"\nDeleting \n-point: {fit_points} \n-at index {click_index}")
                     #self.deleted[click_index].append([click_index, fit_points])
 
-                    print('\ndf length Before deleting: ',len(self.df))
+                    # print('\ndf length Before deleting: ',len(self.df))
 
                     xCol = self.Canvas.xlab
                     yCol = self.Canvas.ylab
 
                     print('\n','-'*30)
+
                     i=int(click_index[0]) # point index to delete
                     # find what i is in the db
                     id=self.df['id'].iloc[i]
@@ -3484,7 +3502,9 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
 
             self.df[yCol]=self.df[yCol]#.apply(self.f)
             self.df[yCol].fillna(value=np.nan, inplace=True)
+            self.df[yCol]=self.df[yCol].astype(float)
             
+            print(self.df[xCol],self.df[yCol])
             try:
                 self.df[yErr]=self.df[yErr]#.apply(self.f)
                 self.Canvas.plot_fig(self.df[xCol],self.df[yCol],xCol,yCol,data=self.df,yerr=self.df[yErr]) #,title=f"Plot of {self.df['SOURCEDIR']} obs. {self.df['FILENAME'][:8]}")#,data=self.)
@@ -5373,6 +5393,7 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
 
         plotIndex = self.get_plot_index()
 
+        print("Plot Index: ", plotIndex)
         self.reset_previous_fits(plotIndex)
 
         # Set default to base fit type

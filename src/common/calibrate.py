@@ -58,6 +58,9 @@ def calc_tcorr(Ta, pc, data):
     # print(data['FRONTEND'],data['BEAMTYPE'],data['OBJECT'])
     # sys.exit()
     # print(data.columns)
+
+    Ta= float(Ta)
+    pc=float(pc)
     if data["FRONTEND"] == "01.3S":
         if data["OBJECT"].upper() == "JUPITER":
                 # Only applying a size correction factor and atmospheric correction to Jupiter
@@ -212,6 +215,13 @@ def calibrate(hpsTa, errHpsTa, hpnTa, errHpnTa, onTa, errOnTa, data, log=''):
         hpsTa, errHpsTa = test_for_nans(hpsTa, errHpsTa)
         hpnTa, errHpnTa = test_for_nans(hpnTa, errHpnTa)
 
+        onTa=float(onTa)
+        errOnTa=float(errOnTa)
+        hpsTa=float(hpsTa)
+        errHpsTa=float(errHpsTa)
+        hpnTa=float(hpnTa)
+        errHpnTa=float(errHpnTa)
+
         # print(hpsTa, errHpsTa )
         if onTa != 0.0:
 
@@ -275,6 +285,9 @@ def calc_pc_eq(Ta1, Ta2, term2="",pol=''):
         der1: first derivative with respect to Ta1
         der2: first derivative with respect to Ta2
     """
+
+    Ta1=float(Ta1)
+    Ta2=float(Ta2)
 
     if term2=="":
         if pol=='n':

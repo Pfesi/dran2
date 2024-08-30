@@ -44,12 +44,18 @@ class DriftScanData(object):
 
         self.get_missing_params()
 
+        # print(lenhdu)
+        # sys.exit()
+
+        # print(self.__dict__)
+        # sys.exit()
+
         if(int(lenhdu)>5):
             self.get_chart_header_data(lenhdu-1)
 
         for k,v in self.__dict__['CARDS'].items():
-            # msg_wrapper("debug", self.log.debug, f'Getting driftscans from, {k}: {v}')
-            # print(k,": ",v)
+            msg_wrapper("debug", self.log.debug, f'Getting driftscans from, {k}: {v}')
+            print(k,": ",v)
             frontend='FRONTEND'
                  
             if v.endswith('_HPNZ'):
@@ -64,6 +70,8 @@ class DriftScanData(object):
                 msg_wrapper("debug", self.log.debug, "Getting driftscans from HPS header")
                 self.get_driftscans(k,'HPS')
 
+        # print(self.__dict__)
+        # sys.exit()
         msg_wrapper("debug", self.log.debug, "Calculate the derived parameters")
         self._calc_water_vapour()
 
@@ -154,7 +162,6 @@ class DriftScanData(object):
                 set_dict_item(self.__dict__,'HZPERK2',testArray,'[Hz/K] Counter calibration')
                 set_dict_item(self.__dict__,f'{tag}_TA_RCP',testArray,f'RCP scan in antenna temp (K)  in {tag} header')
 
-            
     def get_chart_header_data(self,index):
         # set missing parameters from chart header
         pass
