@@ -1,29 +1,23 @@
-# ============================================================================#
+# =========================================================================== #
 # File: _auto.py                                                              #
-# Author: Pfesesani V. van Zyl                                                #
+# Author: Pfesesani V. van Zyl      
+# Email: pfesi24@gmail.com                                                    #
 # =========================================================================== #
 
 # Standard library imports
 # --------------------------------------------------------------------------- #
 import os, sys
-# from dataclasses import dataclass, field
-# import numpy as np
-# from datetime import datetime
 import argparse
-from config import __version__, __DBNAME__ #, dbCols, nbCols, sbCols
+from config import __version__, __DBNAME__ 
 import pandas as pd
 import sqlite3
+import numpy as np
 
 # Module imports
 # --------------------------------------------------------------------------- #
-# import common.exceptions as ex
-# from common.contextManagers import open_file
-# from common.driftScans import DriftScans
-# from common.enums import ScanType
-from common.miscellaneousFunctions import set_dict_item, create_current_scan_directory, delete_logs, set_table_name,fast_scandir
+from common.miscellaneousFunctions import create_current_scan_directory, delete_logs
 from common.logConfiguration import configure_logging
 from common.msgConfiguration import msg_wrapper, load_prog
-# from common.sqlite_db import SQLiteDB
 from common.observation import Observation
 from common.contextManagers import open_database
 from common.variables import sbCols, nbCols, nbCols22, nbCols22jup, dbCols
@@ -31,6 +25,22 @@ from common.variables import sbCols, nbCols, nbCols22, nbCols22jup, dbCols
 
 # TODO: CLEAN THIS CODE, ASAP!
              
+def get_freq_band(freq:int):
+    if freq >= 1000 and freq<= 2000: 
+        return 'L'
+    elif freq > 2000 and freq<= 4000: #
+        return 'S'
+    elif freq > 4000 and freq<= 6000:
+        return 'C'
+    elif freq > 6000 and freq<= 8000:
+        return 'M' # for methanol masers
+    elif freq > 8000 and freq<= 12000: # 8580
+        return 'X'
+    elif freq > 12000 and freq<= 18000:
+        return 'Ku' 
+    elif freq >= 18000 and freq<= 27000:
+        return 'K'
+    
 def check_freqs(freq:int,log,src=''):
     # HartRAO frequency limits: https://www.sarao.ac.za/about/hartrao/hartrao-research-programmes/hartrao-26m-radio-telescope-details/
     # NASA limits: https://www.nasa.gov/general/what-are-the-spectrum-band-designators-and-bandwidths/
@@ -139,37 +149,85 @@ def get_files_and_folders(dirList):
     
     return data['files'].split(',')[:-1], data['folders'].split(',')[:-1]
   
-def generate_table_name_from_path(pathToFolder):
-
+def generate_table_name_from_path(pathToFolder:str):
+    
     # work around for old file naming convention
     splitPath = pathToFolder.split('/')
-    srcName=splitPath[-3]
+    print(splitPath)
 
-    # the path to new file naming convention should be /data/Continuum/...
-    if srcName=='Continuum' or srcName=='Calibrators':
+    # path ends with frequency
+    try:
+        if pathToFolder.endswith('/'):
+            freq=int(pathToFolder.split('/')[-2])
+            src=pathToFolder.split('/')[-3]
+        else:
+            freq=int(pathToFolder.split('/')[-1])
+            src=pathToFolder.split('/')[-2]
+    except Exception as e:
+        print('\nCould not resolve frequency from table name')
+        print('Trying old naming convention resolution')
+
         try:
             if pathToFolder.endswith('/'):
-                freq=int(pathToFolder.split('/')[-2])
-                src=pathToFolder.split('/')[-3]
+                srcTable=(splitPath[-2]).upper()
+                freq=int(srcTable.split('_')[-1])#.replace('M','').replace('P',''))
+                src=srcTable.split('_')[0]
             else:
-                freq=int(pathToFolder.split('/')[-1])
-                src=pathToFolder.split('/')[-2]
+                srcTable=(splitPath[-1]).upper()
+                freq=int(srcTable.split('_')[-1])#.replace('M','').replace('P',''))
+                src=srcTable.split('_')[0]
         except Exception as e:
-            print('\nCould not resolve frequency from table name')
+            print('\nFailed to resolve frequency from table name')
             print(e)
             sys.exit()
-    else:
-        # old file naming convention
-        srcTable=(splitPath[-2]).upper()
-        if srcName in srcTable:
-            freq=int(srcTable.split('_')[-1])
-            src=srcName
-        else:
-            print('\nCould not resolve frequency from table name')
-            sys.exit()
 
-    tableName=f'{src}_{freq}'
-    tableName=tableName.replace('-', 'M').replace('+', 'P') # convert for sqlite table name convention
+    tableName=f'{src}_{freq}'.replace('-','M').replace('+','P')
+    # print(tableName)
+    # sys.exit()
+    # srcName=splitPath[-3]
+
+    # # the path to new file naming convention should be /data/Continuum/...
+    # if srcName=='Continuum' or srcName=='Calibrators':
+    #     try:
+    #         freq=int(pathToFolder.split('/')[-1])
+    #         src=pathToFolder.split('/')[-2]
+    #     except:
+
+    #     try:
+    #         if pathToFolder.endswith('/'):
+    #             freq=int(pathToFolder.split('/')[-2])
+    #             src=pathToFolder.split('/')[-3]
+    #         else:
+    #             freq=int(pathToFolder.split('/')[-1])
+    #             src=pathToFolder.split('/')[-2]
+    #     except Exception as e:
+    #         print('\nCould not resolve frequency from table name')
+    #         print(e)
+    #         sys.exit()
+    # else:
+    #     # old file naming convention
+    #     if pathToFolder.endswith('/'):
+    #         print('here1')
+    #         srcTable=(splitPath[-2]).upper()
+    #         if srcName in srcTable:
+    #             freq=int(srcTable.split('_')[-1])
+    #             src=srcName
+    #         else:
+    #             print('\nCould not resolve frequency from table name')
+    #             sys.exit()
+    #     else:
+    #         print('here')
+    #         srcTable=(splitPath[-1]).upper()
+    #         if srcName in srcTable:
+    #             freq=int(srcTable.split('_')[-1])
+    #             src=srcName
+    #         else:
+    #             print('\nCould not resolve frequency from table name')
+    #             sys.exit()
+        
+
+    # tableName=f'{src}_{freq}'
+    # tableName=tableName.replace('-', 'M').replace('+', 'P') # convert for sqlite table name convention
     return tableName.upper(),freq,src
 
 def run(args):
@@ -335,7 +393,7 @@ def run(args):
                             print(f'File is a symlink: {args.f}. Stopped processing')
                     
             elif readFolder and args.f != "../":
-                
+
                 # Ok! we're reading from a folder
                 # 1. Check if there are existing files in the folder
                 print(f'\nWorking on folder: {args.f}')
@@ -359,9 +417,10 @@ def run(args):
                     tables = get_tables_from_database()
                     tables=[d for d in tables if 'sqlite_sequence' not in d]
                                 
-                    tableName,freq,src = generate_table_name_from_path(args.f)
+                    tableName, freq, src = generate_table_name_from_path(args.f)
 
-                    print(tables,tableName)
+                    print(tables,tableName,tableName in  tables)
+
                     # sys.exit()
                     if tableName in tables:
 
@@ -372,13 +431,14 @@ def run(args):
                         tableData = pd.read_sql_query(f"SELECT * FROM {tableName}", cnx)
                         tableFilenames=sorted(list(tableData['FILENAME']))
                         print(tableFilenames)
-                        
+                        sys.exit()
                         for file in filesInDir:
                             if file in tableFilenames:
                                 print(f'Already processed: {file}')
                             else:
                                 if file.endswith('.fits'):
                                     pathToFile = os.path.join(args.f,file).replace(' ','')
+                                    
                                     # check if symlink
                                     isSymlink=os.path.islink(f'{pathToFile}')
                                     if not isSymlink:
@@ -386,62 +446,83 @@ def run(args):
                                         obs=Observation(FILEPATH=pathToFile, theoFit='',autoFit='',log=log,dbCols=myCols)
                                         obs.get_data()
                                         del obs  
-                                        # sys.exit()
                                     else:
                                         print(f'File is a symlink: {file}. Stopped processing')
                                 else:
                                     print(f'File : {file} is not a valid observing file')
 
-                        # sys.exit()
-
                     else:
+
                         print(f'Table not found, creating new table {tableName}')
+                        # Look for similar frequency existing tables and check for overlap
+
                         myCols=create_table_cols(freq,log,src)
 
                         # Test file hasn't been processed elsewhere
                         # search from previously processed tables if this source data 
                         # has been previously processed.
-                        # print(freq,tables)
-                        # sys.exit()
                         
                         tableList=[]
-                        for table in tables:
-                            # print('---',table)
-                            # sys.exit()
-                            cnx = sqlite3.connect(__DBNAME__)
-                            tableData = pd.read_sql_query(f"SELECT * FROM {table}", cnx)
-                            cnx.close()
-                            tableFilenames=sorted(list(tableData['FILENAME']))
-                            tableList=sorted(tableList+tableFilenames)
-                            # print(len(tableFilenames))
-                        print(len(tableList))
-                        print(tableList)
+                        tableSrc=tableName.split('_')[0]
+                        tableFrq=int(tableName.split('_')[1])
+                        tbFrqBand=get_freq_band(tableFrq)
 
+                        # oldtables=[]
+                        for table in tables:
+                            if tableSrc in table:
+
+                                # print(tableSrc)
+                                tn=table.split('_')[0]
+                                tf=int(table.split('_')[1])
+                                tbNameFrqBand=get_freq_band(tf)
+                                # print(tbFrqBand,tbNameFrqBand)
+
+                                if tbFrqBand==tbNameFrqBand:
+                                    print('Found table: ',table,' similar to ',tableName)
+                                    # oldtables.append(tables)
+
+                                    cnx = sqlite3.connect(__DBNAME__)
+                                    tableData = pd.read_sql_query(f"SELECT * FROM {table}", cnx)
+                                    cnx.close()
+                                    tableFilenames=sorted(list(tableData['FILENAME']))
+                                    tableList=sorted(tableList+tableFilenames)
+
+                        print('\nitems in similar freqs tables: ',len(tableList))
+
+                        diff_list = np.setdiff1d(filesInDir,tableList)
+                        # yields the elements in `filesInDir` that are NOT in `tableList`
+
+                        print('From ',len(filesInDir),' files in filesInDir, we have ',len(diff_list),' new items')
+                        # print(tableList)
+
+                        # print (len(set(filesInDir)^set(tableList)), len(set(filesInDir)), len(set(tableList)))
+                        # print(diff_list)
                         # sys.exit()
                         # Loop through files
-                        for file in filesInDir:
-                            # print('>>> ',file)
-                            if file in tableList:
-                                print(f'Already processed: {file}')# in table {table}')
-                            else:
+
+                        if len(diff_list)>0:
+                            for file in diff_list:
+                                print(f'Processing: {file}')# in table {table}')
+                                # else:
+                                # sys.exit()
                                 if file.endswith('.fits'):
                                     pathToFile = os.path.join(args.f,file).replace(' ','')
-
-                                    # check if symlink
+                                    print(pathToFile)
+                                    # sys.exit()
+                                        # check if symlink
                                     isSymlink=os.path.islink(f'{pathToFile}')
-
-                                    # print(pathToFile)
                                     if not isSymlink:
                                         obs=Observation(FILEPATH=pathToFile, theoFit='',autoFit='',log=log,dbCols=myCols)
                                         obs.get_data()    
                                         del obs  
-                                        # sys.exit()
                                     else:
-                                        print(f'File is a symlink: {file}. Stopped processing')
-                
+                                        print(f'File is a symlink: {pathToFile}. Stopped processing')
+                        else:
+                            print('diff_list =0')
+                            sys.exit()
                 else:
                     print('folders: ', foldersInDir)
-                    # sys.exit()
+                    sys.exit()
                     for folder in foldersInDir:
                         path = "".join([f'{args.f}/',folder]).replace(' ','')
                         print(path)
