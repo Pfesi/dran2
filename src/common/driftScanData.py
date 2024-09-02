@@ -55,7 +55,7 @@ class DriftScanData(object):
 
         for k,v in self.__dict__['CARDS'].items():
             msg_wrapper("debug", self.log.debug, f'Getting driftscans from, {k}: {v}')
-            print(k,": ",v)
+            # print(k,": ",v)
             frontend='FRONTEND'
                  
             if v.endswith('_HPNZ'):

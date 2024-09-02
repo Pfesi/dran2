@@ -105,6 +105,12 @@ class DriftScans(DriftScanAttributes):
         except:
             return []
         
+    def get_scans(self, scanDict:dict, scanKey:str):
+        offset=scanDict(f'{scanKey}_OFFSET') 
+        lcp=scanDict(f'{scanKey}_TA_LCP') 
+        rcp=scanDict(f'{scanKey}_TA_RCP') 
+        return offset, lcp, rcp
+    
     def process_data(self):
         """
         Process the drift scan observations. Get observations from the files
@@ -145,23 +151,26 @@ class DriftScans(DriftScanAttributes):
             # print(frontend)
             # sys.exit()
             if frontend == '13.0S' or frontend == "18.0S":
-                onOffset=self.getScanData('ON_OFFSET') #self.__dict__['ON_OFFSET']['value']
-                lcpOnScan=self.getScanData('ON_TA_LCP') #self.__dict__['ON_TA_LCP']['value']
-                rcpOnScan=self.getScanData('ON_TA_RCP') #self.__dict__['ON_TA_RCP']['value']
-
+                # onOffset=self.getScanData('ON_OFFSET') #self.__dict__['ON_OFFSET']['value']
+                # lcpOnScan=self.getScanData('ON_TA_LCP') #self.__dict__['ON_TA_LCP']['value']
+                # rcpOnScan=self.getScanData('ON_TA_RCP') #self.__dict__['ON_TA_RCP']['value']
+                onOffset, lcpOnScan, rcpOnScan = self.get_scans(self.getScanData,'ON')
                 dataScans=[onOffset,lcpOnScan,rcpOnScan]
             else:
-                hpnOffset=self.getScanData('HPN_OFFSET') #self.__dict__['HPN_OFFSET']['value']
-                lcpHpnScan=self.getScanData('HPN_TA_LCP') #self.__dict__['HPN_TA_LCP']['value']
-                rcpHpnScan=self.getScanData('HPN_TA_RCP') #self.__dict__['HPN_TA_RCP']['value']
+                # hpnOffset=self.getScanData('HPN_OFFSET') #self.__dict__['HPN_OFFSET']['value']
+                # lcpHpnScan=self.getScanData('HPN_TA_LCP') #self.__dict__['HPN_TA_LCP']['value']
+                # rcpHpnScan=self.getScanData('HPN_TA_RCP') #self.__dict__['HPN_TA_RCP']['value']
+                hpnOffset, lcpHpnScan, rcpHpnScan = self.get_scans(self.getScanData,'HPN')
 
-                hpsOffset=self.getScanData('HPS_OFFSET') #self.__dict__['HPS_OFFSET']['value']
-                lcpHpsScan=self.getScanData('HPS_TA_LCP') #self.__dict__['HPS_TA_LCP']['value']
-                rcpHpsScan=self.getScanData('HPS_TA_RCP') #self.__dict__['HPS_TA_RCP']['value']
+                # hpsOffset=self.getScanData('HPS_OFFSET') #self.__dict__['HPS_OFFSET']['value']
+                # lcpHpsScan=self.getScanData('HPS_TA_LCP') #self.__dict__['HPS_TA_LCP']['value']
+                # rcpHpsScan=self.getScanData('HPS_TA_RCP') #self.__dict__['HPS_TA_RCP']['value']
+                hpsOffset, lcpHpsScan, rcpHpsScan = self.get_scans(self.getScanData,'HPS')
 
-                onOffset=self.getScanData('ON_OFFSET') #self.__dict__['ON_OFFSET']['value']
-                lcpOnScan=self.getScanData('ON_TA_LCP') #self.__dict__['ON_TA_LCP']['value']
-                rcpOnScan=self.getScanData('ON_TA_RCP') #self.__dict__['ON_TA_RCP']['value']
+                # onOffset=self.getScanData('ON_OFFSET') #self.__dict__['ON_OFFSET']['value']
+                # lcpOnScan=self.getScanData('ON_TA_LCP') #self.__dict__['ON_TA_LCP']['value']
+                # rcpOnScan=self.getScanData('ON_TA_RCP') #self.__dict__['ON_TA_RCP']['value']
+                onOffset, lcpOnScan, rcpOnScan = self.get_scans(self.getScanData,'ON')
 
                 dataScans=[hpnOffset,lcpHpnScan,rcpHpnScan,
                     hpsOffset,lcpHpsScan,rcpHpsScan,
