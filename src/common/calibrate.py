@@ -1,5 +1,5 @@
 # =========================================================================== #
-# File: calibrate.py                                                           #
+# File: calibrate.py                                                          #
 # Author: Pfesesani V. van Zyl                                                #
 # =========================================================================== #
 
@@ -7,10 +7,10 @@
 # --------------------------------------------------------------------------- #
 import numpy as np 
 import sys
-try:
-    from .miscellaneousFunctions import catch_zeroDivError
-except:
-    from common.miscellaneousFunctions import catch_zeroDivError
+# try:
+from .miscellaneousFunctions import catch_zeroDivError
+# except:
+# from common.miscellaneousFunctions import catch_zeroDivError
 # =========================================================================== #
 
 def calc_pss(flux, Ta, errTa):

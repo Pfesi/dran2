@@ -2,7 +2,6 @@ AUTHORS.rst
 LICENSE.txt
 README.md
 pyproject.toml
-reqs.txt
 reqs2.txt
 src/__init__.py
 src/_auto.py
@@ -33,12 +32,12 @@ src/common/sqlite_db.py
 src/common/variables.py
 src/docs/runMeToBuildDocs.py
 src/docs/source/conf.py
-src/dran2.egg-info/PKG-INFO
-src/dran2.egg-info/SOURCES.txt
-src/dran2.egg-info/dependency_links.txt
-src/dran2.egg-info/entry_points.txt
-src/dran2.egg-info/requires.txt
-src/dran2.egg-info/top_level.txt
+src/dran.egg-info/PKG-INFO
+src/dran.egg-info/SOURCES.txt
+src/dran.egg-info/dependency_links.txt
+src/dran.egg-info/entry_points.txt
+src/dran.egg-info/requires.txt
+src/dran.egg-info/top_level.txt
 src/gui/__init__.py
 src/gui/canvasManager.py
 src/gui/edit_driftscan_window.py

@@ -158,7 +158,7 @@ def generate_table_name_from_path(pathToFolder:str):
     
     # work around for old file naming convention
     splitPath = pathToFolder.split('/')
-    print(splitPath)
+    # print(splitPath)
 
     # path ends with frequency
     try:
@@ -175,11 +175,11 @@ def generate_table_name_from_path(pathToFolder:str):
         try:
             if pathToFolder.endswith('/'):
                 srcTable=(splitPath[-2]).upper()
-                freq=int(srcTable.split('_')[-1])#.replace('M','').replace('P',''))
+                freq=int(srcTable.split('_')[-1])
                 src=srcTable.split('_')[0]
             else:
                 srcTable=(splitPath[-1]).upper()
-                freq=int(srcTable.split('_')[-1])#.replace('M','').replace('P',''))
+                freq=int(srcTable.split('_')[-1])
                 src=srcTable.split('_')[0]
         except Exception as e:
             print('\nFailed to resolve frequency from table name')
@@ -187,52 +187,7 @@ def generate_table_name_from_path(pathToFolder:str):
             sys.exit()
 
     tableName=f'{src}_{freq}'.replace('-','M').replace('+','P')
-    # print(tableName)
-    # sys.exit()
-    # srcName=splitPath[-3]
 
-    # # the path to new file naming convention should be /data/Continuum/...
-    # if srcName=='Continuum' or srcName=='Calibrators':
-    #     try:
-    #         freq=int(pathToFolder.split('/')[-1])
-    #         src=pathToFolder.split('/')[-2]
-    #     except:
-
-    #     try:
-    #         if pathToFolder.endswith('/'):
-    #             freq=int(pathToFolder.split('/')[-2])
-    #             src=pathToFolder.split('/')[-3]
-    #         else:
-    #             freq=int(pathToFolder.split('/')[-1])
-    #             src=pathToFolder.split('/')[-2]
-    #     except Exception as e:
-    #         print('\nCould not resolve frequency from table name')
-    #         print(e)
-    #         sys.exit()
-    # else:
-    #     # old file naming convention
-    #     if pathToFolder.endswith('/'):
-    #         print('here1')
-    #         srcTable=(splitPath[-2]).upper()
-    #         if srcName in srcTable:
-    #             freq=int(srcTable.split('_')[-1])
-    #             src=srcName
-    #         else:
-    #             print('\nCould not resolve frequency from table name')
-    #             sys.exit()
-    #     else:
-    #         print('here')
-    #         srcTable=(splitPath[-1]).upper()
-    #         if srcName in srcTable:
-    #             freq=int(srcTable.split('_')[-1])
-    #             src=srcName
-    #         else:
-    #             print('\nCould not resolve frequency from table name')
-    #             sys.exit()
-        
-
-    # tableName=f'{src}_{freq}'
-    # tableName=tableName.replace('-', 'M').replace('+', 'P') # convert for sqlite table name convention
     return tableName.upper(),freq,src
 
 def run(args):
@@ -256,19 +211,6 @@ def run(args):
         user-configured command-line arguments.
      """
 
-    
-    # print(proc,mem0)
-    # gc.collect()
-    # mem1 = proc.memory_info().rss
-    # print(proc,mem1)
-    # # p = psutil.Process(proc.pid)
-    # # # p.terminate()  #or p.kill()
-    # # print(proc.pid,mem0)
-    # # print('\n',proc.terminate())
-    # # print(proc)
-    # print('done')
-    # sys.exit()
-    
     # initiate and configure logging
     delete_logs() # delete any previously generated logfiles
 
@@ -420,7 +362,6 @@ def run(args):
                 print('*'*50)
 
                 # search for files
-                dirList = sorted(os.listdir(args.f))
                 path=args.f
                 for dirpath, dirs, files in os.walk(path):
                     
@@ -511,18 +452,10 @@ def run(args):
                                         print('Already in list')
                             else:
                                 print(f'>>>>> File : {file} is not a valid observing file')
-                            # sys.exit()
 
                     else:
                         print(f'\nWorking on Path: {dirpath}, ({len(files)}) files')
 
-                        # paths=fast_scandir(dirpath)
-                        # print(paths)
-                        # sys.exit()
-                        # Scenario 1
-                        # If path ends with frequency
-                        # /Users/pfesesanivanzyl/data/Continuum/J2253+1608/5000
-                        # or /Users/pfesesanivanzyl/data/Continuum/J2253+1608/5000/
                         splitPath=dirpath.split('/')
                         print('\n--', splitPath,'\n')
 
@@ -566,83 +499,13 @@ def run(args):
                         tablesFromDB = get_tables_from_database()
                         DBtables=[d for d in tablesFromDB if 'sqlite_sequence' not in d]
 
-                        tableInDB = tableName in DBtables
-                        unprocessedObs=[]
-
-            #             if tableInDB:
-            #                 print(f'\nFound table in database: {tableName}')
-            #                 print('Processing tables...')
-
-            #                 # check if files have been processed already
-            #                 # Get all possible data from database similar to what 
-            #                 # is being processed.
-
-            #                 dataInDBtables=[]
-            #                 for table in DBtables:
-            #                     if src in table:
-            #                         tableEntryfreqBand=get_freq_band(int(table.split('_')[-1]))
-            #                         if tableNameFreqBand==tableEntryfreqBand:
-            #                             # print(tableEntryfreqBand,src,table)
-            #                             print(f'>> Found similar {tableEntryfreqBand}-band freq in table:',table)
-                                        
-            #                             # get data
-            #                             cnx = sqlite3.connect(__DBNAME__)
-            #                             tableData = pd.read_sql_query(f"SELECT * FROM {table}", cnx)
-            #                             tableFilenames=sorted(list(tableData['FILENAME']))
-            #                             dataInDBtables=dataInDBtables+tableFilenames
-            #                             # print(dataInDBtables)
-            #                             print('ok')
-
-                          
-            #                 # sys.exit()  
-            #                 # for file in files:   
-            #                 #     if file in tableFilenames:
-            #                 #         pass
-            #                 #     else:
-            #                 #         # print(f'>>>>> {file} not found in database tables')
-            #                 #         unprocessedObs.append(file)
-
-            #                 # print(len(tableFilenames), len(files), len(unprocessedObs))
-
-            #                 if len(unprocessedObs)>0:
-            #                     print(f'There are {len(unprocessedObs)} unprocessed observations')
-            #                     # sys.exit()
-            #                     for file in unprocessedObs:
-            #                         if file.endswith('.fits'):
-            #                             pathToFile = os.path.join(dirpath,file).replace(' ','')
-                           
-            # #                           # check if symlink
-            #                             isSymlink=os.path.islink(f'{pathToFile}')
-            #                             # print(isSymlink)
-            #                             if not isSymlink:
-            #                                 print(f'\nProcessing file: {pathToFile}')
-            #                                 # sys.exit()
-            #                                 obs=Observation(FILEPATH=pathToFile, theoFit='',autoFit='',log=log,dbCols=myCols)
-            #                                 obs.get_data()
-            #                                 del obs  
-            #                                 gc.collect()
-            #                             else:
-            #                                 print(f'File is a symlink: {pathToFile}. Stopped processing\n')
-            #                         else:
-            #                             print(f'>>>>> File : {file} is not a valid observing file')
-            #                             # sys.exit()
-            #                 else:
-            #                     print(f'Files already processed in table/s')
-            #                 # sys.exit()
-            #             else:
-            #                 print(f'\n!!!!! Table {tableName} not found in database.')
-            #                 print(f'***** Looking for similar frequency band tables in database for src: {src}')
-                        
-            #                 # check if files have been processed already
-            #                 # Get all possible data from database similar to what 
-            #                 # is being processed.
-
+                        # get processed files from the database
                         dataInDBtables=[]
                         for table in DBtables:
                             if src in table:
                                 tableEntryfreqBand=get_freq_band(int(table.split('_')[-1]))
                                 if tableNameFreqBand==tableEntryfreqBand:
-                                    # print(tableEntryfreqBand,src,table)
+
                                     print(f'>> Found similar {tableEntryfreqBand}-band freq in table:',table)
                                         
                                     # get data
@@ -650,47 +513,40 @@ def run(args):
                                     tableData = pd.read_sql_query(f"SELECT * FROM {table}", cnx)
                                     tableFilenames=sorted(list(tableData['FILENAME']))
                                     dataInDBtables=dataInDBtables+tableFilenames
-                                    # print(dataInDBtables)
-                                    print('ok')
 
-                        print(len(dataInDBtables), len(files))
-                        # sys.exit()
                         # get all files that havent processed yet
                         unprocessedObs=[]
                         for file in files:   
                             if file in dataInDBtables:
                                 pass
                             else:
-                                # print(f'>>>>> {file} not found in database tables')
                                 unprocessedObs.append(file)
 
-                        # print(unprocessedObs)
                         # process all unprossed files
                         if len(unprocessedObs)>0:
+
                             print(f'There are {len(unprocessedObs)} unprocessed observations')
-                            # sys.exit()
+
                             for file in unprocessedObs:
                                 if file.endswith('.fits'):
+
                                     pathToFile = os.path.join(dirpath,file).replace(' ','')
                            
-            #                          # check if symlink
+                                    # check if symlink
                                     isSymlink=os.path.islink(f'{pathToFile}')
-                                    # print(isSymlink)
                                     if not isSymlink:
                                         print(f'\nProcessing file: {pathToFile}')
-                                        # sys.exit()
                                         obs=Observation(FILEPATH=pathToFile, theoFit='',autoFit='',log=log,dbCols=myCols)
                                         obs.get_data()
                                         del obs  
                                         gc.collect()
+
                                     else:
                                         print(f'File is a symlink: {pathToFile}. Stopped processing\n')
                                 else:
                                     print(f'>>>>> File : {file} is not a valid observing file')
-                                    # sys.exit()
                         else:
                             print(f'Files already processed in table/s')
-                            # sys.exit()
 
     else:
         if args.db:

@@ -46,7 +46,6 @@ class Observation:
     INFOHEADER: str = field(init=False)     # summarizes the content of the opened FITS file
     
     
-
     def __post_init__(self):
         """ Open file and get file info. 
         """

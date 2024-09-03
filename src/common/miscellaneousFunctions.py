@@ -136,7 +136,7 @@ def set_table_name(src,log):
         src (str): source or table name
     """
 
-    msg=f'Fromat database atable name for {src}'
+    msg=f'Format database table name for {src}'
     msg_wrapper("debug",log.debug,msg)
 
     if '-' in src:  

@@ -1,5 +1,5 @@
 Metadata-Version: 2.1
-Name: dran2
+Name: dran
 Version: 0.0.7
 Summary: Data reduction and analysis of HartRAO 26m telescope drift scans
 Author-email: Pfesesani van Zyl <pfesi24@gmail.com>

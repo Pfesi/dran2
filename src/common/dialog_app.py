@@ -11,8 +11,8 @@ from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog
 # Local imports
 # --------------------------------------------------------------------------- #
 sys.path.append("src/")
-from common.exceptions import EmptyFolderError, EmptyFilePathError
-from common.msgConfiguration import msg_wrapper
+from .exceptions import EmptyFolderError, EmptyFilePathError
+from .msgConfiguration import msg_wrapper #COMMON.
 # =========================================================================== #
 
 

@@ -290,7 +290,7 @@ class DriftScanData(object):
             if self.__dict__['OBJECT']['value'].upper()=='JUPITER':
                 self.calibrate_jupiter_atm()
 
-        elif '13.0S' in frontend or '18.0S' in frontend or '04.5S' in frontend:
+        elif '13.0S' in frontend or '18.0S' in frontend: # or '04.5S' in frontend:
             # calculate the atmospheric absorbtion
             msg_wrapper("debug",self.log.debug,"Calculate atmospheric absorption")
 
@@ -300,6 +300,12 @@ class DriftScanData(object):
                 atmabs=0.0
             self.__dict__['ATMOSABS']={'value':atmabs, 'description':'Atmospheric absorption'}
             self.log_multiple_entries('ATMOSABS')
+
+        elif '04.5S' in frontend:
+            # TODO: Fanie to help with this
+            # Cueerently nothing in place for atmospheric calibration. Fanie to update post processing.
+
+            pass
 
         elif 'D' in frontend:
             msg_wrapper("debug",self.log.debug,"Calculate zenith absorption")
