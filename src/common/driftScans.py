@@ -124,7 +124,6 @@ class DriftScans(DriftScanAttributes):
         autoFit=self.__dict__['autoFit']
         frq=int(self.__dict__['CENTFREQ']['value'])
         
-        
         hpbw=self.__dict__['HPBW']['value']
         fnbw=self.__dict__['FNBW']['value']
         log=self.__dict__['log']
@@ -134,6 +133,7 @@ class DriftScans(DriftScanAttributes):
         src=self.__dict__['OBJECT']['value']
         src=src.replace(' ','')
         saveTo=f'plots/{src}/{int(frq)}'
+
         # print(saveTo)
         msg_wrapper("debug",self.log.debug,f"Saving plots to: {saveTo}")
         msg_wrapper("info",self.log.info,f"Getting drift scans from file")

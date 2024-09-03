@@ -303,7 +303,7 @@ class DriftScanData(object):
 
         elif '04.5S' in frontend:
             # TODO: Fanie to help with this
-            # Cueerently nothing in place for atmospheric calibration. Fanie to update post processing.
+            # Currently nothing in place for atmospheric calibration. Fanie to update post processing. (03/09/2024 calibration meeting 10:30am)
 
             pass
 

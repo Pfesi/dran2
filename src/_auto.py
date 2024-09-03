@@ -526,7 +526,7 @@ def run(args):
                         if len(unprocessedObs)>0:
 
                             print(f'There are {len(unprocessedObs)} unprocessed observations')
-
+                            # sys.exit()
                             for file in unprocessedObs:
                                 if file.endswith('.fits'):
 
@@ -619,7 +619,7 @@ def main():
     except:
         proc = psutil.Process(os.getpid())
         print('\n>>>>> Program interrupted. Terminating program.')
-        proc.terminate()
+        # proc.terminate()
 
 if __name__ == '__main__':   
 

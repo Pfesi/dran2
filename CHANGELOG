@@ -1,0 +1,5 @@
+VERSION  "0.0.8"
+- removed atmospheric calibration at 6.7 GHz. Was causing issues with the data processing pipeline.
+
+0.0.9
+- fixed problem with failure to get 

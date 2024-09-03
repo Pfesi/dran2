@@ -80,7 +80,6 @@ class Observation:
                 return f'{self.FILEPATH} is corrupt'
                 sys.exit()
             
-            
         else:
             msg_wrapper('info',self.log.info,'Using predefined cols')
             
@@ -224,6 +223,8 @@ class Observation:
         """ Get data from fits file hdu
         """
 
+        # print('get data')
+        # sys.exit()
         msg_wrapper("debug",self.log.debug,f"Getting data from fits file hdulist")
         msg_wrapper("debug",self.log.debug,f"Create dict object to store read parameters")
         self.__dict__['CARDS']={} #{'value':[], 'description':"Placeholder for hdu card titles or names"} # holds hdu card titles or names
@@ -260,11 +261,27 @@ class Observation:
         src = self.__dict__['OBJECT']['value']
         freq = self.__dict__['CENTFREQ']['value']
 
+        # print(freq,type(freq))
+        try :
+            f=int(freq)
+        except:
+
+        # if freq == np.nan:
+            print("Couldn't find frequency, creating frequency from path")
+            f=self.__dict__['FILEPATH']['value'].split('/')[-2]
+            try:
+                freq=int(f)
+            except:
+                print('Path not in valid path layout')
+                sys.exit()
+            print(f)
+            # sys.exit()
         # create_current_scan_directory()
         self.create_final_plot_directory(src,freq)
         
-        # print(frontend)
+        print(f'For frontend: {frontend}')
         # sys.exit()
+        self.__dict__['CENTFREQ']['value']=freq
         if 'S' in (frontend):
             if '13.0S' in frontend or '18.0S' in frontend:
                 set_dict_item(self.__dict__,'BEAMTYPE',ScanType.SBW.name, 'wide single beam drift scan')
