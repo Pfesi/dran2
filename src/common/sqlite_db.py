@@ -9,7 +9,11 @@ import os
 import sys
 import sqlite3
 import numpy as np
+import time
+import subprocess
+
 from dataclasses import dataclass
+# from .
 try:
     from .msgConfiguration import msg_wrapper
 except:
@@ -137,19 +141,82 @@ class SQLiteDB:
 
         sqlStmt, values = self.insert_into_table_stmt_with_pk(data, tableName)
         # for i in range(len(values)):
-        # print(sqlStmt)
+        # self.c.execute(sqlStmt, values)
         # sys.exit()
 
+        print(data)
+        print('\n')
+        print('*'*50)
+        fp=data['FILEPATH']
+        cf=int(data['CENTFREQ'])
+        sp=fp.split('/')
+        print(f'FILEPATH: {fp}')
+        print(sp[-2])
+        print(f'CENTFREQ: {cf}')
+        print(str(cf) in fp)
+        x=fp.replace(str(sp[-2]),str(cf))
+        print(x)
+        print('*'*50)
+        print('\n')
+
+        # self.c.execute(sqlStmt, values)
+
         try:
+            self.c.close()
+            self.create_db()
             self.c.execute(sqlStmt, values)
             self.commit_changes()
+            self.c.close()
+        except sqlite3.IntegrityError as e:
+            print('Already in file')
+            sys.exit()
+        except sqlite3.OperationalError as e:
+            print('SQLite operational error, skipping until I find a solution on how to handle this error')
+            # time.sleep(10)
+            # cmd=['fuser', 'HART26DATA.db']
+            # print(f'fuser HART26DATA.db')
+            # output = subprocess.Popen( cmd, stdout=subprocess.PIPE ).communicate()[0]
+            # output=subprocess.run("fuser HART26DATA.db", capture_output=True).stdout
+            # print('out: ',output)
+            # s=os.system(f'fuser HART26DATA.db')
+            pass
         except Exception as e:
             # TODO: fix this exception
+            print(e)
+
+            time.sleep(10)
+            self.c.close()
+            self.create_db()
+            self.c.execute(sqlStmt, values)
+            self.commit_changes()
+            self.c.close()
+
             msg_wrapper('debug',self.log.debug,f"issue: {e}")
 
             if 'UNIQUE constraint failed:' in str(e):
                 print('--',str(e))
-            print(e)
+                if (str(cf) in fp)==False:
+                    print('hello')
+                    # try:
+                    #     os.system(f'mv {fp} {x}')
+                    #     print(f'moved {v1} to {newpath}')
+                    #     print('Moving on\n')
+                    # except:
+                    #     print(f'Can not move {v1} to {newpath}')
+                    #     print('Closing program')
+                    #     sys.exit()
+            elif 'unable to open database file' in str(e):
+
+                assert os.path.exists(self.dbPath), "The file doesn't exist"
+                print('PAth: ',self.dbPath)
+                self.c.close()
+                self.create_db()
+                self.c.execute(sqlStmt, values)
+                print('catch me if you can')
+                print(e)
+
+            else:
+                print(e, 'out')
             sys.exit()
             s=sqlStmt.split(' ')
             v1=values[1]

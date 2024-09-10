@@ -36,14 +36,14 @@ def configure_logging(toggle="off"):
 
     # Create log file and set log levels
     logger.setLevel(logging.DEBUG) # set to info for production server
-    handler1 = logging.FileHandler(logfile, mode='w') #a
-    logger.addHandler(handler1)
+    # handler1 = logging.FileHandler(logfile, mode='w') #a
+    # logger.addHandler(handler1)
 
     # Setup the format of the file logger
     formatter = logging.Formatter(
         # "%(asctime)s - %(levelname)s: %(message)s", "%Y-%m-%d %H:%M:%S")
         "%(asctime)s: %(message)s", "%Y-%m-%d %H:%M:%S")
-    handler1.setFormatter(formatter)
+    # handler1.setFormatter(formatter)
     logger.debug("Logging initiated")
     
     configure_console_logger(toggle)

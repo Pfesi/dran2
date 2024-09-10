@@ -141,8 +141,10 @@ class DriftScans(DriftScanAttributes):
         # for k,v in self.__dict__.items():
         #     print(k,v)
         
+        # print(frontend)
         # sys.exit()
         if 'S' in frontend: 
+
             #'13.0S' or "18.0S" or '02.5S' or "04.5S" or '01.3S' :
             
             # Get driftscan data
@@ -463,6 +465,8 @@ class DriftScans(DriftScanAttributes):
             # print(finalDict)
             # print(len(tableData['keys']),len(tableData['values'][:-1]),len(finalDict))
 # 
+            # print('here')
+            # print(finalDict['FILEPATH'])
             # sys.exit()
 
             db= SQLiteDB('HART26DATA.db',self.log)
@@ -470,6 +474,8 @@ class DriftScans(DriftScanAttributes):
             table=db.create_table(finalDict,dbTable)
             db.populate_table(finalDict, table)
             db.close_db()
+
+            # print(finalDict['FILEPATH'])
             # sys.exit()
             # sys.exit()
    

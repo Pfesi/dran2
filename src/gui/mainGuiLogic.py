@@ -1221,7 +1221,7 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
             
             # populate columns
             self.dbName=self.dbFile.split('/')[-1]
-            self.tables=self.db.get_table_names(self.dbName)
+            self.tables=sorted(self.db.get_table_names(self.dbName))
             # self.time_ui.comboBoxTables.
             # print(self.tables)
             # sys.exit()
@@ -1249,6 +1249,7 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
         self.db = SQLiteDB(dbPath=self.dbFile, log=self.log)
         self.db.create_db()
         self.db.close_db()
+
         # get column names from currently selected table
         self.table = self.time_ui.comboBoxTables.currentText()
         # print('Reading table: ', self.table)
@@ -1550,7 +1551,8 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
 
                 # converting to date
                 res = datetime.strptime(year + "-" + day, "%Y-%j").strftime("%Y-%m-%d")
-                # print(res)
+                print(res)
+                sys.exit()
 
                 # id=int(t['id'].iloc[i])
                 # print(id)
@@ -1564,7 +1566,8 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
 
             # self.df[yCol].fillna(value=np.nan, inplace=True)
            
-            
+            # print(self.df)
+            # sys.exit() 
             self.Canvas.plot_fig(self.df[xCol],self.df[yCol],xCol,yCol,data=self.df,yerr=yerr) #,data=self.)
             # sys.exit()
             

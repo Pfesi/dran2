@@ -95,6 +95,7 @@ def create_table_cols(freq:int,log,src=''):
     cols=[]
     colTypes=[]
 
+    
     # CREATE TABLE HYDRAA_4600 (id INTEGER PRIMARY KEY AUTOINCREMENT, FILENAME TEXT UNIQUE , FILEPATH TEXT , HDULENGTH INTEGER , CURDATETIME TEXT , OBSDATE TEXT , OBSTIME TEXT , OBSDATETIME TEXT , OBJECT TEXT , LONGITUD REAL , LATITUDE REAL , COORDSYS TEXT , EQUINOX REAL , RADECSYS TEXT , OBSERVER TEXT , OBSLOCAL TEXT , PROJNAME TEXT , PROPOSAL TEXT , TELESCOP TEXT , UPGRADE TEXT , FOCUS REAL , TILT REAL , TAMBIENT REAL , PRESSURE REAL , HUMIDITY REAL , WINDSPD REAL , SCANDIR TEXT , POINTING INTEGER , FEEDTYPE TEXT , BMOFFHA REAL , BMOFFDEC REAL , HABMSEP REAL , HPBW REAL , FNBW REAL , SNBW REAL , DICHROIC TEXT , PHASECAL TEXT , NOMTSYS REAL , FRONTEND TEXT , TCAL1 REAL , TCAL2 REAL , HZPERK1 REAL , HZKERR1 REAL , HZPERK2 REAL , HZKERR2 REAL , CENTFREQ REAL , BANDWDTH REAL , INSTRUME TEXT , INSTFLAG TEXT , SCANDIST REAL , SCANTIME REAL , TSYS1 REAL , TSYSERR1 REAL , TSYS2 REAL , TSYSERR2 REAL , BEAMTYPE TEXT , LOGFREQ REAL , ELEVATION REAL , ZA REAL , MJD REAL , HA REAL , PWV REAL , SVP REAL , AVP REAL , DPT REAL , WVD REAL , SEC_Z REAL , X_Z REAL , DRY_ATMOS_TRANSMISSION REAL , ZENITH_TAU_AT_1400M REAL , ABSORPTION_AT_ZENITH REAL , OBSNAME TEXT , NLBRMS REAL , NLSLOPE REAL , ANLBASELOCS TEXT , BNLBASELOCS TEXT , ANLTA REAL , ANLTAERR REAL , BNLTA REAL , BNLTAERR REAL , ANLMIDOFFSET REAL , BNLMIDOFFSET REAL , NLFLAG INTEGER , ANLS2N REAL , BNLS2N REAL , SLBRMS REAL , SLSLOPE REAL , ASLBASELOCS TEXT , BSLBASELOCS TEXT , ASLTA REAL , ASLTAERR REAL , BSLTA REAL , BSLTAERR REAL , ASLMIDOFFSET REAL , BSLMIDOFFSET REAL , SLFLAG INTEGER , ASLS2N REAL , BSLS2N REAL , OLBRMS REAL , OLSLOPE REAL , AOLBASELOCS TEXT , BOLBASELOCS TEXT , AOLTA REAL , AOLTAERR REAL , BOLTA REAL , BOLTAERR REAL , AOLMIDOFFSET REAL , BOLMIDOFFSET REAL , OLFLAG INTEGER , AOLS2N REAL , BOLS2N REAL , NRBRMS REAL , NRSLOPE REAL , ANRBASELOCS TEXT , BNRBASELOCS TEXT , ANRTA REAL , ANRTAERR REAL , BNRTA REAL , BNRTAERR REAL , ANRMIDOFFSET REAL , BNRMIDOFFSET REAL , NRFLAG INTEGER , ANRS2N REAL , BNRS2N REAL , SRBRMS REAL , SRSLOPE REAL , ASRBASELOCS TEXT , BSRBASELOCS TEXT , ASRTA REAL , ASRTAERR REAL , BSRTA REAL , BSRTAERR REAL , ASRMIDOFFSET REAL , BSRMIDOFFSET REAL , SRFLAG INTEGER , ASRS2N REAL , BSRS2N REAL , ORBRMS REAL , ORSLOPE REAL , AORBASELOCS TEXT , BORBASELOCS TEXT , AORTA REAL , AORTAERR REAL , BORTA REAL , BORTAERR REAL , AORMIDOFFSET REAL , BORMIDOFFSET REAL , ORFLAG INTEGER , AORS2N REAL , BORS2N REAL , AOLPC REAL , ACOLTA REAL , ACOLTAERR REAL , BOLPC REAL , BCOLTA REAL , BCOLTAERR REAL , AORPC REAL , ACORTA REAL , ACORTAERR REAL , BORPC REAL , BCORTA REAL , BCORTAERR REAL , SRC TEXT )
     if freq >= 1000 and freq<= 2000: # 1662
         msg_wrapper('debug',log.debug,'Preparing 18cm column labels')
@@ -311,7 +312,7 @@ def run(args):
                 src: str = (args.f.split('/')[-3]).upper()
 
                 # get table columns
-                myCols=create_table_cols(freq,log)
+                myCols=create_table_cols(int(freq),log)
 
                 assert pathToFile.endswith('.fits'), f'The program requires a fits file to work, got: {fileName}'
                 
@@ -320,15 +321,49 @@ def run(args):
                 # check if table exists in database
                 cnx = sqlite3.connect(__DBNAME__)
                 dbTables= pd.read_sql_query("SELECT name FROM sqlite_schema WHERE type='table'", cnx)
-                tables=list(dbTables['name'])
+                tables=sorted(list(dbTables['name']))
 
-                if table in tables:
-                    tableData = pd.read_sql_query(f"SELECT * FROM {table}", cnx)
-                    tableFilenames=sorted(list(tableData['FILENAME']))
-                    if fileName in tableFilenames:
-                        print(f'Already processed: {fileName}')
-                        sys.exit()
-                    else:
+                print(tables)
+                print(table)
+                
+                tableSrc=src.replace('-','M').replace('+','P')
+                tableNameBand=get_freq_band(int(freq))
+                
+                # Check if data has been processed as something else:
+                tfns=[] # table file names
+                tbn=[] # table names
+
+                for tb in tables:
+                    
+                    if tableSrc in tb:
+                        
+                        b=get_freq_band(int(tb.split('_')[-1]))
+                        # 
+                        if b==tableNameBand:
+                            # print(tb,table,tableNameBand,tableSrc,b)
+                            print(tb,table,tableSrc, tableSrc in tb,b,tableNameBand)
+                #                                 # sys.exit()
+                #                                 # get data
+                            cnx = sqlite3.connect(__DBNAME__)
+                            tableData = pd.read_sql_query(f"SELECT * FROM {tb}", cnx)
+                            tableFilenames=sorted(list(tableData['FILENAME']))
+                                                # print(tableFilenames)
+                            tfns=tfns+tableFilenames
+                            tbn.append(tb)
+
+                #                     # print(tfns)
+                # diff_list = np.setdiff1d(tfns,files)
+
+                # if (fileName in tfns):
+                    
+                # sys.exit()
+                # if table in tables:
+                #     tableData = pd.read_sql_query(f"SELECT * FROM {table}", cnx)
+                #     tableFilenames=sorted(list(tableData['FILENAME']))
+                if fileName in tfns:
+                    print(f'Already processed: {pathToFile}')
+                    # sys.exit()
+                else:
                         print(f'Processing file: {pathToFile}')
 
                         # check if symlink
@@ -341,18 +376,18 @@ def run(args):
                             sys.exit()
                         else:
                             print(f'File is a symlink: {args.f}. Stopped processing')
-                else:
-                    # check if symlink
-                        isSymlink=os.path.islink(f'{pathToFile}')
-                        if not isSymlink:
-                            print(f'Processing file: {pathToFile}')
-                            obs=Observation(FILEPATH=pathToFile, theoFit='',autoFit='',log=log)
-                            obs.get_data()
-                            del obs  
-                            gc.collect()
-                            sys.exit()
-                        else:
-                            print(f'File is a symlink: {args.f}. Stopped processing')
+                # else:
+                #     # check if symlink
+                #         isSymlink=os.path.islink(f'{pathToFile}')
+                #         if not isSymlink:
+                #             print(f'Processing file: {pathToFile}')
+                #             obs=Observation(FILEPATH=pathToFile, theoFit='',autoFit='',log=log)
+                #             obs.get_data()
+                #             del obs  
+                #             gc.collect()
+                #             sys.exit()
+                #         else:
+                #             print(f'File is a symlink: {args.f}. Stopped processing')
                     
             elif readFolder and args.f != "../":
 
@@ -398,13 +433,13 @@ def run(args):
 
                                 if tableName in tables:
                                     print(tableName,' in ', tables, '1')
-                                    sys.exit()
+                                    # sys.exit()
                                 else:
                                     # check if files have been processed already
                                     # Get all possible data from database similar to what 
                                     # is being processed.
                                     tableSrc=src.replace('-','M').replace('+','P')
-                                    tableNameBand=get_freq_band(freq)
+                                    tableNameBand=get_freq_band(int(freq))
 
                                     # print(tableSrc,tableNameBand,tableName)
 
@@ -486,7 +521,7 @@ def run(args):
                                 # sys.exit()
 
                         tableName=f'{src}_{freq}'.replace('-','M').replace('+','P')
-                        tableNameFreqBand=get_freq_band(freq)
+                        tableNameFreqBand=get_freq_band(int(freq))
 
                         myCols=create_table_cols(freq,log,src)
 
@@ -525,8 +560,10 @@ def run(args):
                         # process all unprossed files
                         if len(unprocessedObs)>0:
 
+                            unprocessedObs=sorted(unprocessedObs)
                             print(f'There are {len(unprocessedObs)} unprocessed observations')
                             # sys.exit()
+
                             for file in unprocessedObs:
                                 if file.endswith('.fits'):
 
@@ -614,22 +651,23 @@ def main():
     parser.set_defaults(func=run)
     args = parser.parse_args()
 
-    try:
-        args.func(args)
-    except:
-        proc = psutil.Process(os.getpid())
-        print('\n>>>>> Program interrupted. Terminating program.')
-        # proc.terminate()
+    args.func(args)
+    # try:
+    #     args.func(args)
+    # except:
+    #     proc = psutil.Process(os.getpid())
+    #     print('\n>>>>> Program interrupted. Terminating program.')
+    #     # proc.terminate()
 
 if __name__ == '__main__':   
 
     proc = psutil.Process(os.getpid())
+    main()
+    # try:
+    #     main()
+    # except KeyboardInterrupt:
+    #     print('\n>>>>> Program interrupted. Terminating program.')
 
-    try:
-        main()
-    except KeyboardInterrupt:
-        print('\n>>>>> Program interrupted. Terminating program.')
-
-    proc.terminate()
+    # proc.terminate()
 
 

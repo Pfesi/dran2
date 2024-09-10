@@ -26,6 +26,23 @@ from common.msgConfiguration import msg_wrapper, load_prog
 from common.sqlite_db import SQLiteDB
 # =========================================================================== #
 
+def get_freq_band2(freq:int):
+    if freq >= 1000 and freq<= 2000: 
+        return 'L', '18.0S'
+    elif freq > 2000 and freq<= 4000: #
+        return 'S', '13.0S'
+    elif freq > 4000 and freq<= 6000:
+        return 'C', '05.0D'
+    elif freq > 6000 and freq<= 8000:
+        # TODO: get correct frequency band for masers - ask Fanie vdHeever
+        return 'M', '04.5S'# for methanol masers
+    elif freq > 8000 and freq<= 12000: # 8580
+        return 'X', '03.5D'
+    elif freq > 12000 and freq<= 18000:
+        return 'Ku', '02.5S'
+    elif freq >= 18000 and freq<= 27000:
+        return 'K', '01.3S'
+    
 @dataclass
 class Observation:
     """
@@ -262,6 +279,10 @@ class Observation:
         freq = self.__dict__['CENTFREQ']['value']
 
         # print(freq,type(freq))
+        if str(freq)=="nan":
+            print('Fronend is nan')
+            freq='nans'
+
         try :
             f=int(freq)
         except:
@@ -271,10 +292,17 @@ class Observation:
             f=self.__dict__['FILEPATH']['value'].split('/')[-2]
             try:
                 freq=int(f)
+                print(freq)
+                # if freq>= and freq<= :
+                band,frontend=get_freq_band2(freq)
+                print(f'Freq: {freq}, band: {band}, frontend: {frontend}')
+                self.__dict__['FRONTEND']['value']=frontend
+                # sys.exit()
             except:
                 print('Path not in valid path layout')
                 sys.exit()
             print(f)
+
             # sys.exit()
         # create_current_scan_directory()
         self.create_final_plot_directory(src,freq)
@@ -283,6 +311,7 @@ class Observation:
         # sys.exit()
         self.__dict__['CENTFREQ']['value']=freq
         if 'S' in (frontend):
+
             if '13.0S' in frontend or '18.0S' in frontend:
                 set_dict_item(self.__dict__,'BEAMTYPE',ScanType.SBW.name, 'wide single beam drift scan')
             elif '02.5S' in frontend or '04.5S' in frontend or '01.3S' in frontend:
@@ -304,6 +333,9 @@ class Observation:
             else:
                 print('Frequency and path dont match')
                 print(fpath,freq)
+
+                # check if source has been processed    
+                
                 # create required table
 
                 

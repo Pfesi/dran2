@@ -5,15 +5,18 @@
 
 # Standard library imports
 # --------------------------------------------------------------------------- #
-import numpy as np 
-import sys
+
 # try:
 from .miscellaneousFunctions import catch_zeroDivError
 # except:
-# from common.miscellaneousFunctions import catch_zeroDivError
+    # from common.miscellaneousFunctions import catch_zeroDivError
+
+import numpy as np 
+import sys
+
 # =========================================================================== #
 
-def calc_pss(flux, Ta, errTa):
+def calc_pss(flux:float, Ta:float, errTa:float):
     """
         Calculate the Point source sensitivity (PSS)
         and its error for data with no pointing correction

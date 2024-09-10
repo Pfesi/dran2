@@ -212,9 +212,26 @@ class TimeCanvas(FigureCanvas):
                 # self.ax.errorbar(self.x, self.y, yerr,fmt=col, label="data", picker=5)
 
             self.setLabels(self.ax, xlab, ylab, title)
+            # self.ax.tick_params(axis='x',labelrotation=45)
+
+            ## Added code here
+            import matplotlib.dates as mdates ## Import required library
+            
+            if len(self.y) <=30:
+                pass
+            else:
+                months = mdates.MonthLocator(interval=1, bymonthday=-1)  ## 1 month apart & show last date
+                self.ax.xaxis.set_major_locator(months) ## Set months as major locator
+            self.ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d')) ##Display format - update here to change
+            self.ax.tick_params(axis='x',labelrotation=20) ##Adjust angle and horizontal align right
+            # plt.show()
+
             connection_id_0=self.mpl_connect('pick_event', self.onpick)
             connection_id = self.mpl_connect('button_press_event', self.onclick)
             #self.mpl_connect('pick_event', self.onpick)
+
+            # rotate ticks
+
             self.draw()
         self.draw()
 

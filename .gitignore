@@ -24,10 +24,9 @@ dran.py
 src/_cli.py
 quickview*
 temp.html
-# HART26DATA-.db
 *.db
 tables/
-results/
+results*
 done/
 moveToBootes.py
 source_data.zip
