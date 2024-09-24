@@ -61,6 +61,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../extras/tuts/tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../extras/commands.html">Commands</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Resources:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/radio_sources.html">Radio sources</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">Guidelines:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../extras/changelog.html">Changelog</a></li>
@@ -890,8 +894,8 @@
         <span class="c1"># Initialize fit parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_fit_parmeters</span><span class="p">()</span>
         
-        <span class="c1"># self.filePath = self.open_file_name_dialog(&quot;*.fits&quot;)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">filePath</span><span class="o">=</span> <span class="s1">&#39;/Users/pfesesanivanzyl/data/Calibrators/HydraA/2280/2021d365_00h28m13s_Cont_mike_HYDRA_A.fits&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filePath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_file_name_dialog</span><span class="p">(</span><span class="s2">&quot;*.fits&quot;</span><span class="p">)</span>
+        <span class="c1"># self.filePath= &#39;/Users/pfesesanivanzyl/data/Calibrators/HydraA/2280/2021d365_00h28m13s_Cont_mike_HYDRA_A.fits&#39;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filePath</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;You need to select a file to open&quot;</span><span class="p">,</span><span class="s1">&#39;info&#39;</span><span class="p">)</span>
@@ -907,7 +911,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">drift_ui</span><span class="o">.</span><span class="n">pss_values_groupbox</span><span class="o">.</span><span class="n">setVisible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 
             <span class="c1"># Get data from file</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">obs</span><span class="o">=</span><span class="n">Observation</span><span class="p">(</span><span class="n">FILEPATH</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filePath</span><span class="p">,</span> <span class="n">theoFit</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="n">autoFit</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="n">log</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obs</span><span class="o">=</span><span class="n">Observation</span><span class="p">(</span><span class="n">FILEPATH</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filePath</span><span class="p">,</span> <span class="n">theoFit</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="n">autoFit</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="n">log</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">,</span> <span class="n">dbCols</span><span class="o">=</span><span class="p">{})</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">get_data_only</span><span class="p">()</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scans</span> <span class="o">=</span> <span class="p">{},{}</span>
@@ -1271,7 +1275,6 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">iter_dict</span><span class="p">(</span><span class="s2">&quot;AORTA&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span></div>
 
             
-
     <span class="c1"># def iter_dict(self, filter_key1, filter_key2=&quot;&quot;):</span>
     <span class="c1">#     &quot;&quot;&quot;</span>
     <span class="c1">#     Dictionary iterator to extract current fit information</span>
@@ -1386,7 +1389,9 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Open the database. &quot;&quot;&quot;</span>
 
         <span class="c1"># get db file</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dbFile</span> <span class="o">=</span> <span class="s1">&#39;/Users/pfesesanivanzyl/dran/HART26DATA.db&#39;</span> <span class="c1">#&#39;/Users/pfesesanivanzyl/software/working/HartSoftware/dran/CALDB.db&#39; #self.open_file_name_dialog(&quot;*.db&quot;)</span>
+        <span class="c1"># self.dbFile = &#39;/Users/pfesesanivanzyl/dran/HART26DATA.db&#39; </span>
+        <span class="c1"># self.dbFile = &#39;/Users/pfesesanivanzyl/software/working/HartSoftware/dran/CALDB.db&#39; </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dbFile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_file_name_dialog</span><span class="p">(</span><span class="s2">&quot;*.db&quot;</span><span class="p">)</span>
         <span class="c1"># get db file</span>
         <span class="c1"># self.dbFile = self.open_file_name_dialog(&quot;*.db&quot;)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbFile</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
@@ -1402,7 +1407,7 @@
             
             <span class="c1"># populate columns</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dbName</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dbFile</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_table_names</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dbName</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="o">=</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_table_names</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dbName</span><span class="p">))</span>
             <span class="c1"># self.time_ui.comboBoxTables.</span>
             <span class="c1"># print(self.tables)</span>
             <span class="c1"># sys.exit()</span>
@@ -1436,6 +1441,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">SQLiteDB</span><span class="p">(</span><span class="n">dbPath</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dbFile</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">create_db</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">close_db</span><span class="p">()</span>
+
         <span class="c1"># get column names from currently selected table</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_ui</span><span class="o">.</span><span class="n">comboBoxTables</span><span class="o">.</span><span class="n">currentText</span><span class="p">()</span>
         <span class="c1"># print(&#39;Reading table: &#39;, self.table)</span>
@@ -1494,7 +1500,20 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rows</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">colNames</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;FILENAME&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">orig_df</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="c1"># copy of df</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;OBSDATE&quot;</span><span class="p">]</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;OBSDATE&quot;</span><span class="p">],</span><span class="nb">format</span><span class="o">=</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># try:</span>
+            
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;OBSDATE&quot;</span><span class="p">]</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;OBSDATE&quot;</span><span class="p">],</span><span class="nb">format</span><span class="o">=</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="c1"># print(self.df[&#39;OBSDATE&#39;])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;OBSDATE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;OBSDATE&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">date</span> 
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;OBSDATE&#39;</span><span class="p">])</span>
+            <span class="c1"># sys.exit()</span>
+
+        <span class="c1"># except:</span>
+        <span class="c1">#     pass</span>
+        <span class="c1"># self.df.fillna(value=np.nan, inplace=True)</span>
 
         <span class="c1"># self.time_ui.comboBoxColsX.clear()</span>
         <span class="c1"># self.time_ui.comboBoxColsY.clear()</span>
@@ -1502,6 +1521,7 @@
 
         <span class="c1"># print(self.colNames)</span>
         <span class="c1"># sys.exit()</span>
+
         <span class="n">plotCols</span><span class="o">=</span><span class="p">[]</span>
         <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">colNames</span><span class="p">:</span>
             <span class="c1">#&#39;id&#39;, &#39;FILENAME&#39;, &#39;FILEPATH&#39;, &#39;HDULENGTH&#39;, &#39;CURDATETIME&#39;, &#39;OBSDATE&#39;, &#39;OBSTIME&#39;, </span>
@@ -1536,8 +1556,11 @@
 
         <span class="n">errcols</span><span class="o">=</span><span class="p">[]</span>
         <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">colNames</span><span class="p">:</span>
-            <span class="k">if</span>   <span class="s1">&#39;ERR&#39;</span> <span class="ow">in</span> <span class="n">name</span> <span class="p">:</span> <span class="c1">#&#39;LD&#39; in name or &#39;RD&#39; in name or or &#39;DS&#39; in name or &#39;DN&#39; in name or &#39;DO&#39; in name or &#39;DF&#39; in name or &#39;DC&#39; in name</span>
-                <span class="n">errcols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span>   <span class="s1">&#39;ERR&#39;</span> <span class="ow">in</span> <span class="n">name</span> <span class="ow">or</span> <span class="s1">&#39;LD&#39;</span> <span class="ow">in</span> <span class="n">name</span> <span class="ow">or</span> <span class="s1">&#39;RD&#39;</span> <span class="ow">in</span> <span class="n">name</span> <span class="ow">or</span> <span class="s1">&#39;DS&#39;</span> <span class="ow">in</span> <span class="n">name</span> <span class="ow">or</span> <span class="s1">&#39;DN&#39;</span> <span class="ow">in</span> <span class="n">name</span> <span class="ow">or</span> <span class="s1">&#39;DO&#39;</span> <span class="ow">in</span> <span class="n">name</span> <span class="ow">or</span> <span class="s1">&#39;DF&#39;</span> <span class="ow">in</span> <span class="n">name</span> <span class="ow">or</span> <span class="s1">&#39;DC&#39;</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;WINDSPD&#39;</span> <span class="ow">in</span> <span class="n">name</span> <span class="ow">or</span> <span class="s1">&#39;ADOPTED&#39;</span> <span class="ow">in</span> <span class="n">name</span> <span class="ow">or</span> <span class="s1">&#39;DATE&#39;</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">errcols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">pass</span>
 
@@ -1674,9 +1697,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_rows_of_cols</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">colNames</span><span class="p">)</span>
 
         <span class="c1"># sys.exit()</span>
+        <span class="c1"># print([d for d in self.colNames if &#39;DTA&#39; in d].replace(&#39;DTA&#39;,&#39;ERRTA&#39;))</span>
+        <span class="c1"># sys.exit()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rows</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">colNames</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;FILENAME&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;OBSDATE&quot;</span><span class="p">]</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;OBSDATE&quot;</span><span class="p">],</span><span class="nb">format</span><span class="o">=</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;OBSDATE&quot;</span><span class="p">]</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;OBSDATE&quot;</span><span class="p">],</span><span class="nb">format</span><span class="o">=</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
 
         <span class="c1"># get col names</span>
         <span class="k">if</span> <span class="n">xcol</span><span class="o">!=</span><span class="s2">&quot;&quot;</span> <span class="ow">and</span> <span class="n">ycol</span><span class="o">!=</span><span class="s2">&quot;&quot;</span> <span class="ow">and</span> <span class="n">yerr</span><span class="o">!=</span><span class="s2">&quot;&quot;</span><span class="p">:</span>
@@ -1729,7 +1758,8 @@
 
                 <span class="c1"># converting to date</span>
                 <span class="n">res</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">year</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="n">day</span><span class="p">,</span> <span class="s2">&quot;%Y-%j&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="c1"># print(res)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
 
                 <span class="c1"># id=int(t[&#39;id&#39;].iloc[i])</span>
                 <span class="c1"># print(id)</span>
@@ -1738,12 +1768,19 @@
             <span class="c1"># print(t[[&#39;id&#39;,&#39;FILENAME&#39;,&#39;OBSDATE&#39;]])</span>
 
             <span class="c1">#TODO: clean this up</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">xCol</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">xCol</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">NaT</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="c1"># self.df[xCol].fillna(value=0, inplace=True)</span>
+            <span class="c1"># self.df[xCol].fillna(value=pd.NaT, inplace=True)</span>
 
             <span class="c1"># self.df[yCol].fillna(value=np.nan, inplace=True)</span>
            
-            
+            <span class="c1"># print(self.df)</span>
+            <span class="c1"># sys.exit() </span>
+
+            <span class="k">if</span> <span class="n">xCol</span> <span class="o">==</span> <span class="s1">&#39;OBSDATE&#39;</span><span class="p">:</span>
+                <span class="c1"># convert to datetime</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">xCol</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">xCol</span><span class="p">])</span><span class="c1">#, errors=&#39;coerce&#39;)</span>
+                <span class="c1"># print(self.df[xCol])</span>
+                <span class="c1"># sys.exit()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">Canvas</span><span class="o">.</span><span class="n">plot_fig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">xCol</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">yCol</span><span class="p">],</span><span class="n">xCol</span><span class="p">,</span><span class="n">yCol</span><span class="p">,</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">,</span><span class="n">yerr</span><span class="o">=</span><span class="n">yerr</span><span class="p">)</span> <span class="c1">#,data=self.)</span>
             <span class="c1"># sys.exit()</span>
             
@@ -2112,25 +2149,19 @@
 
                     <span class="c1"># find what i is in the db</span>
                     <span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-                    
-                    <span class="c1">#print(f&#39;i: {ii}, id: {id}&#39;)</span>
-                    <span class="c1"># i=ii#d</span>
                     <span class="n">mjd</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;MJD&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
                     <span class="n">FN</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;FILENAME&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 
                     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">-mjd: &#39;</span><span class="p">,</span><span class="n">mjd</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">-file: &#39;</span><span class="p">,</span><span class="n">FN</span><span class="p">)</span> <span class="c1">#date_str</span>
-
                     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">-id: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="se">\n</span><span class="s2">-index: </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                    
-                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&gt; Setting </span><span class="si">{</span><span class="n">yCol</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">yCol</span><span class="p">]</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">, to np.nan&#39;</span><span class="p">)</span>
-                    <span class="c1">#print(self.df.iloc[i][yCol])</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&gt; Setting </span><span class="si">{</span><span class="n">yCol</span><span class="si">}</span><span class="s1">:  </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">yCol</span><span class="p">]</span><span class="si">}</span><span class="s1">, to np.nan&#39;</span><span class="p">)</span>
                     
                     <span class="k">try</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">yCol</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
                     <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">yCol</span><span class="p">]</span><span class="o">=</span><span class="mf">0.0</span>
 
-                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">+ New </span><span class="si">{</span><span class="n">yCol</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">yCol</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">+ New </span><span class="si">{</span><span class="n">yCol</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">yCol</span><span class="p">]</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
                     <span class="c1"># change plot</span>
                     <span class="n">tablename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_ui</span><span class="o">.</span><span class="n">comboBoxTables</span><span class="o">.</span><span class="n">currentText</span><span class="p">()</span>
                   
@@ -2138,8 +2169,11 @@
                     <span class="n">ycol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time_ui</span><span class="o">.</span><span class="n">comboBoxColsY</span><span class="o">.</span><span class="n">currentText</span><span class="p">()</span>
 
                     <span class="c1">#self.dbFile</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">SQLiteDB</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dbFile</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">create_db</span><span class="p">()</span>
+                    <span class="c1"># self.db = SQLiteDB(self.dbFile, log=self.log)</span>
+                    <span class="c1"># self.db.create_db()</span>
+
+                    <span class="n">db</span> <span class="o">=</span> <span class="n">SQLiteDB</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dbFile</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">)</span>
+                    <span class="n">db</span><span class="o">.</span><span class="n">create_db</span><span class="p">()</span>
 
                     <span class="k">try</span><span class="p">:</span>
                         <span class="c1"># srcType=self.df[&#39;OBJECTTYPE&#39;].iloc[i]</span>
@@ -2153,8 +2187,15 @@
                     <span class="n">stmt</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;UPDATE &#39;</span><span class="si">{</span><span class="n">tablename</span><span class="si">}</span><span class="s2">&#39; SET &quot;</span>
 
                     <span class="n">dct</span><span class="o">=</span><span class="p">{}</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span>
 
-                    <span class="n">dct</span><span class="p">[</span><span class="s1">&#39;BEAMTYPE&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;BEAMTYPE&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="n">dct</span><span class="p">[</span><span class="s1">&#39;OBJECT&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;OBJECT&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">dct</span><span class="p">[</span><span class="s1">&#39;FRONTEND&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;FRONTEND&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="k">except</span><span class="p">:</span>
+                        <span class="n">dct</span><span class="p">[</span><span class="s1">&#39;BEAMTYPE&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;BEAMTYPE&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                        <span class="n">dct</span><span class="p">[</span><span class="s1">&#39;FRONTEND&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;BEAMTYPE&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 
                     <span class="k">try</span><span class="p">:</span>
                         <span class="n">dct</span><span class="p">[</span><span class="s1">&#39;ATMOS_ABSORPTION_CORR&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;ATMOS_ABSORPTION_CORR&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
@@ -2165,6 +2206,7 @@
                     <span class="n">bms</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">,</span><span class="s1">&#39;B&#39;</span><span class="p">]</span>
 
                     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;YCOL: &quot;</span><span class="p">,</span><span class="n">ycol</span><span class="p">)</span>
+
                     <span class="k">if</span> <span class="n">ycol</span> <span class="o">==</span> <span class="s2">&quot;SLTA&quot;</span> <span class="ow">or</span> <span class="n">ycol</span><span class="o">==</span><span class="s2">&quot;ASLTA&quot;</span> <span class="ow">or</span> <span class="n">ycol</span><span class="o">==</span><span class="s2">&quot;BSLTA&quot;</span> <span class="ow">or</span> <span class="n">ycol</span><span class="o">==</span><span class="s2">&quot;SLTAERR&quot;</span> <span class="ow">or</span> <span class="n">ycol</span><span class="o">==</span><span class="s2">&quot;ASLTAERR&quot;</span> <span class="ow">or</span> <span class="n">ycol</span><span class="o">==</span><span class="s2">&quot;BSLTAERR&quot;</span> <span class="ow">or</span> <span class="n">ycol</span> <span class="o">==</span> <span class="s2">&quot;SRTA&quot;</span> <span class="ow">or</span> <span class="n">ycol</span><span class="o">==</span><span class="s2">&quot;ASRTA&quot;</span> <span class="ow">or</span> <span class="n">ycol</span><span class="o">==</span><span class="s2">&quot;BSRTA&quot;</span> <span class="ow">or</span> <span class="n">ycol</span> <span class="o">==</span> <span class="s2">&quot;SRTAERR&quot;</span> <span class="ow">or</span> <span class="n">ycol</span><span class="o">==</span><span class="s2">&quot;ASRTAERR&quot;</span> <span class="ow">or</span> <span class="n">ycol</span><span class="o">==</span><span class="s2">&quot;BSRTAERR&quot;</span><span class="p">:</span>
                         
                         <span class="k">if</span> <span class="n">ycol</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s2">&quot;A&quot;</span><span class="p">:</span>
@@ -2180,34 +2222,47 @@
 
                         <span class="nb">print</span><span class="p">()</span>
 
-                        <span class="k">try</span><span class="p">:</span>
-                            <span class="n">hps</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-                            <span class="n">err_hps</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-                            <span class="n">hpn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;N</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TA&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-                            <span class="n">err_hpn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;N</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TAERR&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-                            <span class="n">on</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;O</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TA&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-                            <span class="n">err_on</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;O</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TAERR&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                        <span class="c1"># try:</span>
+                        <span class="n">hps</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                        <span class="n">err_hps</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
-                            <span class="c1"># single-beam</span>
-                            <span class="c1"># if &quot;TAR&quot; in self.df[&#39;OBJECTTYPE&#39;].iloc[i]:</span>
+                        <span class="n">b</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">hpn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;N</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TA&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                            <span class="n">b</span><span class="o">=</span><span class="s1">&#39;s&#39;</span>
+                        <span class="k">except</span><span class="p">:</span>
+                            <span class="n">hpn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">bms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s1">N</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TA&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                            <span class="n">b</span><span class="o">=</span><span class="s1">&#39;d&#39;</span>
+
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">err_hpn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;N</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TAERR&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                            <span class="n">b</span><span class="o">=</span><span class="s1">&#39;s&#39;</span>
+                        <span class="k">except</span><span class="p">:</span>
+                            <span class="n">err_hpn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">bms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s1">N</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TAERR&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                            <span class="n">b</span><span class="o">=</span><span class="s1">&#39;d&#39;</span>
+
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">on</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;O</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TA&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                            <span class="n">b</span><span class="o">=</span><span class="s1">&#39;s&#39;</span>
+                        <span class="k">except</span><span class="p">:</span>
+                            <span class="n">on</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">bms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s1">O</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TA&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                            <span class="n">b</span><span class="o">=</span><span class="s1">&#39;d&#39;</span>
+
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">err_on</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;O</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TAERR&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                            <span class="n">b</span><span class="o">=</span><span class="s1">&#39;s&#39;</span>
+                        <span class="k">except</span><span class="p">:</span>
+                            <span class="n">err_on</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">bms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s1">O</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TAERR&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                            <span class="n">b</span><span class="o">=</span><span class="s1">&#39;d&#39;</span>
+
+                        <span class="k">if</span> <span class="n">b</span><span class="o">==</span><span class="s1">&#39;&#39;</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;something failed&#39;</span><span class="p">)</span>
+                            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+                        <span class="k">elif</span> <span class="n">b</span><span class="o">==</span><span class="s1">&#39;s&#39;</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;dct: &#39;</span><span class="p">,</span><span class="n">dct</span><span class="p">)</span>
                             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using - &#39;N</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TA&#39;: </span><span class="si">{</span><span class="n">hpn</span><span class="si">}</span><span class="s2">, &#39;N</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TAERR&#39;: </span><span class="si">{</span><span class="n">err_hpn</span><span class="si">}</span><span class="s2">, &#39;O</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TA&#39;: </span><span class="si">{</span><span class="n">on</span><span class="si">}</span><span class="s2">, &#39;O</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TAERR&#39;: </span><span class="si">{</span><span class="n">err_on</span><span class="si">}</span><span class="s2"> to recalculate &quot;</span><span class="p">)</span>
-                            <span class="n">pc</span><span class="p">,</span> <span class="n">corrTa</span><span class="p">,</span> <span class="n">errCorrTa</span><span class="o">=</span><span class="n">cp</span><span class="o">.</span><span class="n">calc_pc</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">hpn</span><span class="p">,</span> <span class="n">err_hpn</span><span class="p">,</span> <span class="n">on</span><span class="p">,</span> <span class="n">err_on</span><span class="p">,</span> <span class="n">dct</span><span class="p">)</span>
+                            <span class="n">pc</span><span class="p">,</span> <span class="n">corrTa</span><span class="p">,</span> <span class="n">errCorrTa</span><span class="o">=</span><span class="n">cp</span><span class="o">.</span><span class="n">calibrate</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">hpn</span><span class="p">,</span> <span class="n">err_hpn</span><span class="p">,</span> <span class="n">on</span><span class="p">,</span> <span class="n">err_on</span><span class="p">,</span> <span class="n">dct</span><span class="p">)</span>
                             <span class="n">stmt</span><span class="o">=</span><span class="n">stmt</span><span class="o">+</span><span class="sa">f</span><span class="s2">&quot;S</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TA=&#39;</span><span class="si">{</span><span class="n">hps</span><span class="si">}</span><span class="s2">&#39;, S</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TAERR=&#39;</span><span class="si">{</span><span class="n">err_hps</span><span class="si">}</span><span class="s2">&#39;, S</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">S2N=&#39;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="si">}</span><span class="s2">&#39;, O</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">PC=&#39;</span><span class="si">{</span><span class="n">pc</span><span class="si">}</span><span class="s2">&#39;, CO</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TA=&#39;</span><span class="si">{</span><span class="n">corrTa</span><span class="si">}</span><span class="s2">&#39;, CO</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TAERR=&#39;</span><span class="si">{</span><span class="n">errCorrTa</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>   
-                               
-                            <span class="c1"># elif &quot;CAL&quot; in self.df[&#39;OBJECTTYPE&#39;].iloc[i]:</span>
-                            <span class="c1">#     print(f&quot;Using - &#39;N{pol}TA&#39;: {hpn}, &#39;N{pol}TAERR&#39;: {err_hpn}, &#39;O{pol}TA&#39;: {on}, &#39;O{pol}TAERR&#39;: {err_on} to recalculate &quot;)</span>
-                            <span class="c1">#     pss, errPss, pc, corrTa, errCorrTa, appEff=cp.calc_pc_pss(0, 0, 0, hpn, err_hpn, on, err_on, self.df[&#39;FLUX&#39;].iloc[i],dct)</span>
-                            <span class="c1">#     stmt=stmt+f&quot;S{pol}TA=&#39;{hps}&#39;, S{pol}TAERR=&#39;{err_hps}&#39;, S{pol}S2N=&#39;{np.nan}&#39;, O{pol}PSS=&#39;{pss}&#39;, O{pol}DPSS=&#39;{errPss}&#39;, O{pol}PC=&#39;{pc}&#39;, CO{pol}TA=&#39;{corrTa}&#39;, CO{pol}TAERR=&#39;{errCorrTa}&#39;, O{pol}APPEFF=&#39;{appEff}&#39;, &quot;</span>
-                                 
-                            <span class="c1">#     if pss==0.0:</span>
-                            <span class="c1">#         print(f&#39;- setting O{pol}PSS=np.nan&#39;)</span>
-                            <span class="c1">#         pss=np.nan</span>
-                            <span class="c1">#     if errPss==0.0:</span>
-                            <span class="c1">#         errPss=np.nan</span>
-                            <span class="c1">#         print(f&#39;- setting O{pol}DPSS=np.nan&#39;)</span>
-                            <span class="c1">#     if appEff==0.0:</span>
-                            <span class="c1">#         appEff=np.nan</span>
-                            <span class="c1">#         print(f&#39;- setting O{pol}APPEFF=np.nan&#39;)</span>
 
                             <span class="k">if</span> <span class="n">pc</span><span class="o">==</span><span class="mf">0.0</span><span class="p">:</span>
                                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;- setting O</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s1">PC=np.nan&#39;</span><span class="p">)</span>
@@ -2218,36 +2273,13 @@
                             <span class="k">if</span> <span class="n">errCorrTa</span><span class="o">==</span><span class="mf">0.0</span><span class="p">:</span>
                                 <span class="n">errCorrTa</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
                                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;- setting CO</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TAERR=np.nan&#39;</span><span class="p">)</span>
-                            
-                        <span class="k">except</span><span class="p">:</span>
-                                <span class="n">hps</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-                                <span class="n">err_hps</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-                                <span class="n">hpn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">bms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s1">N</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TA&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-                                <span class="n">err_hpn</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">bms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s1">N</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TAERR&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-                                <span class="n">on</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">bms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s1">O</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TA&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-                                <span class="n">err_on</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">bms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s1">O</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TAERR&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 
+                        <span class="k">elif</span> <span class="n">b</span><span class="o">==</span><span class="s1">&#39;d&#39;</span><span class="p">:</span>
                                 <span class="c1"># dual-beam</span>
-                                <span class="c1"># if &quot;TAR&quot; in self.df[&#39;OBJECTTYPE&#39;].iloc[i]:</span>
                                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using - &#39;</span><span class="si">{</span><span class="n">bms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s2">N</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TA&#39;: </span><span class="si">{</span><span class="n">hpn</span><span class="si">}</span><span class="s2">, &#39;</span><span class="si">{</span><span class="n">bms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s2">N</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TAERR&#39;: </span><span class="si">{</span><span class="n">err_hpn</span><span class="si">}</span><span class="s2">, &#39;</span><span class="si">{</span><span class="n">bms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s2">O</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TA&#39;: </span><span class="si">{</span><span class="n">on</span><span class="si">}</span><span class="s2">, &#39;</span><span class="si">{</span><span class="n">bms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s2">O</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TAERR&#39;: </span><span class="si">{</span><span class="n">err_on</span><span class="si">}</span><span class="s2"> to recalculate &quot;</span><span class="p">)</span>
-                                <span class="n">pc</span><span class="p">,</span> <span class="n">corrTa</span><span class="p">,</span> <span class="n">errCorrTa</span><span class="o">=</span><span class="n">cp</span><span class="o">.</span><span class="n">calc_pc</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">hpn</span><span class="p">,</span> <span class="n">err_hpn</span><span class="p">,</span> <span class="n">on</span><span class="p">,</span> <span class="n">err_on</span><span class="p">,</span> <span class="n">dct</span><span class="p">)</span>
+                                <span class="n">pc</span><span class="p">,</span> <span class="n">corrTa</span><span class="p">,</span> <span class="n">errCorrTa</span><span class="o">=</span><span class="n">cp</span><span class="o">.</span><span class="n">calibrate</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">hpn</span><span class="p">,</span> <span class="n">err_hpn</span><span class="p">,</span> <span class="n">on</span><span class="p">,</span> <span class="n">err_on</span><span class="p">,</span> <span class="n">dct</span><span class="p">)</span>
                                 <span class="n">stmt</span><span class="o">=</span><span class="n">stmt</span><span class="o">+</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s2">S</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TA=&#39;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="si">}</span><span class="s2">&#39;, </span><span class="si">{</span><span class="n">bms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s2">S</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TAERR=&#39;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="si">}</span><span class="s2">&#39;, </span><span class="si">{</span><span class="n">bms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s2">S</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">S2N=&#39;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="si">}</span><span class="s2">&#39;, </span><span class="si">{</span><span class="n">bms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s2">O</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">PC=&#39;</span><span class="si">{</span><span class="n">pc</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&#39;, </span><span class="si">{</span><span class="n">bms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s2">CO</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TA=&#39;</span><span class="si">{</span><span class="n">corrTa</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&#39;, </span><span class="si">{</span><span class="n">bms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s2">CO</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TAERR=&#39;</span><span class="si">{</span><span class="n">errCorrTa</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
                                 
-                                <span class="c1"># elif &quot;CAL&quot; in self.df[&#39;OBJECTTYPE&#39;].iloc[i]:</span>
-                                <span class="c1">#     print(f&quot;Using - &#39;{bms[k]}N{pol}TA&#39;: {hpn}, &#39;{bms[k]}N{pol}TAERR&#39;: {err_hpn}, &#39;{bms[k]}O{pol}TA&#39;: {on}, &#39;{bms[k]}O{pol}TAERR&#39;: {err_on} to recalculate &quot;)</span>
-                                <span class="c1">#     pss, errPss, pc, corrTa, errCorrTa, appEff=cp.calc_pc_pss(0, 0, 0, hpn, err_hpn, on, err_on, self.df[&#39;FLUX&#39;].iloc[i],dct)</span>
-                                <span class="c1">#     stmt=stmt+f&quot;{bms[k]}S{pol}TA=&#39;{np.nan}&#39;, {bms[k]}S{pol}TAERR=&#39;{np.nan}&#39;, {bms[k]}S{pol}S2N=&#39;{np.nan}&#39;, {bms[k]}O{pol}PSS=&#39;{pss}&#39;, {bms[k]}O{pol}DPSS=&#39;{errPss}&#39;, {bms[k]}O{pol}PC=&#39;{pc}&#39;, {bms[k]}CO{pol}TA=&#39;{corrTa}&#39;, {bms[k]}CO{pol}TAERR=&#39;{errCorrTa}&#39;, {bms[k]}O{pol}APPEFF=&#39;{appEff}&#39;, &quot;</span>
-                                
-                                <span class="c1">#     if pss==0.0:</span>
-                                <span class="c1">#         print(f&#39;- setting O{pol}PSS=np.nan&#39;)</span>
-                                <span class="c1">#         pss=np.nan</span>
-                                <span class="c1">#     if errPss==0.0:</span>
-                                <span class="c1">#         errPss=np.nan</span>
-                                <span class="c1">#         print(f&#39;- setting O{pol}DPSS=np.nan&#39;)</span>
-                                <span class="c1">#     if appEff==0.0:</span>
-                                <span class="c1">#         appEff=np.nan</span>
-                                <span class="c1">#         print(f&#39;- setting O{pol}APPEFF=np.nan&#39;)</span>
-
                                 <span class="k">if</span> <span class="n">pc</span><span class="o">==</span><span class="mf">0.0</span><span class="p">:</span>
                                     <span class="n">pc</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
                                     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;- setting </span><span class="si">{</span><span class="n">bms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s1">O</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s1">PC=np.nan&#39;</span><span class="p">)</span>
@@ -2284,23 +2316,8 @@
                                 <span class="c1"># single-beam</span>
                                 <span class="c1"># if &quot;TAR&quot; in self.df[&#39;OBJECTTYPE&#39;].iloc[i]:</span>
                                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using - &#39;S</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TA&#39;: </span><span class="si">{</span><span class="n">hps</span><span class="si">}</span><span class="s2">, &#39;S</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TAERR&#39;: </span><span class="si">{</span><span class="n">err_hps</span><span class="si">}</span><span class="s2">, &#39;O</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TA&#39;: </span><span class="si">{</span><span class="n">on</span><span class="si">}</span><span class="s2">, &#39;O</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TAERR&#39;: </span><span class="si">{</span><span class="n">err_on</span><span class="si">}</span><span class="s2"> to recalculate &quot;</span><span class="p">)</span>
-                                <span class="n">pc</span><span class="p">,</span> <span class="n">corrTa</span><span class="p">,</span> <span class="n">errCorrTa</span><span class="o">=</span><span class="n">cp</span><span class="o">.</span><span class="n">calc_pc</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">hps</span><span class="p">,</span> <span class="n">err_hps</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">on</span><span class="p">,</span> <span class="n">err_on</span><span class="p">,</span> <span class="n">dct</span><span class="p">)</span>
+                                <span class="n">pc</span><span class="p">,</span> <span class="n">corrTa</span><span class="p">,</span> <span class="n">errCorrTa</span><span class="o">=</span><span class="n">cp</span><span class="o">.</span><span class="n">calibrate</span><span class="p">(</span><span class="n">hps</span><span class="p">,</span> <span class="n">err_hps</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">on</span><span class="p">,</span> <span class="n">err_on</span><span class="p">,</span> <span class="n">dct</span><span class="p">)</span>
                                 <span class="n">stmt</span><span class="o">=</span><span class="n">stmt</span><span class="o">+</span><span class="sa">f</span><span class="s2">&quot;N</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TA=&#39;</span><span class="si">{</span><span class="n">hpn</span><span class="si">}</span><span class="s2">&#39;, N</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TAERR=&#39;</span><span class="si">{</span><span class="n">err_hpn</span><span class="si">}</span><span class="s2">&#39;, O</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">PC=&#39;</span><span class="si">{</span><span class="n">pc</span><span class="si">}</span><span class="s2">&#39;, CO</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TA=&#39;</span><span class="si">{</span><span class="n">corrTa</span><span class="si">}</span><span class="s2">&#39;, CO</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TAERR=&#39;</span><span class="si">{</span><span class="n">errCorrTa</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>   
-
-                                <span class="c1"># elif &quot;CAL&quot; in self.df[&#39;OBJECTTYPE&#39;].iloc[i]:</span>
-                                <span class="c1">#     print(f&quot;Using - &#39;S{pol}TA&#39;: {hps}, &#39;S{pol}TAERR&#39;: {err_hps}, &#39;O{pol}TA&#39;: {on}, &#39;O{pol}TAERR&#39;: {err_on} to recalculate &quot;)</span>
-                                <span class="c1">#     pss, errPss, pc, corrTa, errCorrTa, appEff=cp.calc_pc_pss(0, hps, err_hps, 0, 0, on, err_on, self.df[&#39;FLUX&#39;].iloc[i],dct)</span>
-                                <span class="c1">#     stmt=stmt+f&quot;N{pol}TA=&#39;{hpn}&#39;, N{pol}TAERR=&#39;{err_hpn}&#39;, N{pol}S2N=&#39;{np.nan}&#39;, O{pol}PSS=&#39;{pss}&#39;, O{pol}DPSS=&#39;{errPss}&#39;, O{pol}PC=&#39;{pc}&#39;, CO{pol}TA=&#39;{corrTa}&#39;, CO{pol}TAERR=&#39;{errCorrTa}&#39;, O{pol}APPEFF=&#39;{appEff}&#39;, &quot;</span>
-                                
-                                <span class="c1">#     if pss==0.0:</span>
-                                <span class="c1">#         print(f&#39;- setting O{pol}PSS=np.nan&#39;)</span>
-                                <span class="c1">#         pss=np.nan</span>
-                                <span class="c1">#     if errPss==0.0:</span>
-                                <span class="c1">#         errPss=np.nan</span>
-                                <span class="c1">#         print(f&#39;- setting O{pol}DPSS=np.nan&#39;)</span>
-                                <span class="c1">#     if appEff==0.0:</span>
-                                <span class="c1">#         appEff=np.nan</span>
-                                <span class="c1">#         print(f&#39;- setting O{pol}APPEFF=np.nan&#39;)</span>
 
                                 <span class="k">if</span> <span class="n">pc</span><span class="o">==</span><span class="mf">0.0</span><span class="p">:</span>
                                     <span class="n">pc</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
@@ -2313,6 +2330,7 @@
                                     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;- setting CO</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TAERR=np.nan&#39;</span><span class="p">)</span>
                             
                             <span class="k">except</span><span class="p">:</span>
+                                
                                 <span class="n">hps</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">bms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s1">S</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TA&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
                                 <span class="n">err_hps</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">bms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s1">S</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s1">TAERR&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
                                 <span class="n">hpn</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
@@ -2323,23 +2341,9 @@
                                 <span class="c1"># dual-beam</span>
                                 <span class="c1"># if &quot;TAR&quot; in self.df[&#39;OBJECTTYPE&#39;].iloc[i]:</span>
                                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using - &#39;</span><span class="si">{</span><span class="n">bms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s2">S</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TA&#39;: </span><span class="si">{</span><span class="n">hps</span><span class="si">}</span><span class="s2">, &#39;</span><span class="si">{</span><span class="n">bms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s2">S</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TAERR&#39;: </span><span class="si">{</span><span class="n">err_hps</span><span class="si">}</span><span class="s2">, &#39;</span><span class="si">{</span><span class="n">bms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s2">O</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TA&#39;: </span><span class="si">{</span><span class="n">on</span><span class="si">}</span><span class="s2">, &#39;</span><span class="si">{</span><span class="n">bms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s2">O</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TAERR&#39;: </span><span class="si">{</span><span class="n">err_on</span><span class="si">}</span><span class="s2"> to recalculate &quot;</span><span class="p">)</span>
-                                <span class="n">pc</span><span class="p">,</span> <span class="n">corrTa</span><span class="p">,</span> <span class="n">errCorrTa</span><span class="o">=</span><span class="n">cp</span><span class="o">.</span><span class="n">calc_pc</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">hps</span><span class="p">,</span> <span class="n">err_hps</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>  <span class="n">on</span><span class="p">,</span> <span class="n">err_on</span><span class="p">,</span> <span class="n">dct</span><span class="p">)</span>  
+                                <span class="n">pc</span><span class="p">,</span> <span class="n">corrTa</span><span class="p">,</span> <span class="n">errCorrTa</span><span class="o">=</span><span class="n">cp</span><span class="o">.</span><span class="n">calibrate</span><span class="p">(</span><span class="n">hps</span><span class="p">,</span> <span class="n">err_hps</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>  <span class="n">on</span><span class="p">,</span> <span class="n">err_on</span><span class="p">,</span> <span class="n">dct</span><span class="p">)</span>  
                                 <span class="n">stmt</span><span class="o">=</span><span class="n">stmt</span><span class="o">+</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s2">N</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TA=&#39;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="si">}</span><span class="s2">&#39;, </span><span class="si">{</span><span class="n">bms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s2">N</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TAERR=&#39;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="si">}</span><span class="s2">&#39;, </span><span class="si">{</span><span class="n">bms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s2">N</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">S2N=&#39;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="si">}</span><span class="s2">&#39;, </span><span class="si">{</span><span class="n">bms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s2">O</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">PC=&#39;</span><span class="si">{</span><span class="n">pc</span><span class="si">}</span><span class="s2">&#39;, </span><span class="si">{</span><span class="n">bms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s2">CO</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TA=&#39;</span><span class="si">{</span><span class="n">corrTa</span><span class="si">}</span><span class="s2">&#39;, </span><span class="si">{</span><span class="n">bms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s2">CO</span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2">TAERR=&#39;</span><span class="si">{</span><span class="n">errCorrTa</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
-                                
-                                <span class="c1"># elif &quot;CAL&quot; in self.df[&#39;OBJECTTYPE&#39;].iloc[i]:</span>
-                                <span class="c1">#     print(f&quot;Using - &#39;{bms[k]}S{pol}TA&#39;: {hps}, &#39;{bms[k]}S{pol}TAERR&#39;: {err_hps}, &#39;{bms[k]}O{pol}TA&#39;: {on}, &#39;{bms[k]}O{pol}TAERR&#39;: {err_on} to recalculate &quot;)</span>
-                                <span class="c1">#     pss, errPss, pc, corrTa, errCorrTa, appEff=cp.calc_pc_pss(0, hps, err_hps, 0, 0, on, err_on, self.df[&#39;FLUX&#39;].iloc[i],dct)</span>
-                                <span class="c1">#     stmt=stmt+f&quot;{bms[k]}N{pol}TA=&#39;{np.nan}&#39;, {bms[k]}N{pol}TAERR=&#39;{np.nan}&#39;, {bms[k]}N{pol}S2N=&#39;{np.nan}&#39;, {bms[k]}O{pol}PSS=&#39;{pss}&#39;, {bms[k]}O{pol}DPSS=&#39;{errPss}&#39;, {bms[k]}O{pol}PC=&#39;{pc}&#39;, {bms[k]}CO{pol}TA=&#39;{corrTa}&#39;, {bms[k]}CO{pol}TAERR=&#39;{errCorrTa}&#39;, {bms[k]}O{pol}APPEFF=&#39;{appEff}&#39;, &quot;</span>
-                                    
-                                <span class="c1">#     if pss==0.0:</span>
-                                <span class="c1">#         print(f&#39;- setting O{pol}PSS=np.nan&#39;)</span>
-                                <span class="c1">#         pss=np.nan</span>
-                                <span class="c1">#     if errPss==0.0:</span>
-                                <span class="c1">#         errPss=np.nan</span>
-                                <span class="c1">#         print(f&#39;- setting O{pol}DPSS=np.nan&#39;)</span>
-                                <span class="c1">#     if appEff==0.0:</span>
-                                <span class="c1">#         appEff=np.nan</span>
-                                <span class="c1">#         print(f&#39;- setting O{pol}APPEFF=np.nan&#39;)</span>
+                                <span class="nb">print</span><span class="p">(</span><span class="n">pc</span><span class="p">,</span> <span class="n">corrTa</span><span class="p">,</span> <span class="n">errCorrTa</span><span class="p">)</span>
 
                                 <span class="k">if</span> <span class="n">pc</span><span class="o">==</span><span class="mf">0.0</span><span class="p">:</span>
                                     <span class="n">pc</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
@@ -2397,11 +2401,16 @@
                         <span class="n">stmt</span><span class="o">=</span><span class="n">stmt</span><span class="o">+</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ycol</span><span class="si">}</span><span class="s2">=&#39;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
 
                     <span class="n">stmt</span><span class="o">=</span><span class="n">stmt</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span><span class="o">+</span><span class="sa">f</span><span class="s2">&quot;&#39;  WHERE FILENAME = &#39;</span><span class="si">{</span><span class="n">FN</span><span class="si">}</span><span class="s2">&#39; ;&quot;</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="n">stmt</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>   
+                    <span class="nb">print</span><span class="p">(</span><span class="n">stmt</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>  
+                    <span class="c1"># stmt=stmt[:-3]+f&quot;&#39;  WHERE FILENAME = &#39;{FN}&#39; ;&quot;</span>
+                    <span class="c1"># print(stmt) </span>
                     <span class="c1"># sys.exit()</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">commit_changes</span><span class="p">()</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">close_db</span><span class="p">()</span>
+                    <span class="c1"># self.db.c.execute(stmt)</span>
+                    <span class="c1"># self.db.commit_changes()</span>
+                    <span class="c1"># self.db.close_db()</span>
+                    <span class="n">db</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt</span><span class="p">)</span>
+                    <span class="n">db</span><span class="o">.</span><span class="n">commit_changes</span><span class="p">()</span>
+                    <span class="n">db</span><span class="o">.</span><span class="n">close_db</span><span class="p">()</span>
 
                     <span class="bp">self</span><span class="o">.</span><span class="n">Canvas</span><span class="o">.</span><span class="n">clear_figure</span><span class="p">()</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">plot_cols_df</span><span class="p">()</span>
@@ -2423,12 +2432,13 @@
                     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Deleting </span><span class="se">\n</span><span class="s2">-point: </span><span class="si">{</span><span class="n">fit_points</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">-at index </span><span class="si">{</span><span class="n">click_index</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                     <span class="c1">#self.deleted[click_index].append([click_index, fit_points])</span>
 
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">df length Before deleting: &#39;</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">))</span>
+                    <span class="c1"># print(&#39;\ndf length Before deleting: &#39;,len(self.df))</span>
 
                     <span class="n">xCol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Canvas</span><span class="o">.</span><span class="n">xlab</span>
                     <span class="n">yCol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Canvas</span><span class="o">.</span><span class="n">ylab</span>
 
                     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="mi">30</span><span class="p">)</span>
+
                     <span class="n">i</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">click_index</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="c1"># point index to delete</span>
                     <span class="c1"># find what i is in the db</span>
                     <span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
@@ -3734,6 +3744,10 @@
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Plotting </span><span class="si">{</span><span class="n">xCol</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="n">yCol</span><span class="si">}</span><span class="s2"> in table </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">yCol</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">yCol</span><span class="p">]</span><span class="c1">#.apply(self.f)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">yCol</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">yCol</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">yCol</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+            
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">xCol</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">yCol</span><span class="p">])</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">yErr</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">yErr</span><span class="p">]</span><span class="c1">#.apply(self.f)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">Canvas</span><span class="o">.</span><span class="n">plot_fig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">xCol</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">yCol</span><span class="p">],</span><span class="n">xCol</span><span class="p">,</span><span class="n">yCol</span><span class="p">,</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">,</span><span class="n">yerr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="n">yErr</span><span class="p">])</span> <span class="c1">#,title=f&quot;Plot of {self.df[&#39;SOURCEDIR&#39;]} obs. {self.df[&#39;FILENAME&#39;][:8]}&quot;)#,data=self.)</span>
@@ -3743,7 +3757,6 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">Canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span></div>
 
             
-    
     <span class="c1"># PLOTVIEWER OPERATIONS</span>
 <div class="viewcode-block" id="Main.open_db_path">
 <a class="viewcode-back" href="../../../docs/src.gui.html#src.gui.mainGuiLogic.Main.open_db_path">[docs]</a>
@@ -3772,7 +3785,7 @@
             <span class="c1"># open db and get tables</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">SQLiteDB</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dbFilePath</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">create_db</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">tables</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_table_names</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dbFilePath</span><span class="p">))))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tables</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_table_names</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dbFilePath</span><span class="p">)))))</span>
 
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;T2 :&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">)</span>
 
@@ -3896,7 +3909,7 @@
                         
         <span class="c1"># create dataframe</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">rows</span><span class="p">),</span> <span class="n">columns</span> <span class="o">=</span> <span class="n">colNames</span><span class="p">)</span>
-        
+        <span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;FILENAME&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">df</span> <span class="p">,</span><span class="n">db</span></div>
 
     
@@ -3977,8 +3990,6 @@
                                     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;std: </span><span class="si">{</span><span class="n">df</span><span class="p">[</span><span class="n">option</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
                                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="o">*</span><span class="mi">30</span><span class="p">,</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
-                            <span class="c1"># print(df[option])</span>
-
                             <span class="c1"># sys.exit()</span>
                             <span class="k">try</span><span class="p">:</span>
                                 <span class="n">txt</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">txt</span><span class="p">)</span>
@@ -3989,35 +4000,37 @@
                                     
                                     <span class="n">txt</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">txt</span><span class="p">)</span>
                                     <span class="n">df</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">option</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+                                    <span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;FILENAME&#39;</span><span class="p">)</span>
 
                                     <span class="k">if</span> <span class="nb">filter</span> <span class="o">==</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">:</span>
                                         <span class="n">ndf</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">txt</span><span class="p">]</span>
-                                        <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ndf</span><span class="p">))</span>
+                                        <span class="c1"># print(len(ndf))</span>
 
                                     <span class="k">elif</span> <span class="nb">filter</span> <span class="o">==</span> <span class="s2">&quot;&gt;=&quot;</span><span class="p">:</span>
                                         <span class="n">ndf</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">txt</span><span class="p">]</span>
-                                        <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ndf</span><span class="p">))</span>
+                                        <span class="c1"># print(len(ndf))</span>
 
                                     <span class="k">elif</span> <span class="nb">filter</span> <span class="o">==</span> <span class="s2">&quot;&lt;&quot;</span><span class="p">:</span>
                                         <span class="n">ndf</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">txt</span><span class="p">]</span>
-                                        <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ndf</span><span class="p">))</span>
+                                        <span class="c1"># print(len(ndf))</span>
 
                                     <span class="k">elif</span> <span class="nb">filter</span> <span class="o">==</span> <span class="s2">&quot;&lt;=&quot;</span><span class="p">:</span>
                                         <span class="n">ndf</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">txt</span><span class="p">]</span>
-                                        <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ndf</span><span class="p">))</span>
+                                        <span class="c1"># print(len(ndf))</span>
 
                                     <span class="k">elif</span> <span class="nb">filter</span> <span class="o">==</span> <span class="s2">&quot;=&quot;</span><span class="p">:</span>
                                         <span class="n">ndf</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">==</span> <span class="n">txt</span><span class="p">]</span>
-                                        <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ndf</span><span class="p">))</span>
+                                        <span class="c1"># print(len(ndf))</span>
                             
                                     <span class="k">else</span><span class="p">:</span>
                                         <span class="n">ndf</span><span class="o">=</span><span class="n">df</span>
 
                                     <span class="c1">#</span>
-                                    <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">ndf</span><span class="p">),</span><span class="n">option</span><span class="p">,</span><span class="n">txt</span><span class="p">)</span>
+                                    <span class="c1"># print(len(df),len(ndf),option,txt)</span>
 
                                     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ndf</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                                         <span class="c1">#print(ndf[&#39;FILENAME&#39;])</span>
+                                        <span class="n">ndf</span><span class="o">=</span><span class="n">ndf</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;FILENAME&#39;</span><span class="p">)</span>
                                         <span class="n">ndf</span><span class="p">[</span><span class="s1">&#39;plot_tag&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">ndf</span><span class="p">[</span><span class="s1">&#39;FILENAME&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="p">[:</span><span class="mi">18</span><span class="p">])</span>
 
                                         <span class="n">plots</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">ndf</span><span class="p">[</span><span class="s1">&#39;plot_tag&#39;</span><span class="p">])</span>
@@ -4035,7 +4048,7 @@
                                         <span class="n">ls</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">imgDir</span><span class="p">)</span>
                                      
                                         <span class="n">fln</span><span class="o">=</span><span class="p">(</span><span class="n">folderName</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
-                                        <span class="nb">print</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">ls</span><span class="p">),</span><span class="n">fln</span><span class="p">)</span>
+                                        <span class="c1"># print(sorted(ls),fln)</span>
                                        
                                         <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;info&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="s2">&quot;Plotting folder &quot;</span><span class="o">+</span><span class="n">folderName</span><span class="p">)</span>
 
@@ -4077,7 +4090,9 @@
 
                                         <span class="c1"># # get images for current point</span>
                                         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">plots</span><span class="p">)):</span>
+
                                             <span class="nb">print</span><span class="p">(</span><span class="n">imgPath</span><span class="p">,</span><span class="n">imageNames</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                                            
                                             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">imageNames</span><span class="p">)):</span>
                                                 <span class="k">if</span> <span class="n">plots</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">in</span> <span class="n">imageNames</span><span class="p">[</span><span class="n">j</span><span class="p">]:</span> <span class="c1">#[:18]:</span>
                                                     <span class="k">if</span> <span class="s2">&quot;SL&quot;</span> <span class="ow">in</span> <span class="n">option</span> <span class="ow">and</span> <span class="s2">&quot;HPS_LCP&quot;</span> <span class="ow">in</span> <span class="n">imageNames</span><span class="p">[</span><span class="n">j</span><span class="p">]:</span>
@@ -4573,6 +4588,7 @@
                                     <span class="k">else</span><span class="p">:</span>
                                         <span class="n">ndf</span><span class="o">=</span><span class="n">df</span>
 
+                        <span class="n">ndf</span><span class="o">=</span><span class="n">ndf</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;FILENAME&#39;</span><span class="p">)</span>
                         <span class="n">cols</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">ndf</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
                         <span class="n">files</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">ndf</span><span class="o">.</span><span class="n">FILENAME</span><span class="p">)</span>
 
@@ -4594,23 +4610,11 @@
 
                                     <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ols</span><span class="p">:</span>
                                         <span class="n">stmt</span><span class="o">=</span><span class="n">stmt</span><span class="o">+</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=&#39;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
-                                <span class="c1"># elif &quot;OR&quot; in option:</span>
-                                <span class="c1">#         ols=[i for i in cols if &#39;OR&#39; in i]</span>
-                                <span class="c1">#         print(ols)</span>
 
-                                <span class="c1">#         for k in ols:</span>
-                                <span class="c1">#             stmt=stmt+f&quot;{k}=&#39;{np.nan}&#39;, &quot;</span>
-
-                                <span class="c1"># for col in cols:</span>
                                     <span class="nb">print</span><span class="p">(</span><span class="n">stmt</span><span class="p">)</span>
                                     <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
                                 <span class="k">else</span><span class="p">:</span>
-                                    <span class="c1"># if &quot;SL&quot; in option:</span>
-                                    <span class="c1">#     ols=[]</span>
-                                    <span class="c1">#     for i in cols:</span>
-                                    <span class="c1">#         if &#39;SL&#39; in i:</span>
-                                    <span class="c1">#             ols.append(i)</span>
-                                    <span class="c1">#     for k in ols:</span>
+
                                     <span class="n">stmt</span><span class="o">=</span><span class="n">stmt</span><span class="o">+</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">option</span><span class="si">}</span><span class="s2">=&#39;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
 
                                 <span class="nb">print</span><span class="p">()</span>
@@ -4622,7 +4626,9 @@
                                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;done&#39;</span><span class="p">)</span>
                             <span class="c1"># sys.exit()</span>
                         <span class="k">else</span><span class="p">:</span>
+
                             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">processing_file : &#39;</span><span class="p">,</span><span class="n">j</span><span class="p">)</span>
                                 <span class="n">stmt</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;UPDATE &#39;</span><span class="si">{</span><span class="n">folderName</span><span class="si">}</span><span class="s2">&#39; SET &quot;</span>
 
                                 <span class="c1"># print(option)</span>
@@ -4653,22 +4659,50 @@
                                             <span class="n">stmt</span><span class="o">=</span><span class="n">stmt</span><span class="o">+</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=200,  TSYS2=&#39;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
                                         <span class="k">else</span><span class="p">:</span>
                                             <span class="n">stmt</span><span class="o">=</span><span class="n">stmt</span><span class="o">+</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=&#39;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
-                                <span class="k">else</span><span class="p">:</span>
-                                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;else&#39;</span><span class="p">)</span>
-                                    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
-                                    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">:</span>
-                                        <span class="k">if</span> <span class="s1">&#39;SL&#39;</span> <span class="ow">in</span> <span class="n">col</span> <span class="ow">or</span> <span class="s1">&#39;SR&#39;</span> <span class="ow">in</span> <span class="n">col</span> <span class="ow">or</span>  <span class="s1">&#39;OL&#39;</span> <span class="ow">in</span> <span class="n">col</span> <span class="ow">or</span>  <span class="s1">&#39;OR&#39;</span> <span class="ow">in</span> <span class="n">col</span> <span class="ow">or</span>  <span class="s1">&#39;NL&#39;</span> <span class="ow">in</span> <span class="n">col</span> <span class="ow">or</span>  <span class="s1">&#39;NR&#39;</span> <span class="ow">in</span> <span class="n">col</span> <span class="p">:</span>
-                                            <span class="k">if</span> <span class="s2">&quot;FLAG&quot;</span> <span class="ow">in</span> <span class="n">col</span><span class="p">:</span>
-                                                <span class="n">stmt</span><span class="o">=</span><span class="n">stmt</span><span class="o">+</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">=200, &quot;</span>
+
+                                <span class="k">elif</span> <span class="s1">&#39;NL&#39;</span> <span class="ow">in</span> <span class="n">option</span><span class="p">:</span>
+                                        <span class="n">nl</span><span class="o">=</span><span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">cols</span> <span class="k">if</span> <span class="s1">&#39;NL&#39;</span> <span class="ow">in</span> <span class="n">i</span><span class="p">]</span>
+                                        <span class="nb">print</span><span class="p">(</span><span class="n">nl</span><span class="p">)</span>
+                                        <span class="c1"># sys.exit()</span>
+                                        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">nl</span><span class="p">:</span>
+                                            <span class="k">if</span> <span class="s2">&quot;FLAG&quot;</span> <span class="ow">in</span> <span class="n">k</span><span class="p">:</span>
+                                                <span class="n">stmt</span><span class="o">=</span><span class="n">stmt</span><span class="o">+</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=200,  TSYS2=&#39;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
                                             <span class="k">else</span><span class="p">:</span>
-                                                <span class="n">stmt</span><span class="o">=</span><span class="n">stmt</span><span class="o">+</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">=&#39;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="si">}</span><span class="s2">&#39;, TSYS1=&#39;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="si">}</span><span class="s2">&#39;, TSYS2=&#39;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
-                                        <span class="k">else</span><span class="p">:</span>
-                                            <span class="k">pass</span>
-                                        <span class="c1">#or  &#39;OBSTIME&#39; in col or &#39;MJD&#39; in col or  &#39;OBJECT&#39; in col or  &#39;OBJECTTYPE&#39; in col or  &#39;CENTFREQ&#39; in col or  &#39;LOGFREQ&#39; in col or  &#39;FOCUS&#39; in col or  &#39;TILT&#39; in col or  &#39;HA&#39; in col or  &#39;ZA&#39; in col or  &#39;RADIOMETER&#39; in col or  &#39;BANDWDTH&#39; in col or  &#39;TCAL1&#39; in col or &#39;TCAL2&#39; in col or  &#39;NOMTSYS&#39; in col or &#39;TSYS1&#39;, &#39;TSYSERR1&#39;, &#39;TSYS2&#39;, &#39;TSYSERR2&#39;, &#39;TAMBIENT&#39;, &#39;PRESSURE&#39;, &#39;HUMIDITY&#39;, &#39;WINDSPD&#39;, &#39;HPBW&#39;, &#39;FNBW&#39;, &#39;ELEVATION&#39;, &#39;LONGITUDE&#39;, &#39;LATITUDE&#39;, &#39;SCANTYPE&#39;, &#39;BEAMTYPE&#39;, &#39;OBSERVER&#39;, &#39;OBSLOCAL&#39;, &#39;PROJNAME&#39;, &#39;PROPOSAL&#39;, &#39;TELESCOPE&#39;, &#39;UPGRADE&#39;, &#39;INSTFLAG&#39;, &#39;SCANDIST&#39;, &#39;SCANTIME&#39;, &#39;PWV&#39;, &#39;SVP&#39;, &#39;AVP&#39;, &#39;DPT&#39;, &#39;WVD&#39;, &#39;MEAN_ATMOS_CORRECTION&#39;, &#39;TAU10&#39;, &#39;TAU15&#39;, &#39;TBATMOS10&#39;, &#39;TBATMOS15&#39;, &#39;SLTA&#39;, &#39;SLDTA&#39;, &#39;SLS2N&#39;, &#39;SLTAPEAKLOC&#39;, &#39;SLFLAG&#39;, &#39;SLRMSB&#39;, &#39;SLRMSA&#39;, &#39;SLBSLOPE&#39;, &#39;SLBSRMS&#39;, &#39;NLTA&#39;, &#39;NLDTA&#39;, &#39;NLS2N&#39;, &#39;NLTAPEAKLOC&#39;, &#39;NLFLAG&#39;, &#39;NLRMSB&#39;, &#39;NLRMSA&#39;, &#39;NLBSLOPE&#39;, &#39;NLBSRMS&#39;, &#39;OLTA&#39;, &#39;OLDTA&#39;, &#39;OLPC&#39;, &#39;COLTA&#39;, &#39;COLDTA&#39;, &#39;OLS2N&#39;, &#39;OLTAPEAKLOC&#39;, &#39;OLFLAG&#39;, &#39;OLRMSB&#39;, &#39;OLRMSA&#39;, &#39;OLBSLOPE&#39;, &#39;OLBSRMS&#39;, &#39;SRTA&#39;, &#39;SRDTA&#39;, &#39;SRS2N&#39;, &#39;SRTAPEAKLOC&#39;, &#39;SRFLAG&#39;, &#39;SRRMSB&#39;, &#39;SRRMSA&#39;, &#39;SRBSLOPE&#39;, &#39;SRBSRMS&#39;, &#39;NRTA&#39;, &#39;NRDTA&#39;, &#39;NRS2N&#39;, &#39;NRTAPEAKLOC&#39;, &#39;NRFLAG&#39;, &#39;NRRMSB&#39;, &#39;NRRMSA&#39;, &#39;NRBSLOPE&#39;, &#39;NRBSRMS&#39;, &#39;ORTA&#39;, &#39;ORDTA&#39;, &#39;ORPC&#39;, &#39;CORTA&#39;, &#39;CORDTA&#39;, &#39;ORS2N&#39;, &#39;ORTAPEAKLOC&#39;, &#39;ORFLAG&#39;, &#39;ORRMSB&#39;, &#39;ORRMSA&#39;, &#39;ORBSLOPE&#39;, &#39;ORBSRMS&#39;</span>
+                                                <span class="n">stmt</span><span class="o">=</span><span class="n">stmt</span><span class="o">+</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=&#39;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
+
+                                <span class="k">elif</span> <span class="s1">&#39;SL&#39;</span> <span class="ow">in</span> <span class="n">option</span><span class="p">:</span>
+                                        <span class="n">sl</span><span class="o">=</span><span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">cols</span> <span class="k">if</span> <span class="s1">&#39;SL&#39;</span> <span class="ow">in</span> <span class="n">i</span><span class="p">]</span>
+                                        <span class="nb">print</span><span class="p">(</span><span class="n">sl</span><span class="p">)</span>
+                                        <span class="c1"># sys.exit()</span>
+                                        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">sl</span><span class="p">:</span>
+                                            <span class="k">if</span> <span class="s2">&quot;FLAG&quot;</span> <span class="ow">in</span> <span class="n">k</span><span class="p">:</span>
+                                                <span class="n">stmt</span><span class="o">=</span><span class="n">stmt</span><span class="o">+</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=200,  TSYS2=&#39;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
+                                            <span class="k">else</span><span class="p">:</span>
+                                                <span class="n">stmt</span><span class="o">=</span><span class="n">stmt</span><span class="o">+</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=&#39;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
+
+                                <span class="k">elif</span> <span class="s1">&#39;SR&#39;</span> <span class="ow">in</span> <span class="n">option</span><span class="p">:</span>
+                                        <span class="n">sr</span><span class="o">=</span><span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">cols</span> <span class="k">if</span> <span class="s1">&#39;SR&#39;</span> <span class="ow">in</span> <span class="n">i</span><span class="p">]</span>
+                                        <span class="nb">print</span><span class="p">(</span><span class="n">sr</span><span class="p">)</span>
+                                        <span class="c1"># sys.exit()</span>
+                                        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">sr</span><span class="p">:</span>
+                                            <span class="k">if</span> <span class="s2">&quot;FLAG&quot;</span> <span class="ow">in</span> <span class="n">k</span><span class="p">:</span>
+                                                <span class="n">stmt</span><span class="o">=</span><span class="n">stmt</span><span class="o">+</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=200,  TSYS2=&#39;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
+                                            <span class="k">else</span><span class="p">:</span>
+                                                <span class="n">stmt</span><span class="o">=</span><span class="n">stmt</span><span class="o">+</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=&#39;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
+
+                                <span class="k">elif</span> <span class="s1">&#39;NR&#39;</span> <span class="ow">in</span> <span class="n">option</span><span class="p">:</span>
+                                        <span class="n">nr</span><span class="o">=</span><span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">cols</span> <span class="k">if</span> <span class="s1">&#39;NR&#39;</span> <span class="ow">in</span> <span class="n">i</span><span class="p">]</span>
+                                        <span class="nb">print</span><span class="p">(</span><span class="n">nr</span><span class="p">)</span>
+                                        <span class="c1"># sys.exit()</span>
+                                        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">nr</span><span class="p">:</span>
+                                            <span class="k">if</span> <span class="s2">&quot;FLAG&quot;</span> <span class="ow">in</span> <span class="n">k</span><span class="p">:</span>
+                                                <span class="n">stmt</span><span class="o">=</span><span class="n">stmt</span><span class="o">+</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=200,  TSYS2=&#39;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
+                                            <span class="k">else</span><span class="p">:</span>
+                                                <span class="n">stmt</span><span class="o">=</span><span class="n">stmt</span><span class="o">+</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=&#39;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
 
                                 <span class="n">stmt</span><span class="o">=</span><span class="n">stmt</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">+</span><span class="sa">f</span><span class="s2">&quot; WHERE FILENAME=&#39;</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&#39;; </span><span class="se">\n</span><span class="s2">&quot;</span>
 
-                                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;*** </span><span class="si">{</span><span class="n">stmt</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;*** </span><span class="si">{</span><span class="n">stmt</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
                                 <span class="c1"># sys.exit()</span>
                                 <span class="n">db</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt</span><span class="p">)</span>
                                 <span class="n">db</span><span class="o">.</span><span class="n">commit_changes</span><span class="p">()</span>
@@ -4942,9 +4976,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">Canvas</span><span class="o">.</span><span class="n">plot_residual</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_fit_parmeters</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_flags</span><span class="p">()</span></div>
-
-    
-    
 
     
 <div class="viewcode-block" id="Main.fit_data">
@@ -5681,9 +5712,6 @@
 
     
 
-    
-    
-
 <div class="viewcode-block" id="Main.choose_plot">
 <a class="viewcode-back" href="../../../docs/src.gui.html#src.gui.mainGuiLogic.Main.choose_plot">[docs]</a>
     <span class="k">def</span> <span class="nf">choose_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -5695,6 +5723,7 @@
 
         <span class="n">plotIndex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_plot_index</span><span class="p">()</span>
 
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Plot Index: &quot;</span><span class="p">,</span> <span class="n">plotIndex</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reset_previous_fits</span><span class="p">(</span><span class="n">plotIndex</span><span class="p">)</span>
 
         <span class="c1"># Set default to base fit type</span>
@@ -5759,8 +5788,6 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;There are no scans provided. &quot;</span><span class="p">,</span><span class="s1">&#39;info&#39;</span><span class="p">)</span></div>
 
-
-    
 
 <div class="viewcode-block" id="Main.popup_msg_dict">
 <a class="viewcode-back" href="../../../docs/src.gui.html#src.gui.mainGuiLogic.Main.popup_msg_dict">[docs]</a>
@@ -6106,6 +6133,13 @@
 
 
 
+<span class="c1"># # plottinf funcs</span>
+<span class="c1"># def plot_delete_filter(self,key,option,cols):</span>
+<span class="c1">#     # e.g(&#39;OL&#39;,option,cols)</span>
+<span class="c1">#     if key in option:</span>
+<span class="c1">#         ls=[]</span>
+<span class="c1">#         for i in cols:</span>
+<span class="c1">#             if key</span>
 </pre></div>
 
            </div>

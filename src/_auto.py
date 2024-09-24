@@ -1,6 +1,6 @@
 # =========================================================================== #
 # File: _auto.py                                                              #
-# Author: Pfesesani V. van Zyl      
+# Author: Pfesesani V. van Zyl                                                #
 # Email: pfesi24@gmail.com                                                    #
 # =========================================================================== #
 
@@ -8,188 +8,36 @@
 # --------------------------------------------------------------------------- #
 import os, sys
 import argparse
-from config import __version__, __DBNAME__ 
 import pandas as pd
 import sqlite3
 import numpy as np
 import gc
 import psutil
-import subprocess
-import atexit
 
 # Module imports
 # --------------------------------------------------------------------------- #
-from common.miscellaneousFunctions import create_current_scan_directory, delete_logs, fast_scandir
+from config import VERSION, DBNAME 
+from common.miscellaneousFunctions import get_source_properties, get_previously_processed_files, generate_quick_view, convert_database_to_table, delete_db, get_freq_band, get_tables_from_database, create_table_cols, create_current_scan_directory, delete_logs
 from common.logConfiguration import configure_logging
 from common.msgConfiguration import msg_wrapper, load_prog
 from common.observation import Observation
-from common.contextManagers import open_database
-from common.variables import sbCols, nbCols, nbCols22, nbCols22jup, dbCols
+
+
 # =========================================================================== #
 
 # TODO: CLEAN THIS CODE, ASAP!
-             
-def get_freq_band(freq:int):
-    if freq >= 1000 and freq<= 2000: 
-        return 'L'
-    elif freq > 2000 and freq<= 4000: #
-        return 'S'
-    elif freq > 4000 and freq<= 6000:
-        return 'C'
-    elif freq > 6000 and freq<= 8000:
-        # TODO: get correct frequency band for masers - ask Fanie vdHeever
-        return 'M' # for methanol masers
-    elif freq > 8000 and freq<= 12000: # 8580
-        return 'X'
-    elif freq > 12000 and freq<= 18000:
-        return 'Ku' 
-    elif freq >= 18000 and freq<= 27000:
-        return 'K'
+
+def process_new_file(pathToFile, log, myCols, theofit='',autofit=''):
     
-def check_freqs(freq:int,log,src=''):
-    # HartRAO frequency limits: https://www.sarao.ac.za/about/hartrao/hartrao-research-programmes/hartrao-26m-radio-telescope-details/
-    # NASA limits: https://www.nasa.gov/general/what-are-the-spectrum-band-designators-and-bandwidths/
-
-    # 18, 13,6,4.5,3.5,2.5,1.3 cm
-    colTypes=[]
-
-    # CREATE TABLE HYDRAA_4600 (id INTEGER PRIMARY KEY AUTOINCREMENT, FILENAME TEXT UNIQUE , FILEPATH TEXT , HDULENGTH INTEGER , CURDATETIME TEXT , OBSDATE TEXT , OBSTIME TEXT , OBSDATETIME TEXT , OBJECT TEXT , LONGITUD REAL , LATITUDE REAL , COORDSYS TEXT , EQUINOX REAL , RADECSYS TEXT , OBSERVER TEXT , OBSLOCAL TEXT , PROJNAME TEXT , PROPOSAL TEXT , TELESCOP TEXT , UPGRADE TEXT , FOCUS REAL , TILT REAL , TAMBIENT REAL , PRESSURE REAL , HUMIDITY REAL , WINDSPD REAL , SCANDIR TEXT , POINTING INTEGER , FEEDTYPE TEXT , BMOFFHA REAL , BMOFFDEC REAL , HABMSEP REAL , HPBW REAL , FNBW REAL , SNBW REAL , DICHROIC TEXT , PHASECAL TEXT , NOMTSYS REAL , FRONTEND TEXT , TCAL1 REAL , TCAL2 REAL , HZPERK1 REAL , HZKERR1 REAL , HZPERK2 REAL , HZKERR2 REAL , CENTFREQ REAL , BANDWDTH REAL , INSTRUME TEXT , INSTFLAG TEXT , SCANDIST REAL , SCANTIME REAL , TSYS1 REAL , TSYSERR1 REAL , TSYS2 REAL , TSYSERR2 REAL , BEAMTYPE TEXT , LOGFREQ REAL , ELEVATION REAL , ZA REAL , MJD REAL , HA REAL , PWV REAL , SVP REAL , AVP REAL , DPT REAL , WVD REAL , SEC_Z REAL , X_Z REAL , DRY_ATMOS_TRANSMISSION REAL , ZENITH_TAU_AT_1400M REAL , ABSORPTION_AT_ZENITH REAL , OBSNAME TEXT , NLBRMS REAL , NLSLOPE REAL , ANLBASELOCS TEXT , BNLBASELOCS TEXT , ANLTA REAL , ANLTAERR REAL , BNLTA REAL , BNLTAERR REAL , ANLMIDOFFSET REAL , BNLMIDOFFSET REAL , NLFLAG INTEGER , ANLS2N REAL , BNLS2N REAL , SLBRMS REAL , SLSLOPE REAL , ASLBASELOCS TEXT , BSLBASELOCS TEXT , ASLTA REAL , ASLTAERR REAL , BSLTA REAL , BSLTAERR REAL , ASLMIDOFFSET REAL , BSLMIDOFFSET REAL , SLFLAG INTEGER , ASLS2N REAL , BSLS2N REAL , OLBRMS REAL , OLSLOPE REAL , AOLBASELOCS TEXT , BOLBASELOCS TEXT , AOLTA REAL , AOLTAERR REAL , BOLTA REAL , BOLTAERR REAL , AOLMIDOFFSET REAL , BOLMIDOFFSET REAL , OLFLAG INTEGER , AOLS2N REAL , BOLS2N REAL , NRBRMS REAL , NRSLOPE REAL , ANRBASELOCS TEXT , BNRBASELOCS TEXT , ANRTA REAL , ANRTAERR REAL , BNRTA REAL , BNRTAERR REAL , ANRMIDOFFSET REAL , BNRMIDOFFSET REAL , NRFLAG INTEGER , ANRS2N REAL , BNRS2N REAL , SRBRMS REAL , SRSLOPE REAL , ASRBASELOCS TEXT , BSRBASELOCS TEXT , ASRTA REAL , ASRTAERR REAL , BSRTA REAL , BSRTAERR REAL , ASRMIDOFFSET REAL , BSRMIDOFFSET REAL , SRFLAG INTEGER , ASRS2N REAL , BSRS2N REAL , ORBRMS REAL , ORSLOPE REAL , AORBASELOCS TEXT , BORBASELOCS TEXT , AORTA REAL , AORTAERR REAL , BORTA REAL , BORTAERR REAL , AORMIDOFFSET REAL , BORMIDOFFSET REAL , ORFLAG INTEGER , AORS2N REAL , BORS2N REAL , AOLPC REAL , ACOLTA REAL , ACOLTAERR REAL , BOLPC REAL , BCOLTA REAL , BCOLTAERR REAL , AORPC REAL , ACORTA REAL , ACORTAERR REAL , BORPC REAL , BCORTA REAL , BCORTAERR REAL , SRC TEXT )
-    if freq >= 1000 and freq<= 2000: # 1662
-        msg_wrapper('debug',log.debug,'Preparing 18cm column labels')
-        colTypes=sbCols
-
-    elif freq > 2000 and freq<= 4000: # 2280
-        msg_wrapper('debug',log.debug,'Preparing 13cm column labels')
-        colTypes=sbCols
-
-    elif freq > 4000 and freq<= 6000: # 5000
-        msg_wrapper('debug',log.debug,'Preparing 6cm column labels')
-        colTypes=dbCols
-
-    elif freq > 6000 and freq<= 8000: # 6670, maser science
-        msg_wrapper('debug',log.debug,'Preparing 4.5cm column labels')
-        colTypes=nbCols
-
-    elif freq > 8000 and freq<= 12000: # 8580
-        msg_wrapper('debug',log.debug,'Preparing 3.5cm column labels')
-        colTypes=dbCols
-
-    elif freq > 12000 and freq<= 18000: # 12180
-        msg_wrapper('debug',log.debug,'Preparing 2.5cm column labels')
-        colTypes=nbCols
-
-    elif freq >= 18000 and freq<= 27000: # 23000
-        if src.upper()=='JUPITER':
-            msg_wrapper('debug',log.debug,'Preparing 1.3cm column labels')
-            colTypes=nbCols22jup
-        else:
-            colTypes=nbCols22
-
-    return colTypes
-
-def create_table_cols(freq:int,log,src=''):
-    # HartRAO frequency limits: https://www.sarao.ac.za/about/hartrao/hartrao-research-programmes/hartrao-26m-radio-telescope-details/
-    # NASA limits: https://www.nasa.gov/general/what-are-the-spectrum-band-designators-and-bandwidths/
-
-    # 18, 13,6,4.5,3.5,2.5,1.3 cm
-    cols=[]
-    colTypes=[]
-
-    
-    # CREATE TABLE HYDRAA_4600 (id INTEGER PRIMARY KEY AUTOINCREMENT, FILENAME TEXT UNIQUE , FILEPATH TEXT , HDULENGTH INTEGER , CURDATETIME TEXT , OBSDATE TEXT , OBSTIME TEXT , OBSDATETIME TEXT , OBJECT TEXT , LONGITUD REAL , LATITUDE REAL , COORDSYS TEXT , EQUINOX REAL , RADECSYS TEXT , OBSERVER TEXT , OBSLOCAL TEXT , PROJNAME TEXT , PROPOSAL TEXT , TELESCOP TEXT , UPGRADE TEXT , FOCUS REAL , TILT REAL , TAMBIENT REAL , PRESSURE REAL , HUMIDITY REAL , WINDSPD REAL , SCANDIR TEXT , POINTING INTEGER , FEEDTYPE TEXT , BMOFFHA REAL , BMOFFDEC REAL , HABMSEP REAL , HPBW REAL , FNBW REAL , SNBW REAL , DICHROIC TEXT , PHASECAL TEXT , NOMTSYS REAL , FRONTEND TEXT , TCAL1 REAL , TCAL2 REAL , HZPERK1 REAL , HZKERR1 REAL , HZPERK2 REAL , HZKERR2 REAL , CENTFREQ REAL , BANDWDTH REAL , INSTRUME TEXT , INSTFLAG TEXT , SCANDIST REAL , SCANTIME REAL , TSYS1 REAL , TSYSERR1 REAL , TSYS2 REAL , TSYSERR2 REAL , BEAMTYPE TEXT , LOGFREQ REAL , ELEVATION REAL , ZA REAL , MJD REAL , HA REAL , PWV REAL , SVP REAL , AVP REAL , DPT REAL , WVD REAL , SEC_Z REAL , X_Z REAL , DRY_ATMOS_TRANSMISSION REAL , ZENITH_TAU_AT_1400M REAL , ABSORPTION_AT_ZENITH REAL , OBSNAME TEXT , NLBRMS REAL , NLSLOPE REAL , ANLBASELOCS TEXT , BNLBASELOCS TEXT , ANLTA REAL , ANLTAERR REAL , BNLTA REAL , BNLTAERR REAL , ANLMIDOFFSET REAL , BNLMIDOFFSET REAL , NLFLAG INTEGER , ANLS2N REAL , BNLS2N REAL , SLBRMS REAL , SLSLOPE REAL , ASLBASELOCS TEXT , BSLBASELOCS TEXT , ASLTA REAL , ASLTAERR REAL , BSLTA REAL , BSLTAERR REAL , ASLMIDOFFSET REAL , BSLMIDOFFSET REAL , SLFLAG INTEGER , ASLS2N REAL , BSLS2N REAL , OLBRMS REAL , OLSLOPE REAL , AOLBASELOCS TEXT , BOLBASELOCS TEXT , AOLTA REAL , AOLTAERR REAL , BOLTA REAL , BOLTAERR REAL , AOLMIDOFFSET REAL , BOLMIDOFFSET REAL , OLFLAG INTEGER , AOLS2N REAL , BOLS2N REAL , NRBRMS REAL , NRSLOPE REAL , ANRBASELOCS TEXT , BNRBASELOCS TEXT , ANRTA REAL , ANRTAERR REAL , BNRTA REAL , BNRTAERR REAL , ANRMIDOFFSET REAL , BNRMIDOFFSET REAL , NRFLAG INTEGER , ANRS2N REAL , BNRS2N REAL , SRBRMS REAL , SRSLOPE REAL , ASRBASELOCS TEXT , BSRBASELOCS TEXT , ASRTA REAL , ASRTAERR REAL , BSRTA REAL , BSRTAERR REAL , ASRMIDOFFSET REAL , BSRMIDOFFSET REAL , SRFLAG INTEGER , ASRS2N REAL , BSRS2N REAL , ORBRMS REAL , ORSLOPE REAL , AORBASELOCS TEXT , BORBASELOCS TEXT , AORTA REAL , AORTAERR REAL , BORTA REAL , BORTAERR REAL , AORMIDOFFSET REAL , BORMIDOFFSET REAL , ORFLAG INTEGER , AORS2N REAL , BORS2N REAL , AOLPC REAL , ACOLTA REAL , ACOLTAERR REAL , BOLPC REAL , BCOLTA REAL , BCOLTAERR REAL , AORPC REAL , ACORTA REAL , ACORTAERR REAL , BORPC REAL , BCORTA REAL , BCORTAERR REAL , SRC TEXT )
-    if freq >= 1000 and freq<= 2000: # 1662
-        msg_wrapper('debug',log.debug,'Preparing 18cm column labels')
-        colTypes=sbCols
-
-    elif freq > 2000 and freq<= 4000: # 2280
-        msg_wrapper('debug',log.debug,'Preparing 13cm column labels')
-        colTypes=sbCols
-
-    elif freq > 4000 and freq<= 6000: # 5000
-        msg_wrapper('debug',log.debug,'Preparing 6cm column labels')
-        colTypes=dbCols
-
-    elif freq > 6000 and freq<= 8000: # 6670, maser science
-        msg_wrapper('debug',log.debug,'Preparing 4.5cm column labels')
-        colTypes=nbCols
-
-    elif freq > 8000 and freq<= 12000: # 8580
-        msg_wrapper('debug',log.debug,'Preparing 3.5cm column labels')
-        colTypes=dbCols
-
-    elif freq > 12000 and freq<= 18000: # 12180
-        msg_wrapper('debug',log.debug,'Preparing 2.5cm column labels')
-        colTypes=nbCols
-
-    elif freq >= 18000 and freq<= 27000: # 23000
-        if src.upper()=='JUPITER':
-            msg_wrapper('debug',log.debug,'Preparing 1.3cm column labels')
-            colTypes=nbCols22jup
-        else:
-            colTypes=nbCols22
-
-    return colTypes
-
-def get_tables_from_database(dbName=__DBNAME__):
-
-    with open_database(dbName) as f:
-        # cnx = sqlite3.connect(dbName)
-        dbTables= pd.read_sql_query("SELECT name FROM sqlite_schema WHERE type='table'", f)
-        tables=list(dbTables['name'])
-        # cnx.close()
-    return tables
-
-def get_files_and_folders(dirList):
-
-    data={'files':'', 'folders':''}
-    
-    if len(dirList)>0:
-        for dirItem in dirList:
-            if dirItem.endswith('.fits'):
-                data['files']+=f'{dirItem},'
-            else:
-                if '.DS_Store' in dirItem:
-                    pass
-                else:
-                    data['folders']+=f'{dirItem},'
-    
-    return data['files'].split(',')[:-1], data['folders'].split(',')[:-1]
-  
-def generate_table_name_from_path(pathToFolder:str):
-    
-    # work around for old file naming convention
-    splitPath = pathToFolder.split('/')
-    # print(splitPath)
-
-    # path ends with frequency
-    try:
-        if pathToFolder.endswith('/'):
-            freq=int(pathToFolder.split('/')[-2])
-            src=pathToFolder.split('/')[-3]
-        else:
-            freq=int(pathToFolder.split('/')[-1])
-            src=pathToFolder.split('/')[-2]
-    except Exception as e:
-        print('\nCould not resolve frequency from table name')
-        print('Trying old naming convention resolution')
-
-        try:
-            if pathToFolder.endswith('/'):
-                srcTable=(splitPath[-2]).upper()
-                freq=int(srcTable.split('_')[-1])
-                src=srcTable.split('_')[0]
-            else:
-                srcTable=(splitPath[-1]).upper()
-                freq=int(srcTable.split('_')[-1])
-                src=srcTable.split('_')[0]
-        except Exception as e:
-            print('\nFailed to resolve frequency from table name')
-            print(e)
-            sys.exit()
-
-    tableName=f'{src}_{freq}'.replace('-','M').replace('+','P')
-
-    return tableName.upper(),freq,src
+    # check if symlink
+    isSymlink=os.path.islink(f'{pathToFile}')
+    if not isSymlink:
+        obs=Observation(FILEPATH=pathToFile, theoFit=theofit, autoFit=autofit, log=log, dbCols=myCols)
+        obs.get_data()
+        del obs  
+        gc.collect()
+    else:
+        print(f'File is a symlink: {pathToFile}. Stopped processing')     
 
 def run(args):
     """
@@ -218,45 +66,16 @@ def run(args):
     # load the program banner
     load_prog('DRAN')
 
+    # Configure logging
+    log = configure_logging()
+    
     # delete database if option selected
     if args.delete_db:
-        if args.delete_db=='all':
-            os.system('rm *.db')
-        else:
-            try:
-                os.system(f'rm {args.delete_db}.db')
-            except:
-                print(f'Can not delete {args.delete_db}.db')
-                sys.exit()
-
+        delete_db(args.delete_db)
+        
     # convert database files to csv files
     if args.conv and not args.f:
-        
-        # Configure logging
-        log = configure_logging()
-         
-        db=args.conv
-        print('Converting database files')
-        tables=get_tables_from_database()
-        
-        if len(tables)>0:
-            for table in tables:
-                print(f'Converting table {table} to csv')
-                cnx = sqlite3.connect(__DBNAME__)
-                df = pd.read_sql_query(f"select * from {table}", cnx)
-                df.sort_values('FILENAME',inplace=True)
-
-                try:
-                    os.mkdir('Tables')
-                except:
-                    pass
-                df.to_csv(f'Tables/Table_{table}.csv',sep=',',index=False)
-            sys.exit()
-        else:
-            print('No tables found in the database')
-
-    else:
-        pass
+        convert_database_to_table(DBNAME)
         
     if args.f:
 
@@ -264,33 +83,10 @@ def run(args):
         if args.db:
             # Configure logging
             log = configure_logging(args.db)
-        else:
-            # Configure logging
-            log = configure_logging()
             
         # run a quickview
         if args.quickview:
-            
-            # check if file exists
-            if not os.path.exists(args.f):
-                msg_wrapper("error",log.error,f"File {args.f} does not exist, stopping quickview")
-                sys.exit()
-
-            # check if file is a symlink
-            elif os.path.islink(args.f):
-                msg_wrapper("error",log.error,f"File {args.f} is a symlink, stopping quickview")
-                sys.exit()
-
-            # check if file is a directory
-            elif os.path.isdir(args.f):
-                msg_wrapper("error",log.error,f"File {args.f} is a directory, stopping quickview")
-                sys.exit()
-            
-            else:
-                obs=Observation(FILEPATH=args.f, theoFit='',autoFit='',log=log)
-                obs.get_data_only(qv='yes')
-                sys.exit()
-
+            generate_quick_view(args.f,log,Observation)
         else:
         
             # Process the data from the specified file or folder
@@ -305,285 +101,425 @@ def run(args):
                 print(f'\nWorking on file: {args.f}')
                 print('*'*50)
 
-                # check if file has been processed already
-                pathToFile=args.f
-                fileName: str = args.f.split('/')[-1]
-                freq: int = args.f.split('/')[-2]
-                src: str = (args.f.split('/')[-3]).upper()
-
-                # get table columns
-                myCols=create_table_cols(int(freq),log)
-
-                assert pathToFile.endswith('.fits'), f'The program requires a fits file to work, got: {fileName}'
+                # process_file(args.f,args.f.split('/')[-1],log,DBNAME,pathToFolder='')
+                # process_file(fname,path,log,DBNAME,pathToFolder='')
                 
-                table=f'{src}_{freq}'
+                # check if file is in the correct folder/directory by matching the source name
+                # in file with path.
+                pathToFile, fileName, freq, src=get_source_properties(args.f.split('/')[-1],args.f)
+                pathToFolder ='/'.join(('/'.join(pathToFile.split('.fits')[:-1])).split('/')[:-1]).upper()
 
-                # check if table exists in database
-                cnx = sqlite3.connect(__DBNAME__)
-                dbTables= pd.read_sql_query("SELECT name FROM sqlite_schema WHERE type='table'", cnx)
-                tables=sorted(list(dbTables['name']))
-
-                print(tables)
-                print(table)
-                
-                tableSrc=src.replace('-','M').replace('+','P')
-                tableNameBand=get_freq_band(int(freq))
-                
-                # Check if data has been processed as something else:
-                tfns=[] # table file names
-                tbn=[] # table names
-
-                for tb in tables:
-                    
-                    if tableSrc in tb:
-                        
-                        b=get_freq_band(int(tb.split('_')[-1]))
-                        # 
-                        if b==tableNameBand:
-                            # print(tb,table,tableNameBand,tableSrc,b)
-                            print(tb,table,tableSrc, tableSrc in tb,b,tableNameBand)
-                #                                 # sys.exit()
-                #                                 # get data
-                            cnx = sqlite3.connect(__DBNAME__)
-                            tableData = pd.read_sql_query(f"SELECT * FROM {tb}", cnx)
-                            tableFilenames=sorted(list(tableData['FILENAME']))
-                                                # print(tableFilenames)
-                            tfns=tfns+tableFilenames
-                            tbn.append(tb)
-
-                #                     # print(tfns)
-                # diff_list = np.setdiff1d(tfns,files)
-
-                # if (fileName in tfns):
-                    
-                # sys.exit()
-                # if table in tables:
-                #     tableData = pd.read_sql_query(f"SELECT * FROM {table}", cnx)
-                #     tableFilenames=sorted(list(tableData['FILENAME']))
-                if fileName in tfns:
-                    print(f'Already processed: {pathToFile}')
-                    # sys.exit()
+                if 'HYDRA_A' in fileName:
+                    srcNameFromFileName='HYDRAA'
                 else:
+                    srcNameFromFileName=fileName.split('_')[-1].split('.fits')[0].upper() 
+
+                srcNameInPath=f'{srcNameFromFileName}' in pathToFolder.upper()
+
+                if not srcNameInPath:
+
+                    # create a new directory for this src
+                    print(f'File in wrong path: {pathToFile}')
+                    with open('wrongpaths.txt','a') as f:
+                        f.write(f'{pathToFile}\n')
+                    sys.exit()
+
+                else:
+
+                    assert pathToFile.endswith('.fits'), f'The program requires a fits file to work, got: {fileName}'
+                    
+                    # get processed files from database
+                    tableName, myCols, tableFileNames, tableNames = get_previously_processed_files(src, freq,log,DBNAME)
+
+                    if fileName in tableFileNames:
+                        print(f'Already processed: {pathToFile}')
+                    else:
                         print(f'Processing file: {pathToFile}')
+                        process_new_file(pathToFile, log, myCols, theofit='',autofit='')
+                sys.exit()  
 
-                        # check if symlink
-                        isSymlink=os.path.islink(f'{pathToFile}')
-                        if not isSymlink:
-                            obs=Observation(FILEPATH=pathToFile, theoFit='',autoFit='',log=log,dbCols=myCols)
-                            obs.get_data()
-                            del obs  
-                            gc.collect()
-                            sys.exit()
-                        else:
-                            print(f'File is a symlink: {args.f}. Stopped processing')
-                # else:
-                #     # check if symlink
-                #         isSymlink=os.path.islink(f'{pathToFile}')
-                #         if not isSymlink:
-                #             print(f'Processing file: {pathToFile}')
-                #             obs=Observation(FILEPATH=pathToFile, theoFit='',autoFit='',log=log)
-                #             obs.get_data()
-                #             del obs  
-                #             gc.collect()
-                #             sys.exit()
-                #         else:
-                #             print(f'File is a symlink: {args.f}. Stopped processing')
-                    
             elif readFolder and args.f != "../":
-
-                # Ok! we're reading from a folder
-                # 1. Check if there are existing files in the folder
-                print(f'\nWorking on folder: {args.f}')
-                print('*'*50)
-
-                # search for files
-                path=args.f
-                for dirpath, dirs, files in os.walk(path):
+                
+                msg_wrapper('info',log.info,f'Working on folder: {args.f}')
+                msg_wrapper('info',log.info,'*'*50)
+                
+                # Loop through all folders or files in path
+                for dirpath, dirs, files in os.walk(args.f):
+                    msg_wrapper('info',log.info,f'Found {len(files)} files in {dirpath}\n')
                     
-                    print(f'\n>>>>> Found {len(files)} files in {dirpath}\n')
-
+                    # print(files)
                     if len(files) == 0:
-                        pass
+                        msg_wrapper('info',log.info,f'No files found in {dirpath}')
+
                     elif len(files) == 1:
+                        
                         if files[0]=='.DS_Store':
                             pass
                         else:
                             if files[0].endswith('.fits'):
-                                print(f'file {files[0]} needs to get processed')
-                                
-                                # print(dirpath, files[0])
+                                msg_wrapper('info',log.info,f'Working in folder: {dirpath}')
+                                msg_wrapper('info',log.info,f'Processing file: {files[0]}')
+                                print('*'*50)
 
-                                splitPath=dirpath.split('/')
-                                print('\n',splitPath)
+                                # process_file(files[0],os.path.join(dirpath,files[0]),log,DBNAME,dirpath)
 
-                                freq=int(splitPath[-1])
-                                src=splitPath[-2].upper()
+                                # check if file is in the correct folder/directory by matching the source name
+                                # in file with path.
+                                pathToFile, fileName, freq, src=get_source_properties(files[0],os.path.join(dirpath,files[0]))
+                                pathToFolder = dirpath
 
-                                pathToFile = os.path.join(dirpath, files[0])#.replace('-','M').replace('+','P')
-                                print(freq,src,len(files),pathToFile)
-                                myCols=create_table_cols(freq,log,src)
-
-                                tableName=f'{src}_{freq}'.replace('-','M').replace('+','P')
-
-                                # check if table exists in database
-                                tables = get_tables_from_database()
-                                tables=[d for d in tables if 'sqlite_sequence' not in d]
-
-                                print(tableName,tables,tableName in tables)
-
-                                if tableName in tables:
-                                    print(tableName,' in ', tables, '1')
-                                    # sys.exit()
+                                if 'HYDRA_A' in fileName:
+                                    srcNameFromFileName='HYDRAA'
                                 else:
-                                    # check if files have been processed already
-                                    # Get all possible data from database similar to what 
-                                    # is being processed.
-                                    tableSrc=src.replace('-','M').replace('+','P')
-                                    tableNameBand=get_freq_band(int(freq))
+                                    srcNameFromFileName=fileName.split('_')[-1].split('.fits')[0].upper() 
 
-                                    # print(tableSrc,tableNameBand,tableName)
+                                srcNameInPath=f'{srcNameFromFileName}' in pathToFolder.upper()
 
+                                if not srcNameInPath:
+
+                                    # create a new directory for this src
+                                    print(f'File in wrong path: {pathToFile}')
+                                    with open('wrongpaths.txt','a') as f:
+                                        f.write(f'{pathToFile}\n')
+                                    sys.exit()
+                                else:
+                                    assert pathToFile.endswith('.fits'), f'The program requires a fits file to work, got: {fileName}'
+                    
+                                    # get processed files from database
+                                    tableName, myCols, tableFileNames, tableNames = get_previously_processed_files(src, freq,log,DBNAME)
+
+                                    
+                                    if fileName in tableFileNames:
+                                        print(f'Already processed: {pathToFile}')
+                                    else:
+
+                                        # print(tableName, myCols, tableFileNames, tableNames )
+                                        # sys.exit()
+                                        print(f'Processing file: {pathToFile}')
+                                        process_new_file(pathToFile, log, myCols, theofit='',autofit='')
+                                        # sys.exit() 
+
+                            else:
+                                print(f'>>>>> File : {files[0]} is not a valid observing file')
+
+                    else:
+                        
+                        # get the names of all the sources in the directory from the file names
+                        # check if file is in the correct folder/directory by matching the source name
+                        # in file with path.
+                        srcs=[]
+                        for file in files:
+                            if not file.endswith('.fits'):
+                                pass
+                            else:
+                                if 'HYDRA' in file: # solves 'HYDRA_A' issue
+                                    srcs.append('HYDRAA')
+                                else:
+                                    srcs.append(file.split('.fits')[0].split('_')[-1])
+
+                        srcsinfile=list(set(srcs))
+                        msg_wrapper('info',log.info,f'Sources found in directory: {srcsinfile}\n')
+                        
+                        
+                        if len(srcsinfile)>1:
+                            print('We have imposters, aka. files that dont belong here')
+                            sys.exit()
+                            # move the imposter files
+                            savef=''
+
+                            for f in srcsinfile:
+                                # print(f,dirpath)
+                                if f in dirpath:
+                                    savef=f
+                                    print('>>> ',f)
+
+                            # print(dirpath, srcsinfile, savef)
+
+                            # sys.exit()
+
+                            if savef=='':
+                                print(f'\nInvalid file or path format: {srcsinfile}')
+                                print('skipping processing\n')
+                            else:
+                                pass
+                                idx=srcsinfile.index(savef)
+                                srcsinfile.pop(idx)
+
+                                # The files we are kicking out
+
+                                print(dirpath, srcsinfile, savef)
+
+                                print(f'\nThe files we are kicking out contain: {srcsinfile}')
+
+                                sys.exit()
+
+                                if savef == "":
+                                    print('Houston, we have a problem!')
+                                    sys.exit()
+                                else:
+                                #     # print('\n',savef,file)
+                                #     # print(srcsinfile,file)
+                                # if True:    
+                                #     idx=srcsinfile.index(savef)
+                                #     srcsinfile.pop(idx)
+
+                                #     print(idx, srcsinfile, savef)
+
+                                    for s in srcsinfile:
+                                        for x in files:
+                                            if s in x:
+                                                savePath = dirpath.replace(savef,s)
+                                                # print(savePath)
+                                                curPath = os.path.join(dirpath,x)
+                                                newPath = dirpath.replace(savef,s)
+
+                                                try:
+                                                    os.makedirs(newPath)
+                                                except:
+                                                    pass
+
+                                                # print(f"move: {curPath} to {newPath} ")
+                                                print(newPath)
+                                                print(os.path.join(dirpath,x))
+                                                print(os.path.join(savePath,x))
+
+                                                # Check if the file is a symlink
+                                                isSymlink=os.path.islink(newPath)
+                                                if not isSymlink:
+                                                    # os.rename(os.path.join(dirpath,x), os.path.join(savePath,x))
+                                                    print(f'Moving file: {x} to {newPath}')
+                                                else:
+                                                    print(f'File is a symlink: {x}. Stopped processing')
+                                                #     # sys.exit()
+                                                    # done=True
+                                                    # break
+                                                # else:
+                                                #     print(f'File {x} already exists in the database')
+                                                #     # sys.exit()
+                                                #     # done=True
+                                                #     # break
+                                                # else:
+                                                #     print(f'File {x} is not a valid observing file')
+                                                #     # sys.exit()
+                                                #     # done=True
+                                                #     # break
+
+                                                # if done:
+                                                #     break
+
+
+
+
+
+                                                # os.system('mv {x} {dirpath.replace(savef,s)}')
+                                    #             print(f'Moving file: {x} to ') #{dirpath.replace(s,savef)}
+                                                # os.rename(os.path.join(dirpath,x), os.path.join(dirpath.replace(s,savef),x))
+                                                # done=True
+                                                # break
+                                        # dirpath=dirpath.replace(s,savef)
+                                    print(dirpath)
+
+                                    splitPath=dirpath.split('/')
+                                    # print('\n--', splitPath,'\n')
+
+                                    sys.exit()
+
+                                    done=False
+                                    if splitPath[-1]=='':
+                                        # ends with /
+                                        try:
+                                            freq=int(splitPath[-2])
+                                            src=splitPath[-3].upper().replace('-','M').replace('+','P')
+                                        except:
+                                            msg_wrapper("error",log.error,f"Error processing folder: {dirpath}")
+                                            # table name split
+                                            newSplit=splitPath[-2].split('_')
+                                            freq=int(newSplit[-1])
+                                            src=newSplit[0].upper().replace('-','M').replace('+','P')
+                                            # sys.exit()
+                                    else:
+                                        # ends with ''
+                                        try:
+                                            freq=int(splitPath[-1])
+                                            src=splitPath[-2].upper().replace('-','M').replace('+','P')
+                                        except:
+                                            msg_wrapper("error",log.error,f"Error processing folder: {dirpath}")
+                                            # table name split
+                                            newSplit=splitPath[-1].split('_')
+                                            freq=int(newSplit[-1])
+                                            src=newSplit[0].upper().replace('-','M').replace('+','P')
+                                            # sys.exit()
+
+                                    tableName=f'{src}_{freq}'.replace('-','M').replace('+','P')
+                                    tableNameFreqBand=get_freq_band(int(freq))
+
+                                    myCols=create_table_cols(freq,log,src)
+
+                                    print(f'\nFound freq: {freq}, for src: {src}')
+                                    print(f'\nCreated tableName: {tableName}')
                                     # sys.exit()
 
-                                    tfns=[] # table file names
-                                    tbn=[] # table names
+                                    # check if table exists in database
+                                    # ----------------------------------------------------------------
 
-                                    for tb in tables:
-                                        if tableSrc in tb:
-                                            b=get_freq_band(int(tb.split('_')[-1]))
-                                            if b==tableNameBand:
-                                                print(tb,tableName,tableSrc, tableSrc in tb,b,tableNameBand)
-                                                # sys.exit()
+                                    tablesFromDB = get_tables_from_database()
+                                    DBtables=[d for d in tablesFromDB if 'sqlite_sequence' not in d]
+
+                                    # get processed files from the database
+                                    dataInDBtables=[]
+                                    for table in DBtables:
+                                        if src in table:
+                                            tableEntryfreqBand=get_freq_band(int(table.split('_')[-1]))
+                                            if tableNameFreqBand==tableEntryfreqBand:
+
+                                                print(f'>> Found similar {tableEntryfreqBand}-band freq in table:',table)
+                                                    
                                                 # get data
-                                                cnx = sqlite3.connect(__DBNAME__)
-                                                tableData = pd.read_sql_query(f"SELECT * FROM {tb}", cnx)
+                                                cnx = sqlite3.connect(DBNAME)
+                                                tableData = pd.read_sql_query(f"SELECT * FROM {table}", cnx)
                                                 tableFilenames=sorted(list(tableData['FILENAME']))
-                                                # print(tableFilenames)
-                                                tfns=tfns+tableFilenames
-                                                tbn.append(tb)
+                                                dataInDBtables=dataInDBtables+tableFilenames
 
-                                    # print(tfns)
-                                    diff_list = np.setdiff1d(tfns,files)
-                                    # yields the elements in list1 that are NOT in list2 for (list1,list2)
+                                    # print(dataInDBtables)
+                                    # sys.exit()
+                                    # get all files that havent processed yet
+                                    unprocessedObs=[]
+                                    for fl in files:   
+                                        if fl in dataInDBtables:
+                                            pass
+                                        else:
+                                            unprocessedObs.append(fl)
 
-                                    print(diff_list)
+                                    # print(unprocessedObs)
 
-                                    if len(diff_list)>0:
-                                        for file in diff_list:
-                                            if file.endswith('.fits'):
-                                                print('-',pathToFile)
+
+                                    # sys.exit()
+                                    # process all unprossed files
+                                    if len(unprocessedObs)>0:
+
+                                        unprocessedObs=sorted(unprocessedObs)
+                                        print(f'There are {len(unprocessedObs)} unprocessed observations')
+                                        # sys.exit()
+
+                                        for ufile in unprocessedObs:
+                                            if ufile.endswith('.fits'):
+
+
+
+                                                pathToFile = os.path.join(dirpath,ufile).replace(' ','')
+
+                                                print(pathToFile)
+                                                print(freq, src, file, ufile)
+                                                sys.exit()
+
+                                    
+                                                # check if symlink
                                                 isSymlink=os.path.islink(f'{pathToFile}')
                                                 if not isSymlink:
+                                                    print(f'\nProcessing file: {pathToFile}')
                                                     obs=Observation(FILEPATH=pathToFile, theoFit='',autoFit='',log=log,dbCols=myCols)
-                                                    obs.get_data()    
+                                                    obs.get_data()
                                                     del obs  
                                                     gc.collect()
-                                                    sys.exit()
+
                                                 else:
                                                     print(f'File is a symlink: {pathToFile}. Stopped processing\n')
                                             else:
                                                 print(f'>>>>> File : {file} is not a valid observing file')
                                     else:
-                                        print('Already in list')
-                            else:
-                                print(f'>>>>> File : {file} is not a valid observing file')
+                                        print(f'Files already processed in table/s')
 
-                    else:
-                        print(f'\nWorking on Path: {dirpath}, ({len(files)}) files')
-
-                        splitPath=dirpath.split('/')
-                        print('\n--', splitPath,'\n')
-
-                        done=False
-                        if splitPath[-1]=='':
-                            # ends with /
-                            try:
-                                freq=int(splitPath[-2])
-                                src=splitPath[-3].upper().replace('-','M').replace('+','P')
-                            except:
-                                msg_wrapper("error",log.error,f"Error processing folder: {dirpath}")
-                                # table name split
-                                newSplit=splitPath[-2].split('_')
-                                freq=int(newSplit[-1])
-                                src=newSplit[0].upper().replace('-','M').replace('+','P')
-                                # sys.exit()
                         else:
-                            # ends with ''
-                            try:
-                                freq=int(splitPath[-1])
-                                src=splitPath[-2].upper().replace('-','M').replace('+','P')
-                            except:
-                                msg_wrapper("error",log.error,f"Error processing folder: {dirpath}")
-                                # table name split
-                                newSplit=splitPath[-1].split('_')
-                                freq=int(newSplit[-1])
-                                src=newSplit[0].upper().replace('-','M').replace('+','P')
-                                # sys.exit()
 
-                        tableName=f'{src}_{freq}'.replace('-','M').replace('+','P')
-                        tableNameFreqBand=get_freq_band(int(freq))
+                            pathToFolder = dirpath
+                            print(f'Processing files in directory: {pathToFolder}')
+                            
+                            # split the path to determine how to process the data if it ends
+                            # with / or ''
+                            splitPath=dirpath.split('/')
+                            if splitPath[-1]=='':
+                                # ends with /
+                                try:
+                                    freq=int(splitPath[-2])
+                                    src=splitPath[-3].upper().replace('-','M').replace('+','P')
+                                except:
+                                    msg_wrapper("error",log.error,f"Error processing folder: {dirpath}")
 
-                        myCols=create_table_cols(freq,log,src)
+                                    # table name split
+                                    newSplit=splitPath[-2].split('_')
+                                    freq=int(newSplit[-1])
+                                    src=newSplit[0].upper().replace('-','M').replace('+','P')
 
-                        print(f'\nFound freq: {freq}, for src: {src}')
-                        print(f'\nCreated tableName: {tableName}')
-                        
-                        # check if table exists in database
-                        # ----------------------------------------------------------------
-
-                        tablesFromDB = get_tables_from_database()
-                        DBtables=[d for d in tablesFromDB if 'sqlite_sequence' not in d]
-
-                        # get processed files from the database
-                        dataInDBtables=[]
-                        for table in DBtables:
-                            if src in table:
-                                tableEntryfreqBand=get_freq_band(int(table.split('_')[-1]))
-                                if tableNameFreqBand==tableEntryfreqBand:
-
-                                    print(f'>> Found similar {tableEntryfreqBand}-band freq in table:',table)
-                                        
-                                    # get data
-                                    cnx = sqlite3.connect(__DBNAME__)
-                                    tableData = pd.read_sql_query(f"SELECT * FROM {table}", cnx)
-                                    tableFilenames=sorted(list(tableData['FILENAME']))
-                                    dataInDBtables=dataInDBtables+tableFilenames
-
-                        # get all files that havent processed yet
-                        unprocessedObs=[]
-                        for file in files:   
-                            if file in dataInDBtables:
-                                pass
                             else:
-                                unprocessedObs.append(file)
+                                # ends with ''
+                                try:
+                                    freq=int(splitPath[-1])
+                                    src=splitPath[-2].upper().replace('-','M').replace('+','P')
+                                except:
+                                    msg_wrapper("error",log.error,f"Error processing folder: {dirpath}")
+                                    # table name split
+                                    newSplit=splitPath[-1].split('_')
 
-                        # process all unprossed files
-                        if len(unprocessedObs)>0:
+                                    try:
+                                        freq=int(newSplit[-1])
+                                        src=newSplit[0].upper().replace('-','M').replace('+','P')
+                                    except:
+                                        print('File path format is not what is expected.')
+                                        print(f'Treating this as a directory: {dirpath}')
+                                        print('Please make sure your path points to the source folder of the source you are trying to process')
 
-                            unprocessedObs=sorted(unprocessedObs)
-                            print(f'There are {len(unprocessedObs)} unprocessed observations')
+                                        #TODO: Create processing of data in any path. Do this later.
+                                        sys.exit()
+                                        if len(dirs)>0:
+                                            print('We have directories')
+
+                                            for fdir in dirs:
+                                                if '.ipynb' in fdir or '.D_Store' in fdir:
+                                                    pass
+                                                else:
+                                                    print(fdir)
+                                            sys.exit()
+                                        else:
+                                            print('Stopping processing, there are no directories to process.')
+                                            sys.exit()
+
+                            # get processed files from database
+                            tableName, myCols, filesInDAB, tableNames = get_previously_processed_files(src, freq,log,DBNAME)
+
+                            print(tableName,tableNames)
+                            # get all files that havent processed yet
+                            unprocessedObs=[]
+                            
+                            print(len(filesInDAB),len(files))
                             # sys.exit()
-
-                            for file in unprocessedObs:
-                                if file.endswith('.fits'):
-
-                                    pathToFile = os.path.join(dirpath,file).replace(' ','')
-                           
-                                    # check if symlink
-                                    isSymlink=os.path.islink(f'{pathToFile}')
-                                    if not isSymlink:
-                                        print(f'\nProcessing file: {pathToFile}')
-                                        obs=Observation(FILEPATH=pathToFile, theoFit='',autoFit='',log=log,dbCols=myCols)
-                                        obs.get_data()
-                                        del obs  
-                                        gc.collect()
-
-                                    else:
-                                        print(f'File is a symlink: {pathToFile}. Stopped processing\n')
+                            for fl in files:   
+                                if fl in filesInDAB:
+                                    pass
                                 else:
-                                    print(f'>>>>> File : {file} is not a valid observing file')
-                        else:
-                            print(f'Files already processed in table/s')
+                                    if '.DS_Store' in fl:
+                                        pass
+                                    else:
+                                        unprocessedObs.append(fl)
+
+
+                            # process all unprossed files
+                            if len(unprocessedObs)>0:
+                                unprocessedObs=sorted(unprocessedObs)
+                                print(f'There are {len(unprocessedObs)} unprocessed observations')
+                                # print(files)
+                                # sys.exit()
+
+                                for ufile in unprocessedObs:
+                                    if ufile.endswith('.fits'):
+                                        pathToFile = os.path.join(dirpath,ufile).replace(' ','')
+
+                                        print(f'Processing file: {pathToFile}')
+                                        process_new_file(pathToFile, log, myCols, theofit='',autofit='')
+                                    else:
+                                        print(f'>>>>> File : {ufile} is not a valid observing file, skipping processing')
+                                        
+                            else:
+                                print(f'Files already processed in table/s')
 
     else:
         if args.db:
@@ -647,7 +583,7 @@ def main():
                         -quickview y", type=str.lower, required=False, 
                         choices=['y', 'yes'])
     parser.add_argument('-version', action='version', version='%(prog)s ' + 
-                        f'{__version__}')
+                        f'{VERSION}')
     parser.set_defaults(func=run)
     args = parser.parse_args()
 
@@ -657,7 +593,7 @@ def main():
     # except:
     #     proc = psutil.Process(os.getpid())
     #     print('\n>>>>> Program interrupted. Terminating program.')
-    #     # proc.terminate()
+    #     proc.terminate()
 
 if __name__ == '__main__':   
 
@@ -668,6 +604,6 @@ if __name__ == '__main__':
     # except KeyboardInterrupt:
     #     print('\n>>>>> Program interrupted. Terminating program.')
 
-    # proc.terminate()
+    proc.terminate()
 
 

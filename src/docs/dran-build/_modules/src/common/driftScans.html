@@ -107,9 +107,10 @@
 <span class="kn">from</span> <span class="nn">.miscellaneousFunctions</span> <span class="kn">import</span> <span class="n">create_current_scan_directory</span>
 <span class="kn">from</span> <span class="nn">.sqlite_db</span> <span class="kn">import</span> <span class="n">SQLiteDB</span>
 <span class="kn">from</span> <span class="nn">.calibrate</span> <span class="kn">import</span> <span class="n">calibrate</span>
-
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">config</span> <span class="kn">import</span> <span class="n">__DBNAME__</span>
+<span class="kn">import</span> <span class="nn">sqlite3</span>
 
 <div class="viewcode-block" id="DriftScans">
 <a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScans.DriftScans">[docs]</a>
@@ -222,6 +223,15 @@
             <span class="k">return</span> <span class="p">[]</span></div>
 
         
+<div class="viewcode-block" id="DriftScans.get_scans">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScans.DriftScans.get_scans">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_scans</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scanDict</span><span class="p">:</span><span class="nb">dict</span><span class="p">,</span> <span class="n">scanKey</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+        <span class="n">offset</span><span class="o">=</span><span class="n">scanDict</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">scanKey</span><span class="si">}</span><span class="s1">_OFFSET&#39;</span><span class="p">)</span> 
+        <span class="n">lcp</span><span class="o">=</span><span class="n">scanDict</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">scanKey</span><span class="si">}</span><span class="s1">_TA_LCP&#39;</span><span class="p">)</span> 
+        <span class="n">rcp</span><span class="o">=</span><span class="n">scanDict</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">scanKey</span><span class="si">}</span><span class="s1">_TA_RCP&#39;</span><span class="p">)</span> 
+        <span class="k">return</span> <span class="n">offset</span><span class="p">,</span> <span class="n">lcp</span><span class="p">,</span> <span class="n">rcp</span></div>
+
+    
 <div class="viewcode-block" id="DriftScans.process_data">
 <a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScans.DriftScans.process_data">[docs]</a>
     <span class="k">def</span> <span class="nf">process_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -231,6 +241,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">create_current_scan_directory</span><span class="p">()</span>
 
+        
         <span class="n">frontend</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;FRONTEND&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
         <span class="n">theoFit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;theoFit&#39;</span><span class="p">]</span>
         <span class="n">autoFit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;autoFit&#39;</span><span class="p">]</span>
@@ -246,34 +257,45 @@
         <span class="n">src</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="n">saveTo</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;plots/</span><span class="si">{</span><span class="n">src</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">frq</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
 
+        <span class="c1"># print(saveTo)</span>
         <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Saving plots to: </span><span class="si">{</span><span class="n">saveTo</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;info&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Getting drift scans from file&quot;</span><span class="p">)</span>
             
+        <span class="c1"># for k,v in self.__dict__.items():</span>
+        <span class="c1">#     print(k,v)</span>
         
+        <span class="c1"># print(frontend)</span>
+        <span class="c1"># sys.exit()</span>
         <span class="k">if</span> <span class="s1">&#39;S&#39;</span> <span class="ow">in</span> <span class="n">frontend</span><span class="p">:</span> 
+
             <span class="c1">#&#39;13.0S&#39; or &quot;18.0S&quot; or &#39;02.5S&#39; or &quot;04.5S&quot; or &#39;01.3S&#39; :</span>
             
             <span class="c1"># Get driftscan data</span>
             <span class="n">data</span><span class="o">=</span><span class="n">DriftScanData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span> <span class="c1"># get the driftscan data</span>
             
+            <span class="c1"># print(frontend)</span>
+            <span class="c1"># sys.exit()</span>
             <span class="k">if</span> <span class="n">frontend</span> <span class="o">==</span> <span class="s1">&#39;13.0S&#39;</span> <span class="ow">or</span> <span class="n">frontend</span> <span class="o">==</span> <span class="s2">&quot;18.0S&quot;</span><span class="p">:</span>
-                <span class="n">onOffset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getScanData</span><span class="p">(</span><span class="s1">&#39;ON_OFFSET&#39;</span><span class="p">)</span> <span class="c1">#self.__dict__[&#39;ON_OFFSET&#39;][&#39;value&#39;]</span>
-                <span class="n">lcpOnScan</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getScanData</span><span class="p">(</span><span class="s1">&#39;ON_TA_LCP&#39;</span><span class="p">)</span> <span class="c1">#self.__dict__[&#39;ON_TA_LCP&#39;][&#39;value&#39;]</span>
-                <span class="n">rcpOnScan</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getScanData</span><span class="p">(</span><span class="s1">&#39;ON_TA_RCP&#39;</span><span class="p">)</span> <span class="c1">#self.__dict__[&#39;ON_TA_RCP&#39;][&#39;value&#39;]</span>
-
+                <span class="c1"># onOffset=self.getScanData(&#39;ON_OFFSET&#39;) #self.__dict__[&#39;ON_OFFSET&#39;][&#39;value&#39;]</span>
+                <span class="c1"># lcpOnScan=self.getScanData(&#39;ON_TA_LCP&#39;) #self.__dict__[&#39;ON_TA_LCP&#39;][&#39;value&#39;]</span>
+                <span class="c1"># rcpOnScan=self.getScanData(&#39;ON_TA_RCP&#39;) #self.__dict__[&#39;ON_TA_RCP&#39;][&#39;value&#39;]</span>
+                <span class="n">onOffset</span><span class="p">,</span> <span class="n">lcpOnScan</span><span class="p">,</span> <span class="n">rcpOnScan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_scans</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getScanData</span><span class="p">,</span><span class="s1">&#39;ON&#39;</span><span class="p">)</span>
                 <span class="n">dataScans</span><span class="o">=</span><span class="p">[</span><span class="n">onOffset</span><span class="p">,</span><span class="n">lcpOnScan</span><span class="p">,</span><span class="n">rcpOnScan</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">hpnOffset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getScanData</span><span class="p">(</span><span class="s1">&#39;HPN_OFFSET&#39;</span><span class="p">)</span> <span class="c1">#self.__dict__[&#39;HPN_OFFSET&#39;][&#39;value&#39;]</span>
-                <span class="n">lcpHpnScan</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getScanData</span><span class="p">(</span><span class="s1">&#39;HPN_TA_LCP&#39;</span><span class="p">)</span> <span class="c1">#self.__dict__[&#39;HPN_TA_LCP&#39;][&#39;value&#39;]</span>
-                <span class="n">rcpHpnScan</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getScanData</span><span class="p">(</span><span class="s1">&#39;HPN_TA_RCP&#39;</span><span class="p">)</span> <span class="c1">#self.__dict__[&#39;HPN_TA_RCP&#39;][&#39;value&#39;]</span>
+                <span class="c1"># hpnOffset=self.getScanData(&#39;HPN_OFFSET&#39;) #self.__dict__[&#39;HPN_OFFSET&#39;][&#39;value&#39;]</span>
+                <span class="c1"># lcpHpnScan=self.getScanData(&#39;HPN_TA_LCP&#39;) #self.__dict__[&#39;HPN_TA_LCP&#39;][&#39;value&#39;]</span>
+                <span class="c1"># rcpHpnScan=self.getScanData(&#39;HPN_TA_RCP&#39;) #self.__dict__[&#39;HPN_TA_RCP&#39;][&#39;value&#39;]</span>
+                <span class="n">hpnOffset</span><span class="p">,</span> <span class="n">lcpHpnScan</span><span class="p">,</span> <span class="n">rcpHpnScan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_scans</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getScanData</span><span class="p">,</span><span class="s1">&#39;HPN&#39;</span><span class="p">)</span>
 
-                <span class="n">hpsOffset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getScanData</span><span class="p">(</span><span class="s1">&#39;HPS_OFFSET&#39;</span><span class="p">)</span> <span class="c1">#self.__dict__[&#39;HPS_OFFSET&#39;][&#39;value&#39;]</span>
-                <span class="n">lcpHpsScan</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getScanData</span><span class="p">(</span><span class="s1">&#39;HPS_TA_LCP&#39;</span><span class="p">)</span> <span class="c1">#self.__dict__[&#39;HPS_TA_LCP&#39;][&#39;value&#39;]</span>
-                <span class="n">rcpHpsScan</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getScanData</span><span class="p">(</span><span class="s1">&#39;HPS_TA_RCP&#39;</span><span class="p">)</span> <span class="c1">#self.__dict__[&#39;HPS_TA_RCP&#39;][&#39;value&#39;]</span>
+                <span class="c1"># hpsOffset=self.getScanData(&#39;HPS_OFFSET&#39;) #self.__dict__[&#39;HPS_OFFSET&#39;][&#39;value&#39;]</span>
+                <span class="c1"># lcpHpsScan=self.getScanData(&#39;HPS_TA_LCP&#39;) #self.__dict__[&#39;HPS_TA_LCP&#39;][&#39;value&#39;]</span>
+                <span class="c1"># rcpHpsScan=self.getScanData(&#39;HPS_TA_RCP&#39;) #self.__dict__[&#39;HPS_TA_RCP&#39;][&#39;value&#39;]</span>
+                <span class="n">hpsOffset</span><span class="p">,</span> <span class="n">lcpHpsScan</span><span class="p">,</span> <span class="n">rcpHpsScan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_scans</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getScanData</span><span class="p">,</span><span class="s1">&#39;HPS&#39;</span><span class="p">)</span>
 
-                <span class="n">onOffset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getScanData</span><span class="p">(</span><span class="s1">&#39;ON_OFFSET&#39;</span><span class="p">)</span> <span class="c1">#self.__dict__[&#39;ON_OFFSET&#39;][&#39;value&#39;]</span>
-                <span class="n">lcpOnScan</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getScanData</span><span class="p">(</span><span class="s1">&#39;ON_TA_LCP&#39;</span><span class="p">)</span> <span class="c1">#self.__dict__[&#39;ON_TA_LCP&#39;][&#39;value&#39;]</span>
-                <span class="n">rcpOnScan</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getScanData</span><span class="p">(</span><span class="s1">&#39;ON_TA_RCP&#39;</span><span class="p">)</span> <span class="c1">#self.__dict__[&#39;ON_TA_RCP&#39;][&#39;value&#39;]</span>
+                <span class="c1"># onOffset=self.getScanData(&#39;ON_OFFSET&#39;) #self.__dict__[&#39;ON_OFFSET&#39;][&#39;value&#39;]</span>
+                <span class="c1"># lcpOnScan=self.getScanData(&#39;ON_TA_LCP&#39;) #self.__dict__[&#39;ON_TA_LCP&#39;][&#39;value&#39;]</span>
+                <span class="c1"># rcpOnScan=self.getScanData(&#39;ON_TA_RCP&#39;) #self.__dict__[&#39;ON_TA_RCP&#39;][&#39;value&#39;]</span>
+                <span class="n">onOffset</span><span class="p">,</span> <span class="n">lcpOnScan</span><span class="p">,</span> <span class="n">rcpOnScan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_scans</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getScanData</span><span class="p">,</span><span class="s1">&#39;ON&#39;</span><span class="p">)</span>
 
                 <span class="n">dataScans</span><span class="o">=</span><span class="p">[</span><span class="n">hpnOffset</span><span class="p">,</span><span class="n">lcpHpnScan</span><span class="p">,</span><span class="n">rcpHpnScan</span><span class="p">,</span>
                     <span class="n">hpsOffset</span><span class="p">,</span><span class="n">lcpHpsScan</span><span class="p">,</span><span class="n">rcpHpsScan</span><span class="p">,</span>
@@ -282,6 +304,10 @@
             <span class="c1"># create tables for scans and database data structure</span>
             <span class="n">scanData</span><span class="o">=</span><span class="p">{}</span> 
             <span class="n">tableData</span><span class="o">=</span><span class="p">{}</span> 
+
+            <span class="c1"># print(lcpHpsScan)</span>
+            <span class="c1"># print(data)</span>
+            <span class="c1"># sys.exit()</span>
 
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataScans</span><span class="p">)</span><span class="o">==</span><span class="mi">3</span><span class="p">:</span>
                 <span class="n">tag</span><span class="o">=</span><span class="s2">&quot;ON&quot;</span>
@@ -293,7 +319,7 @@
                 <span class="c1"># process the data - i.e. run the fitting and plotting algorithms</span>
                 <span class="n">processedLCPData</span><span class="o">=</span><span class="n">DataProcessingFlowManager</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span><span class="n">frq</span><span class="p">,</span><span class="n">src</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">lcp</span><span class="p">,</span><span class="n">log</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="n">saveTo</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s1">_LCP&#39;</span><span class="p">,</span><span class="s1">&#39;LCP&#39;</span><span class="p">,</span><span class="n">frontend</span><span class="p">,</span><span class="n">hpbw</span><span class="p">,</span><span class="n">fnbw</span><span class="p">,</span><span class="n">theoFit</span><span class="p">,</span> <span class="n">autoFit</span><span class="p">)</span>
                 <span class="n">processedRCPData</span><span class="o">=</span><span class="n">DataProcessingFlowManager</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span><span class="n">frq</span><span class="p">,</span><span class="n">src</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">rcp</span><span class="p">,</span><span class="n">log</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="n">saveTo</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s1">_RCP&#39;</span><span class="p">,</span><span class="s1">&#39;RCP&#39;</span><span class="p">,</span><span class="n">frontend</span><span class="p">,</span><span class="n">hpbw</span><span class="p">,</span><span class="n">fnbw</span><span class="p">,</span><span class="n">theoFit</span><span class="p">,</span> <span class="n">autoFit</span><span class="p">)</span>
-                
+                <span class="c1"># sys.exit()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">fill_in_missing_data_sb</span><span class="p">(</span><span class="n">processedLCPData</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tag</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">L&#39;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">fill_in_missing_data_sb</span><span class="p">(</span><span class="n">processedRCPData</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tag</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">R&#39;</span><span class="p">)</span>
 
@@ -328,8 +354,16 @@
                         <span class="n">processedRCPData</span><span class="o">=</span><span class="n">DataProcessingFlowManager</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span><span class="n">frq</span><span class="p">,</span><span class="n">src</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">rcp</span><span class="p">,</span><span class="n">log</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="n">saveTo</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s1">_RCP&#39;</span><span class="p">,</span><span class="s1">&#39;RCP&#39;</span><span class="p">,</span><span class="n">frontend</span><span class="p">,</span><span class="n">hpbw</span><span class="p">,</span><span class="n">fnbw</span><span class="p">,</span><span class="n">theoFit</span><span class="p">,</span> <span class="n">autoFit</span><span class="p">)</span>
                         <span class="c1"># if tag==&#39;ON&#39;:</span>
                         <span class="c1">#     sys.exit()</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">fill_in_missing_data_sb</span><span class="p">(</span><span class="n">processedLCPData</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tag</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">L&#39;</span><span class="p">)</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">fill_in_missing_data_sb</span><span class="p">(</span><span class="n">processedRCPData</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tag</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">R&#39;</span><span class="p">)</span>
+
+                        <span class="k">if</span> <span class="n">tag</span><span class="o">==</span><span class="s1">&#39;ON&#39;</span><span class="p">:</span>
+                            <span class="n">tg</span><span class="o">=</span><span class="s1">&#39;O&#39;</span>
+                        <span class="k">elif</span> <span class="n">tag</span><span class="o">==</span><span class="s1">&#39;HPN&#39;</span><span class="p">:</span>
+                            <span class="n">tg</span><span class="o">=</span><span class="s1">&#39;N&#39;</span>
+                        <span class="k">elif</span> <span class="n">tag</span><span class="o">==</span><span class="s1">&#39;HPS&#39;</span><span class="p">:</span>
+                            <span class="n">tg</span><span class="o">=</span><span class="s1">&#39;S&#39;</span>
+
+                        <span class="bp">self</span><span class="o">.</span><span class="n">fill_in_missing_data_sb</span><span class="p">(</span><span class="n">processedLCPData</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tg</span><span class="si">}</span><span class="s1">L&#39;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">fill_in_missing_data_sb</span><span class="p">(</span><span class="n">processedRCPData</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tg</span><span class="si">}</span><span class="s1">R&#39;</span><span class="p">)</span>
 
                         <span class="n">scanData</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;lcp&#39;</span><span class="p">:</span><span class="n">processedLCPData</span><span class="p">,</span> <span class="s1">&#39;rcp&#39;</span><span class="p">:</span><span class="n">processedRCPData</span><span class="p">}</span>
 
@@ -354,8 +388,13 @@
             <span class="c1"># sys.exit()</span>
 
             <span class="k">for</span> <span class="n">pol</span> <span class="ow">in</span> <span class="n">pols</span><span class="p">:</span>
+
+                <span class="nb">print</span><span class="p">()</span>
+
                 <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">:</span>
 
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Working on:&#39;</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span><span class="n">pol</span><span class="p">)</span>
+                    <span class="c1"># sys.exit()</span>
                     <span class="n">scan</span><span class="o">=</span><span class="n">scanData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">][</span><span class="n">pol</span><span class="p">]</span><span class="o">.</span><span class="vm">__dict__</span>
 
                     <span class="c1"># print(scan)</span>
@@ -372,7 +411,7 @@
                             <span class="c1"># sys.exit()</span>
                             <span class="k">for</span> <span class="n">s</span><span class="p">,</span><span class="n">t</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                                 <span class="k">if</span> <span class="s1">&#39;peakModel&#39;</span> <span class="ow">in</span> <span class="n">s</span> <span class="ow">or</span> <span class="s1">&#39;correctedData&#39;</span> <span class="ow">in</span> <span class="n">s</span>\
-                                    <span class="ow">or</span> <span class="s1">&#39;peakPts&#39;</span> <span class="ow">in</span> <span class="n">s</span> <span class="ow">or</span> <span class="s1">&#39;Res&#39;</span> <span class="ow">in</span> <span class="n">s</span> <span class="ow">or</span> <span class="s1">&#39;baseLocs&#39;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+                                    <span class="ow">or</span> <span class="s1">&#39;peakPts&#39;</span> <span class="ow">in</span> <span class="n">s</span> <span class="ow">or</span> <span class="s1">&#39;Res&#39;</span> <span class="ow">in</span> <span class="n">s</span>  <span class="ow">or</span> <span class="s1">&#39;baseLocs&#39;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
                                     <span class="c1"># print(&#39;+&#39;,s)</span>
                                     <span class="k">pass</span>
                                 <span class="k">else</span><span class="p">:</span>
@@ -407,11 +446,13 @@
                                         <span class="c1"># print(f&#39;{tg}{pol[0]}{div}SLOPE&#39;.upper(),t[0])</span>
 
                                         <span class="n">coeff</span><span class="o">=</span><span class="n">t</span> <span class="c1">#.split()</span>
+
                                         <span class="k">try</span><span class="p">:</span>
                                             <span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tg</span><span class="si">}{</span><span class="n">pol</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}{</span><span class="n">div</span><span class="si">}</span><span class="s1">SLOPE&#39;</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">coeff</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                                         <span class="k">except</span><span class="p">:</span>
                                             <span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tg</span><span class="si">}{</span><span class="n">pol</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}{</span><span class="n">div</span><span class="si">}</span><span class="s1">SLOPE&#39;</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
                                         <span class="c1"># dbInfo[f&#39;{c[i]}intercept&#39;]=float(coeff[1])</span>
+                                    
                                     <span class="k">elif</span> <span class="s1">&#39;base&#39;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
                                         <span class="n">ch</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span><span class="s1">&#39;;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;[&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;]&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
                                         <span class="c1"># print(s,ch)</span>
@@ -426,32 +467,37 @@
                         <span class="k">else</span><span class="p">:</span>
                             <span class="c1"># if pol==pols[0] and tag==tags[0]:</span>
                                 <span class="c1"># print(f&#39;{tag[0]}{pol[0]}&#39;)</span>
+                                <span class="c1"># print(&#39;===&#39;,tag,pol[0])</span>
+
+                                <span class="k">if</span> <span class="n">tag</span><span class="o">==</span><span class="s1">&#39;HPN&#39;</span><span class="p">:</span>
+                                    <span class="n">tg</span><span class="o">=</span><span class="s1">&#39;N&#39;</span>
+                                <span class="k">elif</span> <span class="n">tag</span><span class="o">==</span><span class="s1">&#39;ON&#39;</span><span class="p">:</span>
+                                    <span class="n">tg</span><span class="o">=</span><span class="s1">&#39;O&#39;</span>
+                                <span class="k">elif</span> <span class="n">tag</span><span class="o">==</span><span class="s1">&#39;HPS&#39;</span><span class="p">:</span>
+                                    <span class="n">tg</span><span class="o">=</span><span class="s1">&#39;S&#39;</span>
+
+                                <span class="n">key</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tg</span><span class="si">}{</span><span class="n">pol</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+                                <span class="c1"># print(&#39;$$$&#39;,key)</span>
                                 <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;fileName&#39;</span><span class="p">:</span>
                                     <span class="n">tableData</span><span class="p">[</span><span class="s1">&#39;OBSNAME&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">v</span>
                                     <span class="c1"># print(&#39;&lt;&lt;&#39;,k,v)</span>
                                 <span class="c1"># elif k.startswith(f&#39;{tag[0]}{pol[0]}&#39;.upper()): #&#39;RMS&#39; in k:</span>
                                 <span class="c1">#     tableData[k]=v</span>
                                 <span class="c1">#     print(&#39;&gt;&gt;&#39;,k,v)</span>
+                                <span class="k">elif</span> <span class="s1">&#39;RMSB&#39;</span> <span class="ow">in</span> <span class="n">k</span><span class="p">:</span>
+                                    <span class="k">if</span> <span class="n">k</span><span class="o">==</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">RMSB&#39;</span> <span class="p">:</span>
+                                        <span class="c1"># print(&#39;&gt;&gt;&gt;&#39;,k,v) </span>
+                                        <span class="n">tableData</span><span class="p">[</span><span class="n">k</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span><span class="o">=</span><span class="n">v</span>
+                                <span class="k">elif</span> <span class="s1">&#39;RMSA&#39;</span> <span class="ow">in</span> <span class="n">k</span><span class="p">:</span>
+                                    <span class="k">if</span> <span class="n">k</span><span class="o">==</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">RMSA&#39;</span> <span class="p">:</span>
+                                        <span class="c1"># print(&#39;&lt;&lt;&lt;&#39;,k,v) </span>
+                                        <span class="n">tableData</span><span class="p">[</span><span class="n">k</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span><span class="o">=</span><span class="n">v</span>   
                                 <span class="k">else</span><span class="p">:</span>
                                     <span class="c1"># print(&#39;&lt;&lt;-&#39;,k,v)</span>
                                     <span class="k">if</span> <span class="n">tag</span><span class="o">==</span><span class="s1">&#39;HPS&#39;</span> <span class="ow">or</span> <span class="n">tag</span><span class="o">==</span><span class="s1">&#39;HPN&#39;</span><span class="p">:</span>
                                         <span class="c1"># print(f&#39;=*= {k}&#39;.upper(), f&#39;{tag[-1]}{pol[0]}rms&#39;.upper())</span>
                                         <span class="k">if</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tag</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}{</span><span class="n">pol</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">rms&#39;</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">in</span> <span class="n">k</span><span class="p">:</span>
                                             <span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">div</span><span class="si">}{</span><span class="n">k</span><span class="si">}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span><span class="o">=</span><span class="n">v</span>
-                                            <span class="c1"># print(f&#39;{tag[-1]}{pol[0]}rms&#39;.upper())</span>
-                                    <span class="c1"># else:</span>
-                                        
-                                    <span class="c1"># else:</span>
-                                    <span class="c1">#     print(f&#39;==={k}&#39;.upper())</span>
-                                    <span class="c1">#     if f&#39;{tag[0]}{pol[0]}rms&#39;.upper() in k:</span>
-                                    <span class="c1">#         tableData[f&#39;{div}{k}&#39;.upper()]=v</span>
-                                    <span class="c1">#         print(f&#39;=== {div}{k}&#39;.upper())</span>
-                                    <span class="c1"># pass</span>
-                            <span class="c1"># else: </span>
-                            <span class="c1">#     pass</span>
-                    <span class="c1"># print()</span>
-            <span class="c1"># fill in missing data</span>
-            <span class="c1"># </span>
 
             <span class="c1"># sys.exit()</span>
             <span class="c1"># Calibrate the data</span>
@@ -463,7 +509,6 @@
                     <span class="n">tableData</span><span class="p">[</span><span class="s1">&#39;COLTAERR&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">taErr</span>
                     <span class="k">break</span>
                 
-
             <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">tableData</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">k</span><span class="o">==</span><span class="s1">&#39;ORTA&#39;</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">tags</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
                     <span class="n">pc</span><span class="p">,</span><span class="n">ta</span><span class="p">,</span><span class="n">taErr</span><span class="o">=</span><span class="n">calibrate</span><span class="p">(</span><span class="n">tableData</span><span class="p">[</span><span class="s1">&#39;SRTA&#39;</span><span class="p">],</span> <span class="n">tableData</span><span class="p">[</span><span class="s1">&#39;SRTAERR&#39;</span><span class="p">],</span> <span class="n">tableData</span><span class="p">[</span><span class="s1">&#39;NRTA&#39;</span><span class="p">],</span> <span class="n">tableData</span><span class="p">[</span><span class="s1">&#39;NRTAERR&#39;</span><span class="p">],</span> <span class="n">tableData</span><span class="p">[</span><span class="s1">&#39;ORTA&#39;</span><span class="p">],</span> <span class="n">tableData</span><span class="p">[</span><span class="s1">&#39;ORTAERR&#39;</span><span class="p">],</span> <span class="n">tableData</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">)</span>        
@@ -473,28 +518,87 @@
                     <span class="k">break</span>
 
             <span class="c1"># for k,v in tableData.items():</span>
-            <span class="c1">#     print(&#39;* &#39;,k,&#39;: &#39;,v)</span>
+            <span class="c1">#     if k==&#39;keys&#39; or k==&#39;values&#39;:</span>
+            <span class="c1">#         pass</span>
+            <span class="c1">#     else:</span>
+            <span class="c1">#         if &#39;S2N&#39; in k:# or &#39;RMS&#39; in k:</span>
+            <span class="c1">#             print(&#39;* &#39;,k,&#39;: &#39;,v)</span>
             <span class="c1"># sys.exit()</span>
             <span class="n">tableData</span><span class="p">[</span><span class="s1">&#39;SRC&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">tableData</span><span class="p">[</span><span class="s1">&#39;OBJECT&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
             <span class="n">freq</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">tableData</span><span class="p">[</span><span class="s1">&#39;CENTFREQ&#39;</span><span class="p">])</span>
             <span class="n">dbTable</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tableData</span><span class="p">[</span><span class="s1">&#39;SRC&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">freq</span><span class="si">}</span><span class="s2">&quot;</span><span class="c1">#.replace(&#39;-&#39;,&#39;m&#39;).replace(&#39;+&#39;,&#39;p&#39;)</span>
             <span class="n">dbTable</span><span class="o">=</span><span class="n">set_table_name</span><span class="p">(</span><span class="n">dbTable</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">)</span>
+
             <span class="k">try</span><span class="p">:</span>
                 <span class="nb">int</span><span class="p">(</span><span class="n">dbTable</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                 <span class="n">dbTable</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">dbTable</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="k">except</span><span class="p">:</span>
                 <span class="k">pass</span>
 
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Table: </span><span class="si">{</span><span class="n">dbTable</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Saving to Table: </span><span class="si">{</span><span class="n">dbTable</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="p">)</span>
 
+            <span class="c1"># sys.exit()</span>
             <span class="c1"># Get data to save to dictionary</span>
             <span class="c1"># --- Setup database where you will be storing information</span>
             <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="s2">&quot;Setup database&quot;</span><span class="p">)</span>
+
+            <span class="c1"># df=pd.DataFrame(tableData)</span>
+            <span class="c1"># print(df)</span>
+
+            <span class="c1"># if &#39;S&#39; in tableData[&#39;FRONTEND&#39;]: #==&#39;13.0S&#39;:</span>
+            <span class="c1">#     tableData.pop(&#39;HABMSEP&#39;,None)</span>
+            <span class="c1">#     tableData.pop(&#39;SEC_Z&#39;,None)</span>
+            <span class="c1">#     tableData.pop(&#39;X_Z&#39;,None)</span>
+            <span class="c1">#     tableData.pop(&#39;DRY_ATMOS_TRANSMISSION&#39;,None)</span>
+            <span class="c1">#     tableData.pop(&#39;ZENITH_TAU_AT_1400M&#39;,None)</span>
+            <span class="c1">#     tableData.pop(&#39;ABSORPTION_AT_ZENITH&#39;,None)</span>
+
+            <span class="c1"># print(tableData.keys())</span>
+            <span class="c1"># sys.exit()</span>
+
+            <span class="n">finalDict</span><span class="o">=</span><span class="p">{}</span>
+            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">tableData</span><span class="p">[</span><span class="s1">&#39;keys&#39;</span><span class="p">]:</span>
+                <span class="c1"># print(&#39;\n&#39;,m)</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">tableData</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">m</span><span class="o">==</span><span class="n">k</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">m</span><span class="o">==</span><span class="s1">&#39;keys&#39;</span> <span class="ow">or</span> <span class="n">m</span><span class="o">==</span><span class="s1">&#39;values&#39;</span><span class="p">:</span>
+                            <span class="k">pass</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="c1"># print(m,k,v)</span>
+                            <span class="c1"># if tableData[&#39;FRONTEND&#39;]==&#39;13.0S&#39; and tableData[&#39;&#39;]:</span>
+                            <span class="c1">#     print(m,k,v)</span>
+                            <span class="c1">#     print(tableData)</span>
+                            <span class="c1">#     sys.exit()</span>
+                            <span class="k">try</span><span class="p">:</span>
+                                <span class="c1"># print(m,k,v[&#39;value&#39;])</span>
+                                <span class="n">finalDict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">=</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+                            <span class="k">except</span><span class="p">:</span>
+                                <span class="c1"># print(m,k,v)</span>
+                                <span class="n">finalDict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">=</span><span class="n">v</span>
+                    
+            <span class="c1"># print(tableData[&#39;keys&#39;])</span>
+            <span class="c1"># # print(tableData[&#39;values&#39;])</span>
+            <span class="c1"># for l,v in finalDict.items():</span>
+            <span class="c1">#     print(l,v)</span>
+
+            <span class="c1"># print(finalDict[&#39;OBSDATE&#39;].split(&#39;T&#39;)[0])</span>
+            <span class="c1"># Get date</span>
+            <span class="n">finalDict</span><span class="p">[</span><span class="s1">&#39;OBSDATE&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">finalDict</span><span class="p">[</span><span class="s1">&#39;OBSDATE&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;T&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c1"># print(finalDict[&#39;OBSDATE&#39;])</span>
+            <span class="c1"># print(finalDict)</span>
+            <span class="c1"># print(len(tableData[&#39;keys&#39;]),len(tableData[&#39;values&#39;][:-1]),len(finalDict))</span>
+<span class="c1"># </span>
+            <span class="c1"># print(&#39;here&#39;)</span>
+            <span class="c1"># print(finalDict[&#39;FILEPATH&#39;])</span>
+            <span class="c1"># sys.exit()</span>
+
             <span class="n">db</span><span class="o">=</span> <span class="n">SQLiteDB</span><span class="p">(</span><span class="s1">&#39;HART26DATA.db&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">)</span>
             <span class="n">db</span><span class="o">.</span><span class="n">create_db</span><span class="p">()</span>
-            <span class="n">table</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="n">tableData</span><span class="p">,</span><span class="n">dbTable</span><span class="p">)</span>
-            <span class="n">db</span><span class="o">.</span><span class="n">populate_table</span><span class="p">(</span><span class="n">tableData</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span>
+            <span class="n">table</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="n">finalDict</span><span class="p">,</span><span class="n">dbTable</span><span class="p">)</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">populate_table</span><span class="p">(</span><span class="n">finalDict</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span>
             <span class="n">db</span><span class="o">.</span><span class="n">close_db</span><span class="p">()</span>
+
+            <span class="c1"># print(finalDict[&#39;FILEPATH&#39;])</span>
             <span class="c1"># sys.exit()</span>
             <span class="c1"># sys.exit()</span>
    
@@ -504,8 +608,8 @@
             <span class="c1"># Get driftscan data</span>
             <span class="n">data</span><span class="o">=</span><span class="n">DriftScanData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
             <span class="c1"># for k,v in data.__dict__.items():</span>
-                <span class="c1"># print(&#39;---&#39;,k,v)</span>
-
+            <span class="c1">#     print(&#39;---&#39;,k,v)</span>
+            <span class="c1"># sys.exit()</span>
             <span class="n">hpnOffset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getScanData</span><span class="p">(</span><span class="s1">&#39;HPN_OFFSET&#39;</span><span class="p">)</span> <span class="c1">#self.__dict__[&#39;HPN_OFFSET&#39;][&#39;value&#39;]</span>
             <span class="n">lcpHpnScan</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getScanData</span><span class="p">(</span><span class="s1">&#39;HPN_TA_LCP&#39;</span><span class="p">)</span> <span class="c1">#self.__dict__[&#39;HPN_TA_LCP&#39;][&#39;value&#39;]</span>
             <span class="n">rcpHpnScan</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">getScanData</span><span class="p">(</span><span class="s1">&#39;HPN_TA_RCP&#39;</span><span class="p">)</span> <span class="c1">#self.__dict__[&#39;HPN_TA_RCP&#39;][&#39;value&#39;]</span>
@@ -584,35 +688,28 @@
             <span class="c1"># print(myDict)</span>
             <span class="c1"># sys.exit()</span>
             <span class="c1"># for beam in beams:</span>
+            <span class="c1"># cnt=0</span>
             <span class="k">for</span> <span class="n">pol</span> <span class="ow">in</span> <span class="n">pols</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">()</span>
                 <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">:</span>
-                    <span class="c1"># print(&#39;Working on:&#39;, tag,pol)</span>
+                    <span class="c1"># print(&#39;\nWorking on:&#39;, tag,pol)</span>
                     <span class="c1"># print(f&#39;{tag.upper()}_{pol.upper()}&#39;)</span>
                     <span class="c1"># print(scanData.keys())</span>
                     <span class="n">scan</span><span class="o">=</span><span class="n">scanData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">][</span><span class="n">pol</span><span class="p">]</span><span class="o">.</span><span class="vm">__dict__</span>
                     <span class="c1"># print(scan.keys())</span>
                     <span class="c1"># sys.exit()</span>
                     <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">scan</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                        <span class="nb">print</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                        <span class="c1"># print(k)</span>
                         <span class="k">if</span> <span class="s1">&#39;Cleaned&#39;</span> <span class="ow">in</span> <span class="n">k</span> <span class="ow">or</span> <span class="s1">&#39;log&#39;</span> <span class="o">==</span> <span class="n">k</span> <span class="ow">or</span> <span class="s1">&#39;x&#39;</span> <span class="o">==</span> <span class="n">k</span> <span class="ow">or</span> <span class="s1">&#39;y&#39;</span> <span class="o">==</span> <span class="n">k</span>\
                             <span class="ow">or</span> <span class="n">k</span><span class="o">==</span><span class="s1">&#39;applyRFIremoval&#39;</span> <span class="ow">or</span> <span class="n">k</span><span class="o">==</span><span class="s1">&#39;spl&#39;</span> <span class="ow">or</span> <span class="n">k</span><span class="o">==</span><span class="s1">&#39;pt&#39;</span>\
                             <span class="ow">or</span> <span class="n">k</span><span class="o">==</span><span class="s1">&#39;srcTag&#39;</span> <span class="ow">or</span> <span class="n">k</span><span class="o">==</span><span class="s1">&#39;flag&#39;</span> <span class="ow">or</span> <span class="n">k</span><span class="o">==</span><span class="s1">&#39;pol&#39;</span><span class="p">:</span>
                             <span class="k">pass</span>
-                        <span class="c1"># elif &#39;RMS&#39; in k:</span>
-                        <span class="c1">#     if tag==&#39;ON&#39;:</span>
-                        <span class="c1">#         tg=&#39;O&#39;</span>
-                        <span class="c1">#     elif tag==&#39;HPN&#39;:</span>
-                        <span class="c1">#         tg=&quot;N&quot;</span>
-                        <span class="c1">#     elif tag==&quot;HPS&quot;:</span>
-                        <span class="c1">#         tg=&quot;S&quot;</span>
-                        <span class="c1">#         div=&#39;&#39;</span>
-                        <span class="c1">#     tableData[f&#39;{beams[0]}{tg}{pol[0]}{div}{k}&#39;.upper()]=v</span>
 
                         <span class="k">elif</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tag</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">pol</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span> <span class="ow">in</span> <span class="n">k</span><span class="p">:</span>
                             <span class="c1"># print(f&#39;{tag.upper()}_{pol.upper()}&#39;)</span>
 
                             <span class="k">for</span> <span class="n">s</span><span class="p">,</span><span class="n">t</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-+-&#39;</span><span class="p">,</span><span class="n">s</span><span class="p">)</span>
+                                <span class="c1"># print(&#39;-+-&#39;,s)</span>
 
                                 <span class="k">if</span> <span class="s1">&#39;PeakModel&#39;</span> <span class="ow">in</span> <span class="n">s</span> <span class="ow">or</span> <span class="s1">&#39;correctedData&#39;</span> <span class="ow">in</span> <span class="n">s</span>\
                                     <span class="ow">or</span> <span class="s1">&#39;PeakData&#39;</span> <span class="ow">in</span> <span class="n">s</span> <span class="ow">or</span> <span class="s1">&#39;Res&#39;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span> <span class="c1"># or  &#39;baseLocs&#39; in s:</span>
@@ -628,14 +725,8 @@
                                         <span class="n">tg</span><span class="o">=</span><span class="s2">&quot;N&quot;</span>
                                     <span class="k">elif</span> <span class="n">tag</span><span class="o">==</span><span class="s2">&quot;HPS&quot;</span><span class="p">:</span>
                                         <span class="n">tg</span><span class="o">=</span><span class="s2">&quot;S&quot;</span>
-                                    <span class="c1"># tg=tag</span>
-                                    <span class="n">div</span><span class="o">=</span><span class="s1">&#39;&#39;</span> <span class="c1">#divider = &#39;_&#39; or &quot;&quot;</span>
 
-                                    <span class="c1"># print(tg,pol)</span>
-                                    
-                                    <span class="c1"># if &#39;RMS&#39; in s:</span>
-                                    <span class="c1">#     tableData[f&#39;{beams[0]}{tg}{pol[0]}{div}{s}&#39;.upper()]=t</span>
-                                    <span class="c1"># el</span>
+                                    <span class="n">div</span><span class="o">=</span><span class="s1">&#39;&#39;</span> <span class="c1">#divider = &#39;_&#39; or &quot;&quot;</span>
 
                                     <span class="k">if</span> <span class="n">s</span><span class="o">==</span><span class="s1">&#39;leftPeakFit&#39;</span><span class="p">:</span>
                                         <span class="c1"># print(f&#39;{beams[0]}{tg}{pol[0]}{div}TA&#39;.upper(),t)</span>
@@ -666,16 +757,18 @@
                                         <span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beams</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}{</span><span class="n">tg</span><span class="si">}{</span><span class="n">pol</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}{</span><span class="n">div</span><span class="si">}</span><span class="s1">midoffset&#39;</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span><span class="o">=</span><span class="n">t</span>
                                     
                                     <span class="k">elif</span> <span class="n">s</span><span class="o">==</span><span class="s1">&#39;driftRms&#39;</span><span class="p">:</span>
-                                            <span class="c1"># print(f&#39;{tg}{pol[0]}{div}BRMS&#39;.upper(),t)</span>
+                                            <span class="c1"># print(&#39;drift rms: &#39;, f&#39;{tg}{pol[0]}{div}BRMS&#39;.upper(),t)</span>
                                             <span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tg</span><span class="si">}{</span><span class="n">pol</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}{</span><span class="n">div</span><span class="si">}</span><span class="s1">BRMS&#39;</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span><span class="o">=</span><span class="n">t</span>
                                     <span class="k">elif</span> <span class="s1">&#39;driftCoeffs&#39;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+                                        <span class="c1"># print(&#39;driftCoeffs: &#39;, f&#39;{tg}{pol[0]}{div}BRMS&#39;.upper(),t)</span>
                                         <span class="c1"># print(f&#39;{tg}{pol[0]}{div}SLOPE&#39;.upper(),t[0])</span>
 
                                         <span class="c1"># coeff=t #.split()</span>
                                         <span class="c1"># print(t)</span>
                                         <span class="k">try</span><span class="p">:</span>
                                             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
-                                                <span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beams</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}{</span><span class="n">tg</span><span class="si">}{</span><span class="n">pol</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}{</span><span class="n">div</span><span class="si">}</span><span class="s1">BASELocs&#39;</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+                                                <span class="c1"># tableData[f&#39;{beams[0]}{tg}{pol[0]}{div}BASELocs&#39;.upper()] = np.nan</span>
                                                 <span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tg</span><span class="si">}{</span><span class="n">pol</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}{</span><span class="n">div</span><span class="si">}</span><span class="s1">SLOPE&#39;</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
                                                 <span class="c1"># print(f&#39;### {tg}{pol[0]}{div}SLOPE&#39;.upper())</span>
                                             <span class="k">else</span><span class="p">:</span>
@@ -702,7 +795,7 @@
                                         <span class="c1">#     ch=str(t).replace(&#39;,&#39;,&#39;;&#39;).replace(&#39;[&#39;,&#39;&#39;).replace(&#39;]&#39;,&#39;&#39;)</span>
                                         <span class="c1">#     # print(s,ch)</span>
                                         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
-                                            <span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beams</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}{</span><span class="n">tg</span><span class="si">}{</span><span class="n">pol</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}{</span><span class="n">div</span><span class="si">}</span><span class="s1">BASELocs&#39;</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                                            <span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beams</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}{</span><span class="n">tg</span><span class="si">}{</span><span class="n">pol</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}{</span><span class="n">div</span><span class="si">}</span><span class="s1">BASELocs&#39;</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
                                         <span class="k">else</span><span class="p">:</span>
                                             <span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beams</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}{</span><span class="n">tg</span><span class="si">}{</span><span class="n">pol</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}{</span><span class="n">div</span><span class="si">}</span><span class="s1">BASElocs&#39;</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">;</span><span class="si">{</span><span class="n">t</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
                                         <span class="c1">#     # print(f&#39;{tg}{pol[0]}{div}{s}&#39;.upper(),ch)</span>
@@ -716,23 +809,91 @@
                                             <span class="c1"># print(f&#39;&gt;&gt;&gt;&gt; {tg}{pol[0]}{div}{s}&#39;.upper(),t)</span>
 
                         <span class="k">else</span><span class="p">:</span>
-                            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-----&#39;</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
+                            <span class="c1"># pass</span>
+                            <span class="c1"># print(&#39;-----&#39;,k,beams[0])</span>
 
                             <span class="c1"># if k == &#39;fileName&#39;:</span>
                             <span class="c1">#     tableData[&#39;OBSNAME&#39;]=v</span>
-                            <span class="c1"># elif &#39;RMS&#39; in k:</span>
-                            <span class="c1">#     tableData[k]=v</span>
-                            <span class="c1">#     if tag==&#39;ON&#39;:</span>
-                            <span class="c1">#         tg=&#39;O&#39;</span>
-                            <span class="c1">#     elif tag==&#39;HPN&#39;:</span>
-                            <span class="c1">#         tg=&quot;N&quot;</span>
-                            <span class="c1">#     elif tag==&quot;HPS&quot;:</span>
-                            <span class="c1">#         tg=&quot;S&quot;</span>
-                            <span class="c1">#     div=&#39;&#39;</span>
-                            <span class="c1">#     tableData[f&#39;{beams[0]}{tg}{pol[0]}{div}{k}&#39;.upper()]=v</span>
+                            <span class="k">if</span> <span class="n">tag</span><span class="o">==</span><span class="s1">&#39;ON&#39;</span><span class="p">:</span>
+                                <span class="n">tg</span><span class="o">=</span><span class="s1">&#39;O&#39;</span>
+                            <span class="k">elif</span> <span class="n">tag</span><span class="o">==</span><span class="s1">&#39;HPN&#39;</span><span class="p">:</span>
+                                <span class="n">tg</span><span class="o">=</span><span class="s2">&quot;N&quot;</span>
+                            <span class="k">elif</span> <span class="n">tag</span><span class="o">==</span><span class="s2">&quot;HPS&quot;</span><span class="p">:</span>
+                                <span class="n">tg</span><span class="o">=</span><span class="s2">&quot;S&quot;</span>
+                            <span class="n">div</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
+
+                            <span class="k">if</span> <span class="s1">&#39;RMSB&#39;</span> <span class="ow">in</span> <span class="n">k</span><span class="p">:</span> <span class="c1"># or &#39;RMSA&#39; in k:</span>
+                                <span class="n">tg</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tg</span><span class="si">}{</span><span class="n">pol</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+                                
+                                <span class="k">if</span> <span class="n">pol</span><span class="o">==</span><span class="s1">&#39;rcp&#39;</span> <span class="p">:</span>
+                                    <span class="n">tg</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tg</span><span class="si">}</span><span class="s1">R&#39;</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+                                    <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;L&#39;</span><span class="p">,</span><span class="s1">&#39;R&#39;</span><span class="p">)</span>
+                                    <span class="c1"># print(k,v,tg)</span>
+                                    <span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span><span class="o">=</span><span class="n">v</span>
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="k">if</span> <span class="n">tg</span> <span class="ow">in</span> <span class="n">k</span><span class="p">:</span>
+                                        <span class="c1"># print(pol,tag,k,v, &#39;L&#39;)</span>
+                                        <span class="c1"># print(k,v)</span>
+                                        <span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span><span class="o">=</span><span class="n">v</span>
+                                    <span class="k">else</span><span class="p">:</span>
+                                        <span class="k">pass</span>
+                            <span class="c1"># elif &#39;RMSA&#39; in k: # or &#39;RMSA&#39; in k:</span>
+                                
+                                <span class="c1"># print(pol,tag,k,v)</span>
+                                
+                                <span class="c1"># # tableData[k]=v</span>
+                            <span class="k">elif</span> <span class="s1">&#39;RMSA&#39;</span> <span class="ow">in</span> <span class="n">k</span><span class="p">:</span> <span class="c1"># or &#39;RMSA&#39; in k:</span>
+                                
+                                <span class="c1"># print(tg)</span>
+                                <span class="k">if</span> <span class="n">pol</span><span class="o">==</span><span class="s1">&#39;rcp&#39;</span> <span class="p">:</span>
+                                    <span class="n">tg</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tg</span><span class="si">}</span><span class="s1">R&#39;</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+                                    <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;L&#39;</span><span class="p">,</span><span class="s1">&#39;R&#39;</span><span class="p">)</span>
+                                    <span class="c1"># print(k,v,tg)</span>
+                                    <span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span><span class="o">=</span><span class="n">v</span>
+                                    <span class="c1"># print(&#39;&gt;&gt;&gt;&#39;,tg,pol)</span>
+                                    <span class="c1"># if tg in k:</span>
+                                    <span class="c1">#     print(pol,tag,k,v,&#39;R&#39;)</span>
+                                    <span class="c1"># else:</span>
+                                    <span class="c1">#     pass</span>
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="n">tg</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tg</span><span class="si">}{</span><span class="n">pol</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+                                    <span class="k">if</span> <span class="n">tg</span> <span class="ow">in</span> <span class="n">k</span><span class="p">:</span>
+                                        <span class="c1"># print(pol,tag,k,v, &#39;L&#39;)</span>
+                                        <span class="c1"># print(k,v)</span>
+                                        <span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span><span class="o">=</span><span class="n">v</span>
+                                    <span class="k">else</span><span class="p">:</span>
+                                        <span class="k">pass</span>
+                            <span class="c1"># elif &#39;RMSA&#39; in k: # or &#39;RMSA&#39; in k:</span>
+                                
+                                <span class="c1"># print(pol,tag,k,v)</span>
+
+                                
+                                <span class="c1"># if pol==&#39;LCP&#39; or pol==&#39;lcp&#39;:</span>
+                                <span class="c1">#     p=&#39;L&#39;</span>
+                                <span class="c1"># elif pol==&#39;RCP&#39; or pol==&#39;rcp&#39;:</span>
+                                <span class="c1">#     p=&#39;R&#39;</span>
+                                <span class="c1"># else:</span>
+                                <span class="c1">#     print(pol)</span>
+                                <span class="c1">#     print(&#39;ERROR: unknown polarization&#39;)</span>
+                                <span class="c1">#     sys.exit()</span>
+                                <span class="c1">#     # continue</span>
+                                <span class="c1"># print(&#39;pol: &#39;, pol)</span>
+
+                                <span class="c1"># if k==&#39;RMSA&#39; or k==&#39;RMSB&#39;:</span>
+                                <span class="c1">#     print(&#39;((((()))))&#39;,k,f&#39;{tg}{p}{k}&#39;.upper(),v)</span>
+                                <span class="c1"># else:</span>
+                          
+                                <span class="c1">#     print(&#39;--&gt;&gt;-&#39;,k, tag,f&#39;{k}&#39;.upper(),v)</span>
+                            <span class="c1">#     tableData[f&#39;{k}&#39;.upper()]=v</span>
+                                <span class="c1"># tableData[f&#39;{beams[0]}{tg}{p}{k}&#39;.upper()]=v</span>
 
                             <span class="c1"># else:</span>
                             <span class="c1">#     pass</span>
+
+            <span class="c1"># sys.exit()</span>
+
+            <span class="c1"># for k,v in tableData.items():</span>
+            <span class="c1">#     print(k,v)</span>
 
             <span class="k">for</span> <span class="n">beam</span> <span class="ow">in</span> <span class="n">beams</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">tableData</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -746,68 +907,110 @@
             <span class="k">for</span> <span class="n">beam</span> <span class="ow">in</span> <span class="n">beams</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">tableData</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                     <span class="k">if</span> <span class="n">k</span><span class="o">==</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s1">ORTA&#39;</span><span class="p">:</span>
-                        <span class="n">pc</span><span class="p">,</span><span class="n">ta</span><span class="p">,</span><span class="n">taErr</span><span class="o">=</span><span class="n">calibrate</span><span class="p">(</span><span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s1">SRTA&#39;</span><span class="p">],</span> <span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s1">SRTAERR&#39;</span><span class="p">],</span> <span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s1">NRTA&#39;</span><span class="p">],</span> <span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s1">NRTAERR&#39;</span><span class="p">],</span> <span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s1">ORTA&#39;</span><span class="p">],</span> <span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s1">ORTAERR&#39;</span><span class="p">],</span> <span class="n">tableData</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">)</span>
+                        <span class="c1"># print(&#39;----&#39;,tableData[f&#39;{beam}SRTAERR&#39;])</span>
+
+                        <span class="n">srta</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s1">SRTA&#39;</span><span class="p">])</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">srtaerr</span><span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s1">SRTAERR&#39;</span><span class="p">])</span>
+                        <span class="k">except</span><span class="p">:</span>
+                            <span class="n">srtaerr</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                            <span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s1">SRTAERR&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+                        <span class="n">nrta</span><span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s1">NRTA&#39;</span><span class="p">])</span>
+
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">nrtaerr</span><span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s1">NRTAERR&#39;</span><span class="p">])</span>
+                        <span class="k">except</span><span class="p">:</span>
+                            <span class="n">nrtaerr</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                            <span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s1">NRTAERR&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                        <span class="n">orta</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s1">ORTA&#39;</span><span class="p">])</span>
+
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">ortaerr</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span> <span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s1">ORTAERR&#39;</span><span class="p">])</span>
+                        <span class="k">except</span><span class="p">:</span>
+                            <span class="n">ortaerr</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                            <span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s1">ORTAERR&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                            
+                        <span class="c1"># print(srta,srtaerr,orta,ortaerr,nrta,nrtaerr)</span>
+                        <span class="n">pc</span><span class="p">,</span><span class="n">ta</span><span class="p">,</span><span class="n">taErr</span><span class="o">=</span><span class="n">calibrate</span><span class="p">(</span><span class="n">srta</span><span class="p">,</span> <span class="n">srtaerr</span><span class="p">,</span> <span class="n">nrta</span><span class="p">,</span><span class="n">nrtaerr</span><span class="p">,</span> <span class="n">orta</span><span class="p">,</span><span class="n">ortaerr</span><span class="p">,</span> <span class="n">tableData</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">)</span>
                         <span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s1">ORPC&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">pc</span>
                         <span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s1">CORTA&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">ta</span>
                         <span class="n">tableData</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">beam</span><span class="si">}</span><span class="s1">CORTAERR&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">taErr</span>
                         <span class="k">break</span>
 
             <span class="c1"># Calibrate the data</span>
+            <span class="n">finalData</span><span class="o">=</span><span class="p">{}</span>
             <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">tableData</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="c1"># print(&#39;* &#39;,k,&#39;: &#39;,v)</span>
-                <span class="k">if</span> <span class="s1">&#39;RMS&#39;</span> <span class="ow">in</span> <span class="n">k</span><span class="p">:</span>
-                <span class="c1">#     print(k)</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;* &#39;</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="s1">&#39;: &#39;</span><span class="p">,</span><span class="n">v</span><span class="p">)</span>
-                <span class="c1">#     sys.exit()</span>
-            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">k</span><span class="o">==</span><span class="s1">&#39;keys&#39;</span> <span class="ow">or</span> <span class="n">k</span><span class="o">==</span><span class="s1">&#39;values&#39;</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="k">else</span><span class="p">:</span>
+                    
+                    <span class="k">if</span> <span class="n">k</span><span class="o">==</span><span class="s1">&#39;RMSA&#39;</span> <span class="ow">or</span> <span class="n">k</span><span class="o">==</span><span class="s1">&#39;RMSB&#39;</span><span class="p">:</span>
+                        <span class="k">pass</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># print(&#39;* &#39;,k,&#39;: &#39;,v)</span>
+                        <span class="n">finalData</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">=</span><span class="n">v</span>
+                <span class="c1"># if &#39;RMS&#39; in k:</span>
+                <span class="c1"># #     print(k)</span>
+                <span class="c1">#     print(&#39;* &#39;,k,&#39;: &#39;,v)</span>
+                <span class="c1"># #     sys.exit()</span>
 
-            <span class="n">tableData</span><span class="p">[</span><span class="s1">&#39;SRC&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">tableData</span><span class="p">[</span><span class="s1">&#39;OBJECT&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-            <span class="n">freq</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">tableData</span><span class="p">[</span><span class="s1">&#39;CENTFREQ&#39;</span><span class="p">])</span>
-            <span class="n">dbTable</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">tableData</span><span class="p">[</span><span class="s1">&#39;SRC&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">freq</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="c1"># Save to table</span>
+            <span class="n">finalData</span><span class="p">[</span><span class="s1">&#39;SRC&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">finalData</span><span class="p">[</span><span class="s1">&#39;OBJECT&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">freq</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">finalData</span><span class="p">[</span><span class="s1">&#39;CENTFREQ&#39;</span><span class="p">])</span>
+            <span class="n">dbTable</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">finalData</span><span class="p">[</span><span class="s1">&#39;SRC&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">freq</span><span class="si">}</span><span class="s2">&quot;</span>
 
+            <span class="c1"># print(dbTable)</span>
+            <span class="c1"># sys.exit()</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="nb">int</span><span class="p">(</span><span class="n">dbTable</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                 <span class="n">dbTable</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">dbTable</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="k">except</span><span class="p">:</span>
                 <span class="k">pass</span>
 
-            <span class="c1"># print(f&#39;Table: {dbTable}&#39;, freq)</span>
-            <span class="n">dbTable</span><span class="o">=</span><span class="n">set_table_name</span><span class="p">(</span><span class="n">dbTable</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Table: </span><span class="si">{</span><span class="n">dbTable</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">frq</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;FILEPATH&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">])</span>
+
+            <span class="c1"># sys.exit()</span>
+            <span class="c1"># dbTable=set_table_name(dbTable, self.log)</span>
 
             <span class="c1"># Get data to save to dictionary</span>
             <span class="c1"># --- Setup database where you will be storing information</span>
             <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="s2">&quot;Setup database&quot;</span><span class="p">)</span>
             <span class="n">db</span><span class="o">=</span> <span class="n">SQLiteDB</span><span class="p">(</span><span class="n">__DBNAME__</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">)</span>
             <span class="n">db</span><span class="o">.</span><span class="n">create_db</span><span class="p">()</span>
-            <span class="n">table</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="n">tableData</span><span class="p">,</span><span class="n">dbTable</span><span class="p">)</span>
-            <span class="n">db</span><span class="o">.</span><span class="n">populate_table</span><span class="p">(</span><span class="n">tableData</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span>
+            <span class="n">table</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">create_table</span><span class="p">(</span><span class="n">finalData</span><span class="p">,</span><span class="n">dbTable</span><span class="p">)</span>
+
+            <span class="c1"># print(table)</span>
+
+            <span class="c1"># if str(int(freq)) in self.__dict__[&#39;FILEPATH&#39;][&#39;value&#39;]:</span>
+            <span class="c1">#     print(&#39;same freq&#39;)</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">populate_table</span><span class="p">(</span><span class="n">finalData</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span>
             <span class="n">db</span><span class="o">.</span><span class="n">close_db</span><span class="p">()</span>
+            <span class="c1"># else:</span>
+            <span class="c1">#     print(&quot;Frequency of source doesn&#39;t match path frequency&quot;)</span>
+            <span class="c1">#     # open database and match</span>
+            <span class="c1">#     # check if table exists in database</span>
+            <span class="c1">#     cnx = sqlite3.connect(__DBNAME__)</span>
+            <span class="c1">#     # dbTables= pd.read_sql_query(&quot;SELECT name FROM sqlite_schema WHERE type=&#39;table&#39;&quot;, cnx)</span>
+            <span class="c1">#     # tables=list(dbTables[&#39;name&#39;])</span>
+            <span class="c1">#     tableData = pd.read_sql_query(f&quot;SELECT * FROM {table}&quot;, cnx)</span>
+            <span class="c1">#     tableFilenames=sorted(list(tableData[&#39;FILENAME&#39;]))</span>
+
+            <span class="c1">#     for file in tableFilenames:</span>
+            <span class="c1">#         if self.__dict__[&#39;FILENAME&#39;] in file:</span>
+            <span class="c1">#             print(&#39;Already processed file: &#39;,self.__dict__[&#39;FILEPATH&#39;][&#39;value&#39;], &#39;in table: &#39;, table)</span>
+                    <span class="c1"># else:</span>
+                    <span class="c1">#     print(&#39;--&#39;)</span>
+                        <span class="c1"># sys.exit()</span>
+                <span class="c1"># print(tableFilenames, self.__dict__[&#39;FILENAME&#39;])</span>
+                <span class="c1"># if &#39;+&#39; in tables</span>
+                <span class="c1"># sys.exit()</span>
+        
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown source frontend value : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">frontend</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">. Contact author to have it included.&quot;</span><span class="p">)</span>
             <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span></div>
 
-
-    <span class="c1"># def get_table_cols(self,frq:int):</span>
-    <span class="c1">#     if frq &gt;= 4000 and frq&lt;=9000:</span>
-    <span class="c1">#         cols=[&#39;id&#39;,&#39;FILENAME&#39;,&#39;FILEPATH&#39;,&#39;FRONTEND&#39;,&#39;HDULENGTH&#39;,&#39;CURDATETIME&#39;,&#39;MJD&#39;,&#39;OBSDATE&#39;,&#39;OBSTIME&#39;,&#39;OBSDATETIME&#39;,</span>
-    <span class="c1">#                 &#39;OBJECT&#39;,&#39;SRC&#39;,&#39;OBSERVER&#39;,&#39;OBSLOCAL&#39;,&#39;OBSNAME&#39;,&#39;PROJNAME&#39;,&#39;PROPOSAL&#39;,&#39;TELESCOP&#39;,&#39;UPGRADE&#39;,</span>
-    <span class="c1">#                 &#39;CENTFREQ&#39;,&#39;BANDWDTH&#39;,&#39;LOGFREQ&#39;,&#39;BEAMTYPE&#39;,&#39;HPBW&#39;,&#39;FNBW&#39;,&#39;SNBW&#39;,&#39;FEEDTYPE&#39;,</span>
-    <span class="c1">#                 &#39;LONGITUD&#39;,&#39;LATITUDE&#39;,&#39;COORDSYS&#39;,&#39;EQUINOX&#39;,&#39;RADECSYS&#39;,</span>
-    <span class="c1">#                 &#39;FOCUS&#39;,&#39;TILT&#39;,&#39;TAMBIENT&#39;,&#39;PRESSURE&#39;,&#39;HUMIDITY&#39;,&#39;WINDSPD&#39;,&#39;SCANDIR&#39;,&#39;POINTING&#39;,&#39;BMOFFHA&#39;,&#39;BMOFFDEC&#39;,&#39;HABMSEP&#39;,</span>
-    <span class="c1">#                 &#39;DICHROIC&#39;,&#39;PHASECAL&#39;,&#39;NOMTSYS&#39;,&#39;SCANDIST&#39;,&#39;SCANTIME&#39;,</span>
-    <span class="c1">#                 &#39;HZPERK1&#39;,&#39;HZKERR1&#39;,&#39;HZPERK2&#39;,&#39;HZKERR2&#39;,&#39;INSTRUME&#39;,&#39;INSTFLAG&#39;,</span>
-    <span class="c1">#                 &#39;TCAL1&#39;,&#39;TCAL2&#39;,&#39;TSYS1&#39;,&#39;TSYSERR1&#39;,&#39;TSYS2&#39;,&#39;TSYSERR2&#39;,&#39;ELEVATION&#39;,</span>
-    <span class="c1">#                 &#39;ZA&#39;,&#39;HA&#39;,&#39;PWV&#39;,&#39;SVP&#39;,&#39;AVP&#39;,&#39;DPT&#39;,&#39;WVD&#39;,&#39;SEC_Z&#39;,&#39;X_Z&#39;,&#39;DRY_ATMOS_TRANSMISSION&#39;,&#39;ZENITH_TAU_AT_1400M&#39;,&#39;ABSORPTION_AT_ZENITH&#39;,</span>
-                    
-    <span class="c1">#                 &#39;ANLTA&#39;,&#39;ANLTAERR&#39;,&#39;ANLMIDOFFSET&#39;,&#39;ANLS2N&#39;,&#39;BNLTA&#39;,&#39;BNLTAERR&#39;,&#39;BNLMIDOFFSET&#39;,&#39;BNLS2N&#39;,&#39;NLFLAG&#39;,&#39;NLBRMS&#39;,&#39;NLSLOPE&#39;,&#39;ANLBASELOCS&#39;,&#39;BNLBASELOCS&#39;,</span>
-    <span class="c1">#                 &#39;ASLTA&#39;,&#39;ASLTAERR&#39;,&#39;ASLMIDOFFSET&#39;,&#39;ASLS2N&#39;,&#39;BSLTA&#39;,&#39;BSLTAERR&#39;,&#39;BSLMIDOFFSET&#39;,&#39;BSLS2N&#39;,&#39;SLFLAG&#39;,&#39;SLBRMS&#39;,&#39;SLSLOPE&#39;,&#39;ASLBASELOCS&#39;,&#39;BSLBASELOCS&#39;,</span>
-    <span class="c1">#                 &#39;AOLTA&#39;,&#39;AOLTAERR&#39;,&#39;AOLMIDOFFSET&#39;,&#39;AOLS2N&#39;,&#39;BOLTA&#39;,&#39;BOLTAERR&#39;,&#39;BOLMIDOFFSET&#39;,&#39;BOLS2N&#39;,&#39;OLFLAG&#39;,&#39;OLBRMS&#39;,&#39;OLSLOPE&#39;,&#39;AOLBASELOCS&#39;,&#39;BOLBASELOCS&#39;,</span>
-    <span class="c1">#                 &#39;AOLPC&#39;,&#39;ACOLTA&#39;,&#39;ACOLTAERR&#39;,&#39;BOLPC&#39;,&#39;BCOLTA&#39;,&#39;BCOLTAERR&#39;,</span>
-                    
-    <span class="c1">#                 &#39;ANRTA&#39;,&#39;ANRTAERR&#39;,&#39;ANRMIDOFFSET&#39;,&#39;ANRS2N&#39;,&#39;BNRTA&#39;,&#39;BNRTAERR&#39;,&#39;BNRMIDOFFSET&#39;,&#39;BNRS2N&#39;,&#39;NRFLAG&#39;,&#39;NRBRMS&#39;,&#39;NRSLOPE&#39;,&#39;ANRBASELOCS&#39;,&#39;BNRBASELOCS&#39;,</span>
-    <span class="c1">#                 &#39;ASRTA&#39;,&#39;ASRTAERR&#39;,&#39;ASRMIDOFFSET&#39;,&#39;ASRS2N&#39;,&#39;BSRTA&#39;,&#39;BSRTAERR&#39;,&#39;BSRMIDOFFSET&#39;,&#39;BSRS2N&#39;,&#39;SRFLAG&#39;,&#39;SRBRMS&#39;,&#39;SRSLOPE&#39;,&#39;ASRBASELOCS&#39;,&#39;BSRBASELOCS&#39;,</span>
-    <span class="c1">#                 &#39;AORTA&#39;,&#39;AORTAERR&#39;,&#39;AORMIDOFFSET&#39;,&#39;AORS2N&#39;,&#39;BORTA&#39;,&#39;BORTAERR&#39;,&#39;BORMIDOFFSET&#39;,&#39;BORS2N&#39;,&#39;ORFLAG&#39;,&#39;ORBRMS&#39;,&#39;ORSLOPE&#39;,&#39;AORBASELOCS&#39;,&#39;BORBASELOCS&#39;,</span>
-    <span class="c1">#                 &#39;AORPC&#39;,&#39;ACORTA&#39;,&#39;ACORTAERR&#39;,&#39;BORPC&#39;,&#39;BCORTA&#39;,&#39;BCORTAERR&#39;]</span>
         
 <div class="viewcode-block" id="DriftScans.process_data_only">
 <a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScans.DriftScans.process_data_only">[docs]</a>
@@ -823,8 +1026,6 @@
         <span class="n">theoFit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;theoFit&#39;</span><span class="p">]</span>
         <span class="n">autoFit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;autoFit&#39;</span><span class="p">]</span>
         <span class="n">frq</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;CENTFREQ&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">])</span>
-
-
         
         <span class="n">hpbw</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;HPBW&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
         <span class="n">fnbw</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;FNBW&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>

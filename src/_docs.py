@@ -1,6 +1,7 @@
 # =========================================================================== #
-# File    : _docs.py                                              #
-# Author  : Pfesesani V. van Zyl                                              #
+# File: _docs.py                                                              #
+# Author: Pfesesani V. van Zyl                                                #
+# Email: pfesi24@gmail.com                                                    #
 # =========================================================================== #
 
 # Standard library imports
@@ -29,7 +30,6 @@ def main():
     except:
         print("There's a problem with the browser launching, contact the author or visit the readthedocs site")
         sys.exit()
-
 
 if __name__ == "__main__":
     main()

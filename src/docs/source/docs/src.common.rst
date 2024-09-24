@@ -148,6 +148,14 @@ src.common.sqlite\_db module
    :undoc-members:
    :show-inheritance:
 
+src.common.variables module
+---------------------------
+
+.. automodule:: src.common.variables
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

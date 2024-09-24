@@ -1,5 +1,12 @@
-logfile="logfile.txt"
-__app__name = "dran"
-__version__ = "1.0.0"
-__DBNAME__='HART26DATA.db'
+# Basic configuration
+# -------------------
 
+# App configuration
+APPNAME = "DRAN"
+VERSION = "1.0.0"
+
+# Logging configuration
+LOGFILE = "logfile.txt"
+
+# Database configuration
+DBNAME = 'HART26DATA.db'

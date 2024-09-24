@@ -61,6 +61,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../extras/tuts/tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../extras/commands.html">Commands</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Resources:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/radio_sources.html">Radio sources</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">Guidelines:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../extras/changelog.html">Changelog</a></li>
@@ -140,11 +144,17 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">get_missing_params</span><span class="p">()</span>
 
+        <span class="c1"># print(lenhdu)</span>
+        <span class="c1"># sys.exit()</span>
+
+        <span class="c1"># print(self.__dict__)</span>
+        <span class="c1"># sys.exit()</span>
+
         <span class="k">if</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">lenhdu</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">5</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">get_chart_header_data</span><span class="p">(</span><span class="n">lenhdu</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;CARDS&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="c1"># msg_wrapper(&quot;debug&quot;, self.log.debug, f&#39;Getting driftscans from, {k}: {v}&#39;)</span>
+            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;Getting driftscans from, </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="c1"># print(k,&quot;: &quot;,v)</span>
             <span class="n">frontend</span><span class="o">=</span><span class="s1">&#39;FRONTEND&#39;</span>
                  
@@ -160,6 +170,8 @@
                 <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span> <span class="s2">&quot;Getting driftscans from HPS header&quot;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">get_driftscans</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="s1">&#39;HPS&#39;</span><span class="p">)</span>
 
+        <span class="c1"># print(self.__dict__)</span>
+        <span class="c1"># sys.exit()</span>
         <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span> <span class="s2">&quot;Calculate the derived parameters&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_calc_water_vapour</span><span class="p">()</span>
 
@@ -265,7 +277,6 @@
                 <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s1">_TA_RCP&#39;</span><span class="p">,</span><span class="n">testArray</span><span class="p">,</span><span class="sa">f</span><span class="s1">&#39;RCP scan in antenna temp (K)  in </span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s1"> header&#39;</span><span class="p">)</span></div>
 
 
-            
 <div class="viewcode-block" id="DriftScanData.get_chart_header_data">
 <a class="viewcode-back" href="../../../docs/src.common.html#src.common.driftScanData.DriftScanData.get_chart_header_data">[docs]</a>
     <span class="k">def</span> <span class="nf">get_chart_header_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">index</span><span class="p">):</span>
@@ -397,7 +408,7 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;OBJECT&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">==</span><span class="s1">&#39;JUPITER&#39;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">calibrate_jupiter_atm</span><span class="p">()</span>
 
-        <span class="k">elif</span> <span class="s1">&#39;13.0S&#39;</span> <span class="ow">in</span> <span class="n">frontend</span> <span class="ow">or</span> <span class="s1">&#39;18.0S&#39;</span> <span class="ow">in</span> <span class="n">frontend</span> <span class="ow">or</span> <span class="s1">&#39;04.5S&#39;</span> <span class="ow">in</span> <span class="n">frontend</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="s1">&#39;13.0S&#39;</span> <span class="ow">in</span> <span class="n">frontend</span> <span class="ow">or</span> <span class="s1">&#39;18.0S&#39;</span> <span class="ow">in</span> <span class="n">frontend</span><span class="p">:</span> <span class="c1"># or &#39;04.5S&#39; in frontend:</span>
             <span class="c1"># calculate the atmospheric absorbtion</span>
             <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="s2">&quot;Calculate atmospheric absorption&quot;</span><span class="p">)</span>
 
@@ -408,7 +419,11 @@
             <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;ATMOSABS&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span><span class="n">atmabs</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">:</span><span class="s1">&#39;Atmospheric absorption&#39;</span><span class="p">}</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log_multiple_entries</span><span class="p">(</span><span class="s1">&#39;ATMOSABS&#39;</span><span class="p">)</span>
 
-      
+        <span class="k">elif</span> <span class="s1">&#39;04.5S&#39;</span> <span class="ow">in</span> <span class="n">frontend</span><span class="p">:</span>
+            <span class="c1"># TODO: Fanie to help with this</span>
+            <span class="c1"># Currently nothing in place for atmospheric calibration. Fanie to update post processing. (03/09/2024 calibration meeting 10:30am)</span>
+
+            <span class="k">pass</span>
 
         <span class="k">elif</span> <span class="s1">&#39;D&#39;</span> <span class="ow">in</span> <span class="n">frontend</span><span class="p">:</span>
             <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="s2">&quot;Calculate zenith absorption&quot;</span><span class="p">)</span>
@@ -565,17 +580,6 @@
         <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span>
                     <span class="s1">&#39;Get Jupiter AU distance from calsky data or calculation&#39;</span><span class="p">)</span>
 
-        <span class="c1"># # Get observation date and split it</span>
-        <span class="c1"># year = int(self.data[&quot;OBSDATE&quot;][:4])</span>
-        <span class="c1"># month = int(self.data[&quot;OBSDATE&quot;][5:7])</span>
-        <span class="c1"># day = int(self.data[&quot;OBSDATE&quot;][8:])</span>
-
-        <span class="c1"># ls</span>
-        
-        <span class="c1"># Get month of date in words</span>
-        <span class="c1"># myDate = datetime.date(year, month, day)</span>
-        <span class="c1"># myMonth=myDate.strftime(&quot;%b&quot;)</span>
-
         <span class="c1"># convert 1 arcsec to radians</span>
         <span class="n">rad</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="mi">206264</span> 
 
@@ -592,16 +596,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">log_multiple_entries</span><span class="p">(</span><span class="s1">&#39;JUPITER_DIST_AU&#39;</span><span class="p">,</span><span class="s1">&#39;PLANET_ANG_DIAM&#39;</span><span class="p">)</span></div>
 </div>
 
-        <span class="c1"># print(jupDistancs, JUPITER_DIST_AU)</span>
-        <span class="c1"># sys.exit()</span>
-        <span class="c1"># Get AU distance / radius</span>
-        <span class="c1"># try:</span>
-        <span class="c1">#     # calskyRes=get_calsky_results(year)</span>
-        <span class="c1">#     # row=calskyRes[(calskyRes[&#39;month&#39;]==myMonth) &amp; (calskyRes[&#39;day&#39;]==day)]</span>
-        <span class="c1">#     self.data[&quot;JUPITER_DIST_AU&quot;] = row[&#39;radius&#39;].iloc[0]</span>
-        <span class="c1"># except ex.ValueOutOfRangeException:</span>
-        <span class="c1">#     print(f&quot;\nValueOutOfRangeException: The date {myDate} has not been accounted for, contact mantainer&quot;)</span>
-        <span class="c1">#     sys.exit()</span>
 </pre></div>
 
            </div>

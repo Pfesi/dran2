@@ -61,6 +61,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../extras/tuts/tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../extras/commands.html">Commands</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Resources:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/radio_sources.html">Radio sources</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">Guidelines:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../extras/changelog.html">Changelog</a></li>
@@ -110,6 +114,8 @@
 <span class="kn">import</span> <span class="nn">webbrowser</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">dt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.dates</span> <span class="k">as</span> <span class="nn">mdates</span> <span class="c1">## Import required library</span>
 
 <span class="c1"># Local imports</span>
 <span class="c1"># --------------------------------------------------------------------------- #</span>
@@ -235,8 +241,11 @@
         <span class="k">elif</span> <span class="n">x</span> <span class="o">==</span> <span class="s1">&#39;NaT&#39;</span><span class="p">:</span>
             <span class="c1"># print(&#39;+&#39;,x)</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">elif</span> <span class="n">x</span> <span class="o">==</span><span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># print(&#39;&amp;&#39;,x)</span>
+            
             <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
 
         
@@ -257,6 +266,7 @@
             <span class="c1"># print(&#39;&amp;&#39;,x)</span>
             <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
 
+    
     
 <div class="viewcode-block" id="TimeCanvas.plot_fig">
 <a class="viewcode-back" href="../../../docs/src.gui.html#src.gui.timeseries_canvas.TimeCanvas.plot_fig">[docs]</a>
@@ -287,7 +297,11 @@
 <span class="sd">                list of artists added</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="c1"># self.x</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">=</span><span class="n">data</span> <span class="c1"># drift scan data</span>
+
+        <span class="c1"># print(type(x))</span>
+        <span class="c1"># sys.exit()</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">clear_figure</span><span class="p">()</span>
@@ -301,7 +315,6 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">=</span><span class="n">y</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">xlab</span><span class="o">=</span><span class="n">xlab</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ylab</span><span class="o">=</span><span class="n">ylab</span>
-
            
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">yerr</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span> <span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="n">picker</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
@@ -318,9 +331,49 @@
                 <span class="c1"># self.ax.errorbar(self.x, self.y, yerr,fmt=col, label=&quot;data&quot;, picker=5)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">setLabels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="p">,</span> <span class="n">xlab</span><span class="p">,</span> <span class="n">ylab</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+            <span class="c1"># self.ax.tick_params(axis=&#39;x&#39;,labelrotation=45)</span>
+
+            <span class="c1">## Added code here</span>
+            
+            <span class="c1"># now = dt.datetime.now()</span>
+            <span class="c1"># for i, d in enumerate([360, 30, 7, 1]):</span>
+            <span class="c1">#     # self.ax = axes.flatten()[i]</span>
+            <span class="c1">#     # earlycut = now - relativedelta(days=d)</span>
+            <span class="c1">#     # data = df.loc[df.index&gt;=earlycut, :]</span>
+            <span class="c1">#     # self.ax.plot(data.index, data[&#39;value&#39;])</span>
+
+            <span class="c1"># self.ax.xaxis.set_minor_locator() get_xaxis().set_minor_locator(self.mpl.ticker.AutoMinorLocator())</span>
+            <span class="c1">#     self.ax.get_yaxis().set_minor_locator(self.mpl.ticker.AutoMinorLocator())</span>
+
+            <span class="c1"># self.ax.grid( )#which=&#39;major&#39;, color=&#39;w&#39;, linewidth=1.5)</span>
+            <span class="c1"># self.ax.grid(b=True, which=&#39;minor&#39;, color=&#39;w&#39;, linewidth=0.75)</span>
+
+            <span class="c1">#     plt.setp(self.ax.get_xticklabels(), rotation=30, horizontalalignment=&#39;right&#39;)</span>
+
+            
+
+            <span class="c1"># if len(self.y) &lt;=30:</span>
+            <span class="c1">#     pass</span>
+            <span class="c1"># else:</span>
+            <span class="n">months</span> <span class="o">=</span> <span class="n">mdates</span><span class="o">.</span><span class="n">MonthLocator</span><span class="p">(</span><span class="n">bymonth</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span><span class="c1">#interval=6, bymonthday=-1)  ## 6 months apart &amp; show last date</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">months</span><span class="p">)</span> <span class="c1">## Set months as major locator</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_minor_locator</span><span class="p">(</span><span class="n">mdates</span><span class="o">.</span><span class="n">MonthLocator</span><span class="p">())</span> 
+
+            <span class="c1"># TODO: create a button to toggle grid on/off</span>
+            <span class="c1"># TODO: create button to change grid color, line width etc</span>
+            <span class="c1"># TODO: Button to toggle step change locations on/off</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span><span class="c1">## Set months as minor locator</span>
+            <span class="c1"># self.ax.xaxis.set_major_formatter(mdates.DateFormatter(&#39;%Y-%m-%d&#39;)) ##Display format - update here to change</span>
+            <span class="c1"># self.ax.tick_params(axis=&#39;x&#39;,labelrotation=20) ##Adjust angle and horizontal align right</span>
+            <span class="c1"># # plt.show()</span>
+
             <span class="n">connection_id_0</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpl_connect</span><span class="p">(</span><span class="s1">&#39;pick_event&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">onpick</span><span class="p">)</span>
             <span class="n">connection_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mpl_connect</span><span class="p">(</span><span class="s1">&#39;button_press_event&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">onclick</span><span class="p">)</span>
             <span class="c1">#self.mpl_connect(&#39;pick_event&#39;, self.onpick)</span>
+
+            <span class="c1"># rotate ticks</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">autofmt_xdate</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span></div>
 
@@ -508,8 +561,10 @@
         <span class="n">freq</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">ind</span><span class="p">,][</span><span class="s2">&quot;CENTFREQ&quot;</span><span class="p">])</span>
 
         <span class="n">imgDir</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;plots/</span><span class="si">{</span><span class="n">obj</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">freq</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="n">plotFolderList</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">imgDir</span><span class="p">)</span>
-        <span class="n">plotFolderName</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">ind</span><span class="p">,][</span><span class="s2">&quot;FILEPATH&quot;</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">imgDir</span><span class="p">)</span>
+        <span class="c1"># sys.exit()</span>
+        <span class="c1"># plotFolderList = os.listdir(imgDir)</span>
+        <span class="c1"># plotFolderName = self.data.iloc[ind,][&quot;FILEPATH&quot;]</span>
         
         <span class="n">plotFileName</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">ind</span><span class="p">,][</span><span class="s2">&quot;FILENAME&quot;</span><span class="p">])</span>
         <span class="n">plotMJD</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">ind</span><span class="p">,][</span><span class="s2">&quot;MJD&quot;</span><span class="p">])</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1">&#39;</span>

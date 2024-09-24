@@ -110,6 +110,7 @@
 <span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">from</span> <span class="nn">config</span> <span class="kn">import</span> <span class="n">__version__</span><span class="p">,</span> <span class="n">__DBNAME__</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">sqlite3</span>
 
 <span class="c1"># Module imports</span>
 <span class="c1"># --------------------------------------------------------------------------- #</span>
@@ -123,6 +124,26 @@
 <span class="kn">from</span> <span class="nn">common.sqlite_db</span> <span class="kn">import</span> <span class="n">SQLiteDB</span>
 <span class="c1"># =========================================================================== #</span>
 
+<div class="viewcode-block" id="get_freq_band2">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.observation.get_freq_band2">[docs]</a>
+<span class="k">def</span> <span class="nf">get_freq_band2</span><span class="p">(</span><span class="n">freq</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">freq</span> <span class="o">&gt;=</span> <span class="mi">1000</span> <span class="ow">and</span> <span class="n">freq</span><span class="o">&lt;=</span> <span class="mi">2000</span><span class="p">:</span> 
+        <span class="k">return</span> <span class="s1">&#39;L&#39;</span><span class="p">,</span> <span class="s1">&#39;18.0S&#39;</span>
+    <span class="k">elif</span> <span class="n">freq</span> <span class="o">&gt;</span> <span class="mi">2000</span> <span class="ow">and</span> <span class="n">freq</span><span class="o">&lt;=</span> <span class="mi">4000</span><span class="p">:</span> <span class="c1">#</span>
+        <span class="k">return</span> <span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="s1">&#39;13.0S&#39;</span>
+    <span class="k">elif</span> <span class="n">freq</span> <span class="o">&gt;</span> <span class="mi">4000</span> <span class="ow">and</span> <span class="n">freq</span><span class="o">&lt;=</span> <span class="mi">6000</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;05.0D&#39;</span>
+    <span class="k">elif</span> <span class="n">freq</span> <span class="o">&gt;</span> <span class="mi">6000</span> <span class="ow">and</span> <span class="n">freq</span><span class="o">&lt;=</span> <span class="mi">8000</span><span class="p">:</span>
+        <span class="c1"># TODO: get correct frequency band for masers - ask Fanie vdHeever</span>
+        <span class="k">return</span> <span class="s1">&#39;M&#39;</span><span class="p">,</span> <span class="s1">&#39;04.5S&#39;</span><span class="c1"># for methanol masers</span>
+    <span class="k">elif</span> <span class="n">freq</span> <span class="o">&gt;</span> <span class="mi">8000</span> <span class="ow">and</span> <span class="n">freq</span><span class="o">&lt;=</span> <span class="mi">12000</span><span class="p">:</span> <span class="c1"># 8580</span>
+        <span class="k">return</span> <span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="s1">&#39;03.5D&#39;</span>
+    <span class="k">elif</span> <span class="n">freq</span> <span class="o">&gt;</span> <span class="mi">12000</span> <span class="ow">and</span> <span class="n">freq</span><span class="o">&lt;=</span> <span class="mi">18000</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;Ku&#39;</span><span class="p">,</span> <span class="s1">&#39;02.5S&#39;</span>
+    <span class="k">elif</span> <span class="n">freq</span> <span class="o">&gt;=</span> <span class="mi">18000</span> <span class="ow">and</span> <span class="n">freq</span><span class="o">&lt;=</span> <span class="mi">27000</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;K&#39;</span><span class="p">,</span> <span class="s1">&#39;01.3S&#39;</span></div>
+
+    
 <div class="viewcode-block" id="Observation">
 <a class="viewcode-back" href="../../../docs/src.common.html#src.common.observation.Observation">[docs]</a>
 <span class="nd">@dataclass</span>
@@ -136,36 +157,96 @@
     <span class="n">theoFit</span><span class="p">:</span> <span class="nb">str</span>    <span class="c1"># theoretical fit implemented y/n</span>
     <span class="n">autoFit</span><span class="p">:</span><span class="nb">str</span>     <span class="c1"># automated fit implemented y/n</span>
     <span class="n">log</span><span class="p">:</span><span class="nb">object</span>      <span class="c1"># logger</span>
+    <span class="n">dbCols</span><span class="p">:</span> <span class="nb">dict</span>    <span class="c1"># dictionary of table columns</span>
+    
 
     <span class="c1"># -- Observation parameters not initialized when class called</span>
     <span class="n">HDULIST</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>        <span class="c1"># list of HDU objects</span>
     <span class="n">HDULENGTH</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>      <span class="c1"># length of HDULIST</span>
     <span class="n">INFOHEADER</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>     <span class="c1"># summarizes the content of the opened FITS file</span>
-
+    
+    
     <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Open file and get file info. </span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># TODO: remember to include the value and description for these items when you&#39;re done</span>
-        
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;info&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Opening file </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">FILEPATH</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-            <span class="k">with</span> <span class="n">open_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">FILEPATH</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">HDULIST</span> <span class="o">=</span> <span class="n">f</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">HDULENGTH</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">HDULIST</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">INFOHEADER</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">info</span>
+        <span class="c1"># print(&#39;\n dbCol: &#39;,self.dbCols)</span>
+        <span class="c1"># sys.exit()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dbCols</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># probably gui self processing tool </span>
 
-                <span class="c1"># set values to dictionary</span>
-                <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Setting FILEPATH, HDULIST, HDULENGTH and INFOHEADER to internal dict&quot;</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;HDULIST&quot;</span><span class="p">]</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">HDULIST</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">:</span><span class="s2">&quot;Header data unit for observing file&quot;</span><span class="p">}</span>
-                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;HDULENGTH&quot;</span><span class="p">]</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">HDULENGTH</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">:</span><span class="s2">&quot;Number of HDUs in observing file&quot;</span><span class="p">}</span>
-                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;INFOHEADER&quot;</span><span class="p">]</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">INFOHEADER</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">:</span><span class="s2">&quot;Information header for observing file&quot;</span><span class="p">}</span>
-                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;FILEPATH&quot;</span><span class="p">]</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">FILEPATH</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">:</span><span class="s2">&quot;Path to file or filename&quot;</span><span class="p">}</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="c1"># TODO:  put in proper file exception handling</span>
-            <span class="c1"># see context manager</span>
-            <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">FILEPATH</span><span class="si">}</span><span class="s1"> is corrupt&#39;</span>
+            <span class="c1"># print(self.__dict__)</span>
+            <span class="c1"># setup a dictionary with all the parameters pre-set  </span>
+            
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;info&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Opening file </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">FILEPATH</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="k">with</span> <span class="n">open_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">FILEPATH</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">HDULIST</span> <span class="o">=</span> <span class="n">f</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">HDULENGTH</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">HDULIST</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">INFOHEADER</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">info</span>
+
+                    <span class="c1"># set values to dictionary</span>
+                    <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Setting FILEPATH, HDULIST, HDULENGTH and INFOHEADER to internal dict&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;HDULIST&quot;</span><span class="p">]</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">HDULIST</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">:</span><span class="s2">&quot;Header data unit for observing file&quot;</span><span class="p">}</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;HDULENGTH&quot;</span><span class="p">]</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">HDULENGTH</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">:</span><span class="s2">&quot;Number of HDUs in observing file&quot;</span><span class="p">}</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;INFOHEADER&quot;</span><span class="p">]</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">INFOHEADER</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">:</span><span class="s2">&quot;Information header for observing file&quot;</span><span class="p">}</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;FILEPATH&quot;</span><span class="p">]</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">FILEPATH</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">:</span><span class="s2">&quot;Path to file or filename&quot;</span><span class="p">}</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="c1"># TODO:  put in proper file exception handling</span>
+                <span class="c1"># see context manager</span>
+                <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">FILEPATH</span><span class="si">}</span><span class="s1"> is corrupt&#39;</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+            
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg_wrapper</span><span class="p">(</span><span class="s1">&#39;info&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">,</span><span class="s1">&#39;Using predefined cols&#39;</span><span class="p">)</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">dbCols</span><span class="p">[</span><span class="s1">&#39;keys&#39;</span><span class="p">]</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dbCols</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dbCols</span><span class="p">[</span><span class="s1">&#39;values&#39;</span><span class="p">]</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dbCols</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">dbCols</span><span class="p">[</span><span class="s1">&#39;FILEPATH&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">FILEPATH</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">:</span><span class="s1">&#39;Path to file&#39;</span><span class="p">}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dbCols</span><span class="p">[</span><span class="s1">&#39;theoFit&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">theoFit</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">:</span><span class="s1">&#39;Theoretical fit to be used&#39;</span><span class="p">}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dbCols</span><span class="p">[</span><span class="s1">&#39;autoFit&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">autoFit</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">:</span><span class="s1">&#39;Automated fitting to be used&#39;</span><span class="p">}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dbCols</span><span class="p">[</span><span class="s1">&#39;log&#39;</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span>
+
+            <span class="c1"># print(&#39;--++--\n&#39;,self.dbCols)</span>
+            <span class="c1"># sys.exit()</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;info&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Opening file </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">FILEPATH</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="k">with</span> <span class="n">open_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">FILEPATH</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">HDULIST</span> <span class="o">=</span> <span class="n">f</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">HDULENGTH</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">HDULIST</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">INFOHEADER</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">info</span>
+
+                <span class="c1">#     # set values to dictionary</span>
+                    <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Setting FILEPATH, HDULIST, HDULENGTH and INFOHEADER to internal dict&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">dbCols</span><span class="p">[</span><span class="s2">&quot;HDULIST&quot;</span><span class="p">]</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">HDULIST</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">:</span><span class="s2">&quot;Header data unit for observing file&quot;</span><span class="p">}</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">dbCols</span><span class="p">[</span><span class="s2">&quot;HDULENGTH&quot;</span><span class="p">]</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">HDULENGTH</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">:</span><span class="s2">&quot;Number of HDUs in observing file&quot;</span><span class="p">}</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">dbCols</span><span class="p">[</span><span class="s2">&quot;INFOHEADER&quot;</span><span class="p">]</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">INFOHEADER</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">:</span><span class="s2">&quot;Information header for observing file&quot;</span><span class="p">}</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbCols</span>
+
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="c1"># TODO:  put in proper file exception handling</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;error: &#39;</span><span class="p">,</span><span class="n">e</span><span class="p">)</span>
+                <span class="c1"># sys.exit()</span>
+                <span class="c1"># see context manager</span>
+                <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">FILEPATH</span><span class="si">}</span><span class="s1"> is corrupt&#39;</span>
+            
+            <span class="c1"># sys.exit()</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span><span class="s1">&#39;dict&#39;</span> <span class="ow">or</span> <span class="n">k</span><span class="o">==</span><span class="s1">&#39;log&#39;</span> <span class="ow">or</span> <span class="n">k</span><span class="o">==</span><span class="s1">&#39;keys&#39;</span> <span class="ow">or</span> <span class="n">k</span><span class="o">==</span><span class="s1">&#39;values&#39;</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># print(k,v)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">:</span><span class="s1">&#39;&#39;</span><span class="p">}</span>
+
+            <span class="c1"># for k,v in self.__dict__.items():</span>
+            <span class="c1">#     print(k,v)</span>
+            <span class="c1"># sys.exit()    </span>
 
 <div class="viewcode-block" id="Observation.set_key_value_pairs">
 <a class="viewcode-back" href="../../../docs/src.common.html#src.common.observation.Observation.set_key_value_pairs">[docs]</a>
@@ -270,11 +351,11 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Get data from fits file hdu</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="c1"># print(&#39;get data&#39;)</span>
+        <span class="c1"># sys.exit()</span>
         <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Getting data from fits file hdulist&quot;</span><span class="p">)</span>
         <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Create dict object to store read parameters&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;CARDS&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">{}</span> <span class="c1">#{&#39;value&#39;:[], &#39;description&#39;:&quot;Placeholder for hdu card titles or names&quot;} # holds hdu card titles or names</span>
-
-        <span class="c1"># </span>
         
         <span class="n">CURDATETIME</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S&#39;</span><span class="p">)</span>
         <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;info&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Date and time of data processing: </span><span class="si">{</span><span class="n">CURDATETIME</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -308,9 +389,189 @@
         <span class="n">src</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;OBJECT&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
         <span class="n">freq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;CENTFREQ&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
 
+        <span class="c1"># print(freq,type(freq))</span>
+        <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span><span class="o">==</span><span class="s2">&quot;nan&quot;</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Fronend is nan&#39;</span><span class="p">)</span>
+            <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;nans&#39;</span>
+
+        <span class="k">try</span> <span class="p">:</span>
+            <span class="n">f</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+
+        <span class="c1"># if freq == np.nan:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t find frequency, creating frequency from path&quot;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;FILEPATH&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">freq</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>
+                <span class="c1"># if freq&gt;= and freq&lt;= :</span>
+                <span class="n">band</span><span class="p">,</span><span class="n">frontend</span><span class="o">=</span><span class="n">get_freq_band2</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Freq: </span><span class="si">{</span><span class="n">freq</span><span class="si">}</span><span class="s1">, band: </span><span class="si">{</span><span class="n">band</span><span class="si">}</span><span class="s1">, frontend: </span><span class="si">{</span><span class="n">frontend</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;FRONTEND&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">frontend</span>
+                <span class="c1"># sys.exit()</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Path not in valid path layout&#39;</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+            <span class="c1"># sys.exit()</span>
         <span class="c1"># create_current_scan_directory()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">create_final_plot_directory</span><span class="p">(</span><span class="n">src</span><span class="p">,</span><span class="n">freq</span><span class="p">)</span>
         
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;For frontend: </span><span class="si">{</span><span class="n">frontend</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># sys.exit()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;CENTFREQ&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">freq</span>
+        <span class="k">if</span> <span class="s1">&#39;S&#39;</span> <span class="ow">in</span> <span class="p">(</span><span class="n">frontend</span><span class="p">):</span>
+
+            <span class="k">if</span> <span class="s1">&#39;13.0S&#39;</span> <span class="ow">in</span> <span class="n">frontend</span> <span class="ow">or</span> <span class="s1">&#39;18.0S&#39;</span> <span class="ow">in</span> <span class="n">frontend</span><span class="p">:</span>
+                <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;BEAMTYPE&#39;</span><span class="p">,</span><span class="n">ScanType</span><span class="o">.</span><span class="n">SBW</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;wide single beam drift scan&#39;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="s1">&#39;02.5S&#39;</span> <span class="ow">in</span> <span class="n">frontend</span> <span class="ow">or</span> <span class="s1">&#39;04.5S&#39;</span> <span class="ow">in</span> <span class="n">frontend</span> <span class="ow">or</span> <span class="s1">&#39;01.3S&#39;</span> <span class="ow">in</span> <span class="n">frontend</span><span class="p">:</span>
+                <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;BEAMTYPE&#39;</span><span class="p">,</span><span class="n">ScanType</span><span class="o">.</span><span class="n">SBN</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;narrow single beam drift scan&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unknown beam type :</span><span class="si">{</span><span class="n">frontend</span><span class="si">}</span><span class="s1"> - contact author to have it included</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+
+            <span class="c1"># get driftscan data from file</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="s1">&#39;CENTFREQ&#39;</span> <span class="ow">in</span> <span class="n">k</span><span class="p">:</span>
+                    <span class="n">freq</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="s1">&#39;FILEPATH&#39;</span> <span class="ow">in</span> <span class="n">k</span><span class="p">:</span>
+                    <span class="n">fpath</span><span class="o">=</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+            
+            <span class="c1"># TODO: decide what to do with this</span>
+            <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span> <span class="ow">in</span> <span class="n">fpath</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Frequency and path dont match&#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span><span class="n">freq</span><span class="p">)</span>
+
+                <span class="c1"># check if source has been processed    </span>
+                
+                <span class="c1"># create required table</span>
+
+                
+            <span class="n">driftScans</span><span class="o">=</span><span class="n">DriftScans</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+            <span class="n">driftScans</span><span class="o">.</span><span class="n">process_data</span><span class="p">()</span> <span class="c1"># process the data</span>
+            <span class="k">del</span> <span class="n">driftScans</span> <span class="c1"># release from memory</span>
+
+        <span class="k">elif</span> <span class="s1">&#39;D&#39;</span> <span class="ow">in</span> <span class="p">(</span><span class="n">frontend</span><span class="p">):</span>
+            <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;BEAMTYPE&#39;</span><span class="p">,</span><span class="n">ScanType</span><span class="o">.</span><span class="n">DB</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;dual beam drift scan&#39;</span><span class="p">)</span>
+
+            <span class="c1"># get driftscan data from \file</span>
+            <span class="n">driftScans</span><span class="o">=</span><span class="n">DriftScans</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+            <span class="n">driftScans</span><span class="o">.</span><span class="n">process_data</span><span class="p">()</span> <span class="c1"># process the data</span>
+            <span class="k">del</span> <span class="n">driftScans</span> <span class="c1"># release from memory</span></div>
+
+
+<div class="viewcode-block" id="Observation.get_data_from_predefined_cols">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.observation.Observation.get_data_from_predefined_cols">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_data_from_predefined_cols</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get data from fits file hdu</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Getting data from fits file hdulist&quot;</span><span class="p">)</span>
+        <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Create dict object to store read parameters&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;CARDS&#39;</span><span class="p">]</span><span class="o">=</span><span class="p">{}</span> <span class="c1">#{&#39;value&#39;:[], &#39;description&#39;:&quot;Placeholder for hdu card titles or names&quot;} # holds hdu card titles or names</span>
+
+        <span class="c1"># print(self.__dict__)</span>
+        <span class="c1"># sys.exit()</span>
+        <span class="c1"># </span>
+        
+        <span class="n">CURDATETIME</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S&#39;</span><span class="p">)</span>
+        <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;info&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Date and time of data processing: </span><span class="si">{</span><span class="n">CURDATETIME</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;CURDATETIME&quot;</span><span class="p">]</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span><span class="n">CURDATETIME</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">:</span><span class="s2">&quot;Current date and time of the data processing&quot;</span><span class="p">}</span>
+
+        <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Looping over each HDU object in hdulist&quot;</span><span class="p">)</span>
+
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">hdulen</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">HDULENGTH</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;faultyFiles.txt&#39;</span><span class="p">,</span><span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">FILEPATH</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">File is a symlink: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">FILEPATH</span><span class="si">}</span><span class="s1">. Stopped processing&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+        
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">hdulen</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_data_from_hdu_lists</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+
+        <span class="n">keys</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_key_value_pairs</span><span class="p">(</span><span class="s1">&#39;HZPERK1&#39;</span><span class="p">,</span> <span class="s1">&#39;HZPERK1&#39;</span><span class="p">,</span> <span class="s1">&#39;HZKERR1&#39;</span><span class="p">,</span> <span class="s1">&#39;[Hz/K] Counter cal error&#39;</span><span class="p">,</span><span class="s1">&#39;TCAL2&#39;</span><span class="p">,</span><span class="n">keys</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_key_value_pairs</span><span class="p">(</span><span class="s1">&#39;HZPERK2&#39;</span><span class="p">,</span> <span class="s1">&#39;HZPERK2&#39;</span><span class="p">,</span> <span class="s1">&#39;HZKERR2&#39;</span><span class="p">,</span> <span class="s1">&#39;[Hz/K] Counter cal error&#39;</span><span class="p">,</span><span class="s1">&#39;HZKERR1&#39;</span><span class="p">,</span><span class="n">keys</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_key_value_pairs</span><span class="p">(</span><span class="s1">&#39;TSYS1&#39;</span><span class="p">,</span> <span class="s1">&#39;TSYS1 [K]&#39;</span><span class="p">,</span> <span class="s1">&#39;TSYSERR1&#39;</span><span class="p">,</span> <span class="s1">&#39;[K] System temperature&#39;</span><span class="p">,</span><span class="s1">&#39;HZKERR2&#39;</span><span class="p">,</span><span class="n">keys</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_key_value_pairs</span><span class="p">(</span><span class="s1">&#39;TSYS2&#39;</span><span class="p">,</span> <span class="s1">&#39;TSYS2[K]&#39;</span><span class="p">,</span> <span class="s1">&#39;TSYSERR2&#39;</span><span class="p">,</span> <span class="s1">&#39;[K] System temperature&#39;</span><span class="p">,</span><span class="s1">&#39;TSYSERR1&#39;</span><span class="p">,</span><span class="n">keys</span><span class="p">)</span>
+        
+        
+        <span class="c1"># add other important bits</span>
+        <span class="c1"># ----------------------------------</span>
+
+        <span class="c1"># get drift scans</span>
+        <span class="c1"># use hdu frontend to determine path to data processing</span>
+        <span class="c1"># print(self.__dict__.keys())</span>
+        <span class="c1"># sys.exit()</span>
+
+        <span class="n">frontend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;FRONTEND&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+        <span class="n">src</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;OBJECT&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+        <span class="n">freq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;CENTFREQ&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+
+        <span class="n">keys</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;keys&#39;</span><span class="p">]</span>
+        <span class="n">values</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;values&#39;</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">lenValues</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">lenKeys</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
+        
+        <span class="c1"># create table with frequency:</span>
+        <span class="c1"># -------------------------------</span>
+
+       
+        <span class="c1"># fn=</span>
+        <span class="c1"># print()</span>
+        <span class="c1"># sys.exit()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>
+        <span class="c1"># if freq==&#39;nan&#39;:</span>
+        <span class="n">fp</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;FILEPATH&quot;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+        <span class="n">fn</span><span class="o">=</span><span class="n">fp</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1"># print(fn)</span>
+
+        <span class="c1"># sys.exit()</span>
+        <span class="c1"># print(freq)</span>
+        <span class="n">tbFreq</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>
+        <span class="n">table</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">src</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">tbFreq</span><span class="si">}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="c1"># print(table)</span>
+
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+        <span class="n">cnx</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">__DBNAME__</span><span class="p">)</span>
+        <span class="n">dbTables</span><span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_sql_query</span><span class="p">(</span><span class="s2">&quot;SELECT name FROM sqlite_schema WHERE type=&#39;table&#39;&quot;</span><span class="p">,</span> <span class="n">cnx</span><span class="p">)</span>
+        <span class="n">tables</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">dbTables</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">tables</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">tables</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sqlStmt</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
+            <span class="k">if</span> <span class="n">lenKeys</span><span class="o">==</span><span class="n">lenValues</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">lenValues</span><span class="p">):</span>
+                    <span class="c1"># print(&#39;---&#39;,key,value)</span>
+                    <span class="k">if</span> <span class="n">keys</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;FILENAME&#39;</span><span class="p">:</span>
+                        <span class="n">sqlStmt</span> <span class="o">+=</span><span class="sa">f</span><span class="s1">&#39;CREATE TABLE IF NOT EXISTS </span><span class="si">{</span><span class="n">table</span><span class="si">}</span><span class="s1"> (&#39;</span>
+                        <span class="n">idKey</span> <span class="o">=</span> <span class="n">sqlStmt</span> <span class="o">+</span> <span class="s2">&quot;id INTEGER PRIMARY KEY AUTOINCREMENT&quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span>
+                        <span class="n">sqlStmt</span> <span class="o">=</span> <span class="n">idKey</span> <span class="o">+</span> <span class="n">keys</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="s2">&quot;TEXT&quot;</span> <span class="o">+</span> <span class="s2">&quot; UNIQUE , &quot;</span>
+                                                    <span class="c1"># print(sqlStmt)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">keys</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;log&#39;</span> <span class="ow">or</span> <span class="n">keys</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;CARDS&#39;</span> <span class="ow">or</span> <span class="n">keys</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;INFOHEADER&#39;</span> <span class="ow">or</span> <span class="n">keys</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;HDULIST&#39;</span><span class="p">:</span>
+                            <span class="k">pass</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">sqlStmt</span> <span class="o">=</span> <span class="n">sqlStmt</span> <span class="o">+</span> <span class="n">keys</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">, &quot;</span>
+                                                    <span class="c1"># print(key,value)</span>
+                        <span class="k">pass</span>
+                <span class="n">stmt</span><span class="o">=</span><span class="n">sqlStmt</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;)&#39;</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="n">stmt</span><span class="p">)</span>
+        <span class="n">cnx</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="c1"># sys.exit()</span>
+
+        <span class="c1"># create_current_scan_directory()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_final_plot_directory</span><span class="p">(</span><span class="n">src</span><span class="p">,</span><span class="n">tbFreq</span><span class="p">)</span>
+        <span class="c1"># sys.exit()</span>
+
         <span class="k">if</span> <span class="s1">&#39;S&#39;</span> <span class="ow">in</span> <span class="p">(</span><span class="n">frontend</span><span class="p">):</span>
             <span class="k">if</span> <span class="s1">&#39;13.0S&#39;</span> <span class="ow">in</span> <span class="n">frontend</span> <span class="ow">or</span> <span class="s1">&#39;18.0S&#39;</span> <span class="ow">in</span> <span class="n">frontend</span><span class="p">:</span>
                 <span class="n">set_dict_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span><span class="s1">&#39;BEAMTYPE&#39;</span><span class="p">,</span><span class="n">ScanType</span><span class="o">.</span><span class="n">SBW</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;wide single beam drift scan&#39;</span><span class="p">)</span>
@@ -320,6 +581,8 @@
                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unknown beam type :</span><span class="si">{</span><span class="n">frontend</span><span class="si">}</span><span class="s1"> - contact author to have it included</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
                 <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
 
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;about to process&#39;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
             <span class="c1"># get driftscan data from file</span>
             <span class="n">driftScans</span><span class="o">=</span><span class="n">DriftScans</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
             <span class="n">driftScans</span><span class="o">.</span><span class="n">process_data</span><span class="p">()</span> <span class="c1"># process the data</span>
@@ -333,6 +596,7 @@
             <span class="n">driftScans</span><span class="o">.</span><span class="n">process_data</span><span class="p">()</span> <span class="c1"># process the data</span>
             <span class="k">del</span> <span class="n">driftScans</span> <span class="c1"># release from memory</span></div>
 
+            <span class="c1"># sys.exit()</span>
 
 <div class="viewcode-block" id="Observation.get_hdu_info">
 <a class="viewcode-back" href="../../../docs/src.common.html#src.common.observation.Observation.get_hdu_info">[docs]</a>
@@ -405,7 +669,8 @@
                     <span class="k">except</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;FRONTEND&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span><span class="n">hdu</span><span class="p">[</span><span class="s1">&#39;FRONTEND&#39;</span><span class="p">],</span><span class="s1">&#39;description&#39;</span><span class="p">:</span><span class="n">hdu</span><span class="o">.</span><span class="n">comments</span><span class="p">[</span><span class="s1">&#39;FRONTEND&#39;</span><span class="p">]}</span>
 
-                    <span class="k">if</span> <span class="s1">&#39;D&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;FRONTEND&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="s1">&#39;_CAL&#39;</span> <span class="ow">in</span> <span class="n">hduIndexName</span><span class="p">:</span>
+                    
+                    <span class="k">if</span> <span class="s1">&#39;D&#39;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;FRONTEND&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">])</span> <span class="ow">and</span> <span class="s1">&#39;_CAL&#39;</span> <span class="ow">in</span> <span class="n">hduIndexName</span><span class="p">:</span>
                         <span class="k">if</span> <span class="s1">&#39;_CAL&#39;</span> <span class="ow">in</span> <span class="n">hduIndexName</span><span class="p">:</span>
                             <span class="c1"># print(column)#,hdu.columns())</span>
                             <span class="c1"># use low noise diode</span>
@@ -417,7 +682,7 @@
                             <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                         <span class="k">else</span><span class="p">:</span>
                             <span class="k">pass</span>
-                    <span class="k">elif</span> <span class="s1">&#39;S&#39;</span>  <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;FRONTEND&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="p">:</span>
+                    <span class="k">elif</span> <span class="s1">&#39;S&#39;</span>  <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;FRONTEND&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]):</span>
                         <span class="c1"># print(&#39;---&#39;,hduIndexName)</span>
                         <span class="k">if</span> <span class="s1">&#39;Chart&#39;</span> <span class="ow">in</span> <span class="n">hduIndexName</span><span class="p">:</span>
                         
@@ -450,8 +715,6 @@
                     <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
-        <span class="c1"># sys.exit()</span>
-
 <div class="viewcode-block" id="Observation.create_final_plot_directory">
 <a class="viewcode-back" href="../../../docs/src.common.html#src.common.observation.Observation.create_final_plot_directory">[docs]</a>
     <span class="k">def</span> <span class="nf">create_final_plot_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span><span class="n">freq</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
@@ -469,6 +732,7 @@
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="nb">print</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">freq</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">plotDir</span><span class="o">=</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;plots/</span><span class="si">{</span><span class="n">src</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="n">msg_wrapper</span><span class="p">(</span><span class="s2">&quot;info&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Creating directory to store processed plots: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">plotDir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>

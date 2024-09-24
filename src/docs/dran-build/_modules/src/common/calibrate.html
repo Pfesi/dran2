@@ -97,23 +97,26 @@
              
   <h1>Source code for src.common.calibrate</h1><div class="highlight"><pre>
 <span></span><span class="c1"># =========================================================================== #</span>
-<span class="c1"># File: calibrate.py                                                           #</span>
+<span class="c1"># File: calibrate.py                                                          #</span>
 <span class="c1"># Author: Pfesesani V. van Zyl                                                #</span>
 <span class="c1"># =========================================================================== #</span>
 
 <span class="c1"># Standard library imports</span>
 <span class="c1"># --------------------------------------------------------------------------- #</span>
+
+<span class="c1"># try:</span>
+<span class="kn">from</span> <span class="nn">.miscellaneousFunctions</span> <span class="kn">import</span> <span class="n">catch_zeroDivError</span>
+<span class="c1"># except:</span>
+    <span class="c1"># from common.miscellaneousFunctions import catch_zeroDivError</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span> 
 <span class="kn">import</span> <span class="nn">sys</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">.miscellaneousFunctions</span> <span class="kn">import</span> <span class="n">catch_zeroDivError</span>
-<span class="k">except</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">common.miscellaneousFunctions</span> <span class="kn">import</span> <span class="n">catch_zeroDivError</span>
+
 <span class="c1"># =========================================================================== #</span>
 
 <div class="viewcode-block" id="calc_pss">
 <a class="viewcode-back" href="../../../docs/src.common.html#src.common.calibrate.calc_pss">[docs]</a>
-<span class="k">def</span> <span class="nf">calc_pss</span><span class="p">(</span><span class="n">flux</span><span class="p">,</span> <span class="n">Ta</span><span class="p">,</span> <span class="n">errTa</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">calc_pss</span><span class="p">(</span><span class="n">flux</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">Ta</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">errTa</span><span class="p">:</span><span class="nb">float</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate the Point source sensitivity (PSS)</span>
 <span class="sd">        and its error for data with no pointing correction</span>
@@ -160,7 +163,10 @@
 
     <span class="c1"># print(data[&#39;FRONTEND&#39;],data[&#39;BEAMTYPE&#39;],data[&#39;OBJECT&#39;])</span>
     <span class="c1"># sys.exit()</span>
+    <span class="c1"># print(data.columns)</span>
 
+    <span class="n">Ta</span><span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">Ta</span><span class="p">)</span>
+    <span class="n">pc</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">pc</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;FRONTEND&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;01.3S&quot;</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;OBJECT&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;JUPITER&quot;</span><span class="p">:</span>
                 <span class="c1"># Only applying a size correction factor and atmospheric correction to Jupiter</span>
@@ -300,7 +306,7 @@
 
 <div class="viewcode-block" id="calibrate">
 <a class="viewcode-back" href="../../../docs/src.common.html#src.common.calibrate.calibrate">[docs]</a>
-<span class="k">def</span> <span class="nf">calibrate</span><span class="p">(</span>  <span class="n">hpsTa</span><span class="p">,</span> <span class="n">errHpsTa</span><span class="p">,</span> <span class="n">hpnTa</span><span class="p">,</span> <span class="n">errHpnTa</span><span class="p">,</span> <span class="n">onTa</span><span class="p">,</span> <span class="n">errOnTa</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">log</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">calibrate</span><span class="p">(</span><span class="n">hpsTa</span><span class="p">,</span> <span class="n">errHpsTa</span><span class="p">,</span> <span class="n">hpnTa</span><span class="p">,</span> <span class="n">errHpnTa</span><span class="p">,</span> <span class="n">onTa</span><span class="p">,</span> <span class="n">errOnTa</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Calculate the pointing corrected antenna temperature.</span>
 <span class="sd">    </span>
@@ -318,30 +324,41 @@
 <span class="sd">                corrTa: the corrected antenna temperature </span>
 <span class="sd">                errCorrTa: the error in the corrected antenna temperature</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># # Check if data has nans</span>
+        
+        <span class="c1"># Check if data has nans</span>
         <span class="n">onTa</span><span class="p">,</span> <span class="n">errOnTa</span> <span class="o">=</span> <span class="n">test_for_nans</span><span class="p">(</span><span class="n">onTa</span><span class="p">,</span> <span class="n">errOnTa</span><span class="p">)</span>
         <span class="n">hpsTa</span><span class="p">,</span> <span class="n">errHpsTa</span> <span class="o">=</span> <span class="n">test_for_nans</span><span class="p">(</span><span class="n">hpsTa</span><span class="p">,</span> <span class="n">errHpsTa</span><span class="p">)</span>
         <span class="n">hpnTa</span><span class="p">,</span> <span class="n">errHpnTa</span> <span class="o">=</span> <span class="n">test_for_nans</span><span class="p">(</span><span class="n">hpnTa</span><span class="p">,</span> <span class="n">errHpnTa</span><span class="p">)</span>
-        
+
+        <span class="n">onTa</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">onTa</span><span class="p">)</span>
+        <span class="n">errOnTa</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">errOnTa</span><span class="p">)</span>
+        <span class="n">hpsTa</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">hpsTa</span><span class="p">)</span>
+        <span class="n">errHpsTa</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">errHpsTa</span><span class="p">)</span>
+        <span class="n">hpnTa</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">hpnTa</span><span class="p">)</span>
+        <span class="n">errHpnTa</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">errHpnTa</span><span class="p">)</span>
+
+        <span class="c1"># print(hpsTa, errHpsTa )</span>
         <span class="k">if</span> <span class="n">onTa</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
 
             <span class="c1">#if no hpnTa</span>
             <span class="k">if</span><span class="p">((</span><span class="n">hpnTa</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">hpsTa</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)):</span>
+                <span class="c1"># missing north</span>
                 <span class="c1">#pc = exp[((ln(hpsTa) - ln(Ton) + ln(2))**2)/4ln(2)]</span>
                 <span class="c1">#corrTa = Ton x pc</span>
-
+                <span class="n">term2</span> <span class="o">=</span> <span class="mi">4</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
                 <span class="c1"># calculate the pointing and corrected antenna temp and its error</span>
-                <span class="n">pc</span><span class="p">,</span> <span class="n">der1</span><span class="p">,</span> <span class="n">der2</span> <span class="o">=</span> <span class="n">calc_pc_eq</span><span class="p">(</span><span class="n">hpsTa</span><span class="p">,</span> <span class="n">onTa</span><span class="p">)</span>
+                <span class="n">pc</span><span class="p">,</span> <span class="n">der1</span><span class="p">,</span> <span class="n">der2</span> <span class="o">=</span> <span class="n">calc_pc_eq</span><span class="p">(</span><span class="n">hpsTa</span><span class="p">,</span> <span class="n">onTa</span><span class="p">,</span><span class="n">term2</span><span class="p">,</span><span class="s1">&#39;n&#39;</span><span class="p">)</span>
                 <span class="n">corrTa</span> <span class="o">=</span> <span class="n">calc_tcorr</span><span class="p">(</span> <span class="n">onTa</span><span class="p">,</span> <span class="n">pc</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
                 <span class="n">errCorrTa</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">errOnTa</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">der2</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">errHpsTa</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">der1</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
 
             <span class="c1">#if no hpsTa</span>
             <span class="k">elif</span><span class="p">((</span><span class="n">hpnTa</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">hpsTa</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)):</span>
+                <span class="c1"># missing south</span>
                 <span class="c1"># pc = exp[((ln(Ton) - ln(hpnTa) + ln(2))**2)/4ln(2)]</span>
                 <span class="c1"># corrTa = Ton x pc</span>
-
+                <span class="n">term2</span> <span class="o">=</span> <span class="mi">4</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
                 <span class="c1"># calculate the pointing and corrected antenna temp and its error</span>
-                <span class="n">pc</span><span class="p">,</span> <span class="n">der1</span><span class="p">,</span> <span class="n">der2</span> <span class="o">=</span> <span class="n">calc_pc_eq</span><span class="p">(</span><span class="n">onTa</span><span class="p">,</span> <span class="n">hpnTa</span><span class="p">)</span>
+                <span class="n">pc</span><span class="p">,</span> <span class="n">der1</span><span class="p">,</span> <span class="n">der2</span> <span class="o">=</span> <span class="n">calc_pc_eq</span><span class="p">(</span><span class="n">onTa</span><span class="p">,</span> <span class="n">hpnTa</span><span class="p">,</span><span class="n">term2</span><span class="p">,</span><span class="s1">&#39;s&#39;</span><span class="p">)</span>
                 <span class="n">corrTa</span> <span class="o">=</span> <span class="n">calc_tcorr</span><span class="p">(</span><span class="n">onTa</span><span class="p">,</span> <span class="n">pc</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
                 <span class="n">errCorrTa</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">errOnTa</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">der1</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">errHpnTa</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">der2</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
 
@@ -387,13 +404,19 @@
 <span class="sd">        der2: first derivative with respect to Ta2</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="n">Ta1</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">Ta1</span><span class="p">)</span>
+    <span class="n">Ta2</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">Ta2</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="n">term2</span><span class="o">==</span><span class="s2">&quot;&quot;</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">pol</span><span class="o">==</span><span class="s1">&#39;s&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">pol</span><span class="o">==</span><span class="s1">&#39;n&#39;</span><span class="p">:</span>
+            <span class="c1"># missing north</span>
             <span class="n">term1</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Ta1</span><span class="p">))</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Ta2</span><span class="p">))</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span>
-        <span class="k">elif</span> <span class="n">pol</span><span class="o">==</span><span class="s1">&#39;n&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">pol</span><span class="o">==</span><span class="s1">&#39;s&#39;</span><span class="p">:</span>
+            <span class="c1"># missing south</span>
             <span class="n">term1</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Ta1</span><span class="p">))</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Ta2</span><span class="p">))</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span>
         <span class="n">term2</span> <span class="o">=</span> <span class="mi">4</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">Ta1</span><span class="p">,</span><span class="n">Ta2</span><span class="p">)</span>
         <span class="n">term1</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Ta1</span><span class="p">))</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">Ta2</span><span class="p">)))</span><span class="o">**</span><span class="mi">2</span>
     <span class="n">term3</span> <span class="o">=</span> <span class="n">term1</span><span class="o">/</span><span class="n">term2</span>
     <span class="n">pc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">term3</span><span class="p">)</span>

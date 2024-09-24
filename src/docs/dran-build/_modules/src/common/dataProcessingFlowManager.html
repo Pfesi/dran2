@@ -276,6 +276,7 @@
                 <span class="c1"># 4. Correct baseline and Create a new data set with no drift</span>
                 <span class="c1"># =============================================================</span>
                 <span class="k">if</span> <span class="s1">&#39;S&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">frontend</span><span class="p">:</span>
+                    <span class="c1"># sys.exit()</span>
 
                     <span class="c1"># fit the data using a gaussian</span>
                     <span class="c1"># set initial parameters for data fitting</span>
@@ -285,10 +286,14 @@
                     <span class="c1">#     self.flag,  self.baseLeft, self.baseRight, self.base, self.peakLoc, \</span>
                     <span class="c1">#     self.lb,self.rb = </span>
                     <span class="n">saveTag</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">saveTo</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">plotName</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s1">_&#39;</span>
-                    <span class="n">ret</span> <span class="o">=</span> <span class="n">fit_beam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xCleaned</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">yCleaned</span><span class="p">,</span> <span class="n">p0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">FNBW</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">force</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">,</span> <span class="n">saveTag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">theoFit</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">autoFit</span><span class="p">)</span>
+                    <span class="c1">#fit_beam(x, y, p, fnbw, force, log, saveTag, fitTheoretical, autoFit=None)</span>
+                    <span class="c1"># print(self.autoFit)</span>
+                    <span class="c1"># sys.exit()</span>
+                    <span class="n">ret</span> <span class="o">=</span> <span class="n">fit_beam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">xCleaned</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">yCleaned</span><span class="p">,</span> <span class="n">p0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">FNBW</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">force</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">,</span> <span class="n">saveTag</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">theoFit</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">autoFit</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">])</span>
 
                     <span class="c1"># print(len(ret[&#39;correctedData&#39;])&gt;1)</span>
-                    <span class="c1"># print(ret.keys())</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">ret</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                    <span class="c1"># sys.exit()</span>
                     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ret</span><span class="p">[</span><span class="s1">&#39;correctedData&#39;</span><span class="p">])</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
                         <span class="k">if</span> <span class="nb">max</span><span class="p">(</span><span class="n">ret</span><span class="p">[</span><span class="s1">&#39;peakModel&#39;</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
                             <span class="c1"># self.flag=12</span>

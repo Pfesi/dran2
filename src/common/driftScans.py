@@ -11,7 +11,7 @@ from .sqlite_db import SQLiteDB
 from .calibrate import calibrate
 import pandas as pd
 import matplotlib.pyplot as plt
-from config import __DBNAME__
+from config import DBNAME
 import sqlite3
 
 @dataclass
@@ -270,7 +270,7 @@ class DriftScans(DriftScanAttributes):
 
                 for tag in tags:
 
-                    print('\nWorking on:', tag,pol)
+                    # print('\nWorking on:', tag,pol)
                     # sys.exit()
                     scan=scanData[f'{tag}'][pol].__dict__
 
@@ -457,6 +457,7 @@ class DriftScans(DriftScanAttributes):
             # # print(tableData['values'])
             # for l,v in finalDict.items():
             #     print(l,v)
+            # sys.exit()
 
             # print(finalDict['OBSDATE'].split('T')[0])
             # Get date
@@ -854,7 +855,7 @@ class DriftScans(DriftScanAttributes):
             # Get data to save to dictionary
             # --- Setup database where you will be storing information
             msg_wrapper("debug",self.log.debug,"Setup database")
-            db= SQLiteDB(__DBNAME__,self.log)
+            db= SQLiteDB(DBNAME,self.log)
             db.create_db()
             table=db.create_table(finalData,dbTable)
 
@@ -868,7 +869,7 @@ class DriftScans(DriftScanAttributes):
             #     print("Frequency of source doesn't match path frequency")
             #     # open database and match
             #     # check if table exists in database
-            #     cnx = sqlite3.connect(__DBNAME__)
+            #     cnx = sqlite3.connect(DBNAME)
             #     # dbTables= pd.read_sql_query("SELECT name FROM sqlite_schema WHERE type='table'", cnx)
             #     # tables=list(dbTables['name'])
             #     tableData = pd.read_sql_query(f"SELECT * FROM {table}", cnx)

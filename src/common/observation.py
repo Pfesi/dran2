@@ -10,7 +10,7 @@ from dataclasses import dataclass, field
 import numpy as np
 from datetime import datetime
 import argparse
-from config import __version__, __DBNAME__
+from config import VERSION, DBNAME
 import pandas as pd
 import sqlite3
 
@@ -20,28 +20,13 @@ import common.exceptions as ex
 from common.contextManagers import open_file
 from common.driftScans import DriftScans
 from common.enums import ScanType
-from common.miscellaneousFunctions import set_dict_item, create_current_scan_directory, delete_logs, set_table_name,fast_scandir
+from common.miscellaneousFunctions import set_dict_item, create_current_scan_directory, delete_logs, set_table_name,fast_scandir, get_freq_band2
 from common.logConfiguration import configure_logging
 from common.msgConfiguration import msg_wrapper, load_prog
 from common.sqlite_db import SQLiteDB
 # =========================================================================== #
 
-def get_freq_band2(freq:int):
-    if freq >= 1000 and freq<= 2000: 
-        return 'L', '18.0S'
-    elif freq > 2000 and freq<= 4000: #
-        return 'S', '13.0S'
-    elif freq > 4000 and freq<= 6000:
-        return 'C', '05.0D'
-    elif freq > 6000 and freq<= 8000:
-        # TODO: get correct frequency band for masers - ask Fanie vdHeever
-        return 'M', '04.5S'# for methanol masers
-    elif freq > 8000 and freq<= 12000: # 8580
-        return 'X', '03.5D'
-    elif freq > 12000 and freq<= 18000:
-        return 'Ku', '02.5S'
-    elif freq >= 18000 and freq<= 27000:
-        return 'K', '01.3S'
+
     
 @dataclass
 class Observation:

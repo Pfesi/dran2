@@ -61,6 +61,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../extras/tuts/tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../extras/commands.html">Commands</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Resources:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/radio_sources.html">Radio sources</a></li>
+</ul>
 <p class="caption" role="heading"><span class="caption-text">Guidelines:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../extras/changelog.html">Changelog</a></li>
@@ -110,7 +114,7 @@
 <div class="viewcode-block" id="open_database">
 <a class="viewcode-back" href="../../../docs/src.common.html#src.common.contextManagers.open_database">[docs]</a>
 <span class="nd">@contextmanager</span>
-<span class="k">def</span> <span class="nf">open_database</span><span class="p">(</span><span class="n">fileName</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">open_database</span><span class="p">(</span><span class="n">dbName</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Context manager for opening and closing a database file</span>
 
@@ -120,9 +124,9 @@
 <span class="sd">    Yields:</span>
 <span class="sd">        cursor : cursor object to run database operations.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">connection</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span>
+    <span class="n">connection</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">dbName</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">cursor</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+        <span class="n">cursor</span> <span class="o">=</span> <span class="n">connection</span><span class="c1">#.cursor()</span>
         <span class="k">yield</span> <span class="n">cursor</span>
     <span class="k">finally</span><span class="p">:</span>
         <span class="n">connection</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>

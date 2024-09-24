@@ -32,3 +32,10 @@ moveToBootes.py
 source_data.zip
 source_data/
 dran-workflow.key
+wrongpats.txt
+reqs.txt
+src/dran.egg-info
+src/dran2.egg-info
+dist/*
+test.py
+moveToBootes.py

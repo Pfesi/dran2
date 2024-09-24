@@ -16,7 +16,8 @@ import matplotlib.pyplot as plt
 import webbrowser
 import numpy as np
 import pandas as pd
-
+import datetime as dt
+import matplotlib.dates as mdates ## Import required library
 
 # Local imports
 # --------------------------------------------------------------------------- #
@@ -132,8 +133,11 @@ class TimeCanvas(FigureCanvas):
         elif x == 'NaT':
             # print('+',x)
             return np.nan
+        elif x =='':
+            return np.nan
         else:
             # print('&',x)
+            
             return float(x)
         
     def replaceDateItem(self,x):
@@ -150,6 +154,7 @@ class TimeCanvas(FigureCanvas):
         else:
             # print('&',x)
             return float(x)
+    
     
     def plot_fig(self, x=[], y=[], xlab="", ylab="", title="Main database plot window", col="C0.", data="",yerr=[]):
         # plot_fig(self.df[xCol],self.df[yCol],xCol,yCol,data=self.df,yerr=yerr)
@@ -178,6 +183,7 @@ class TimeCanvas(FigureCanvas):
                 list of artists added
         """
 
+        # self.x
         self.data=data # drift scan data
 
         # print(type(x))
@@ -195,7 +201,6 @@ class TimeCanvas(FigureCanvas):
             self.y=y
             self.xlab=xlab
             self.ylab=ylab
-
            
             if len(yerr)==0 :
                 self.ax.plot(self.x, self.y, col, label="data", picker=5)
@@ -215,23 +220,46 @@ class TimeCanvas(FigureCanvas):
             # self.ax.tick_params(axis='x',labelrotation=45)
 
             ## Added code here
-            import matplotlib.dates as mdates ## Import required library
             
-            if len(self.y) <=30:
-                pass
-            else:
-                months = mdates.MonthLocator(interval=1, bymonthday=-1)  ## 1 month apart & show last date
-                self.ax.xaxis.set_major_locator(months) ## Set months as major locator
-            self.ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d')) ##Display format - update here to change
-            self.ax.tick_params(axis='x',labelrotation=20) ##Adjust angle and horizontal align right
-            # plt.show()
+            # now = dt.datetime.now()
+            # for i, d in enumerate([360, 30, 7, 1]):
+            #     # self.ax = axes.flatten()[i]
+            #     # earlycut = now - relativedelta(days=d)
+            #     # data = df.loc[df.index>=earlycut, :]
+            #     # self.ax.plot(data.index, data['value'])
+
+            # self.ax.xaxis.set_minor_locator() get_xaxis().set_minor_locator(self.mpl.ticker.AutoMinorLocator())
+            #     self.ax.get_yaxis().set_minor_locator(self.mpl.ticker.AutoMinorLocator())
+
+            # self.ax.grid( )#which='major', color='w', linewidth=1.5)
+            # self.ax.grid(b=True, which='minor', color='w', linewidth=0.75)
+
+            #     plt.setp(self.ax.get_xticklabels(), rotation=30, horizontalalignment='right')
+
+            
+
+            # if len(self.y) <=30:
+            #     pass
+            # else:
+            months = mdates.MonthLocator(bymonth=(1,7))#interval=6, bymonthday=-1)  ## 6 months apart & show last date
+            self.ax.xaxis.set_major_locator(months) ## Set months as major locator
+            self.ax.xaxis.set_minor_locator(mdates.MonthLocator()) 
+
+            # TODO: create a button to toggle grid on/off
+            # TODO: create button to change grid color, line width etc
+            # TODO: Button to toggle step change locations on/off
+            self.ax.grid(True,alpha=0.2)## Set months as minor locator
+            # self.ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d')) ##Display format - update here to change
+            # self.ax.tick_params(axis='x',labelrotation=20) ##Adjust angle and horizontal align right
+            # # plt.show()
 
             connection_id_0=self.mpl_connect('pick_event', self.onpick)
             connection_id = self.mpl_connect('button_press_event', self.onclick)
             #self.mpl_connect('pick_event', self.onpick)
 
             # rotate ticks
-
+            self.fig.autofmt_xdate()
+            self.fig.tight_layout()
             self.draw()
         self.draw()
 

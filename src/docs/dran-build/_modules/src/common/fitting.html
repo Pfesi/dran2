@@ -1485,6 +1485,8 @@
         <span class="c1"># 2) correct the drift in the data and get the residual and rms</span>
         <span class="n">baseLocs</span><span class="o">=</span><span class="p">[]</span><span class="c1">#np.where()[0]</span>
 
+        <span class="c1"># print(autoFit)</span>
+        <span class="c1"># sys.exit()</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">autoFit</span><span class="p">[</span><span class="s1">&#39;baselocs&#39;</span><span class="p">])):</span>
             <span class="k">if</span> <span class="n">i</span><span class="o">%</span><span class="mi">2</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
                 <span class="c1">#print(autoFit[&#39;baselocs&#39;][i],autoFit[&#39;baselocs&#39;][i+1])</span>
@@ -2444,7 +2446,10 @@
         <span class="c1">#print(&quot;Fitting negative&quot;)</span>
         <span class="n">fa</span><span class="o">=</span><span class="s2">&quot;n&quot;</span>
 
-    <span class="n">beamCut</span> <span class="o">=</span> <span class="mf">0.6</span> <span class="c1"># fitting top 40%, 0.7 (30% for cals) or 0.5 (50% for targets) should make this an option</span>
+    <span class="c1"># TODO: should make this an option</span>
+    <span class="c1"># Decided to change this because the software now treats both </span>
+    <span class="c1"># target sources and calibrators the same way</span>
+    <span class="n">beamCut</span> <span class="o">=</span> <span class="mf">0.6</span> <span class="c1"># fitting top 40%, 0.7 (30% for cals) or 0.5 (50% for targets) </span>
 
     <span class="c1"># Ensure peak is within accepted limits</span>
     <span class="k">if</span> <span class="n">fa</span><span class="o">==</span><span class="s2">&quot;p&quot;</span><span class="p">:</span>

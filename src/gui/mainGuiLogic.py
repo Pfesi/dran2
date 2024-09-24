@@ -1568,6 +1568,12 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
            
             # print(self.df)
             # sys.exit() 
+
+            if xCol == 'OBSDATE':
+                # convert to datetime
+                self.df[xCol] = pd.to_datetime(self.df[xCol])#, errors='coerce')
+                # print(self.df[xCol])
+                # sys.exit()
             self.Canvas.plot_fig(self.df[xCol],self.df[yCol],xCol,yCol,data=self.df,yerr=yerr) #,data=self.)
             # sys.exit()
             
@@ -2159,7 +2165,7 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
                                 else:
                                     stmt=stmt+f"O{pol}FLAG='{np.nan}', O{pol}TA='{np.nan}', O{pol}TAERR='{np.nan}', O{pol}PC='{np.nan}', CO{pol}TA='{np.nan}', CO{pol}TAERR='{np.nan}', S{pol}TA='{np.nan}', S{pol}TAERR='{np.nan}', N{pol}TA='{np.nan}', N{pol}TAERR='{np.nan}',  "
                         else:
-                                stmt=stmt+f"{bms[k]}O{pol}FLAG='{np.nan}', {bms[k]}N{pol}TA='{np.nan}', {bms[k]}N{pol}TAERR='{np.nan}', {bms[k]}S{pol}TA='{np.nan}', {bms[k]}S{pol}TAERR='{np.nan}', {bms[k]}O{pol}TA='{np.nan}', {bms[k]}O{pol}TAERR='{np.nan}', {bms[k]}CO{pol}TA='{np.nan}', {bms[k]}CO{pol}TAERR='{np.nan} ',{bms[k]}S{pol}S2N='{np.nan}', {bms[k]}O{pol}PC='{np.nan}', "
+                                stmt=stmt+f"O{pol}FLAG='{np.nan}', {bms[k]}N{pol}TA='{np.nan}', {bms[k]}N{pol}TAERR='{np.nan}', {bms[k]}S{pol}TA='{np.nan}', {bms[k]}S{pol}TAERR='{np.nan}', {bms[k]}O{pol}TA='{np.nan}', {bms[k]}O{pol}TAERR='{np.nan}', {bms[k]}CO{pol}TA='{np.nan}', {bms[k]}CO{pol}TAERR='{np.nan} ',{bms[k]}S{pol}S2N='{np.nan}', {bms[k]}O{pol}PC='{np.nan}', "
                         # except:
                         # elif "CAL" in self.df['OBJECTTYPE'].iloc[i]:
                         #     frq=self.df['CENTFREQ'].iloc[i]
@@ -3505,6 +3511,8 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
 
             self.df[yCol]=self.df[yCol]#.apply(self.f)
             self.df[yCol].fillna(value=np.nan, inplace=True)
+
+            self.df[yCol]=self.df[yCol].replace('',np.nan)
             self.df[yCol]=self.df[yCol].astype(float)
             
             print(self.df[xCol],self.df[yCol])
@@ -3654,6 +3662,22 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
         df=df.sort_values('FILENAME')
         return df ,db
     
+    def checkKeysFound(self,pol,option,img,path,images,keys):
+        
+        for key in keys:
+            if f'{key}{pol}TA' in option or f'{key}{pol}MID' in option or \
+                f'{key}{pol}S2N' in option or f'{key}{pol}FLAG' in option or \
+                f'{key}{pol}RMS' in option or f'{key}{pol}SLOPE' in option or \
+                f'{key}{pol}BRMS' in option:
+
+                if key=='S'and f"HPS_{pol}CP" in img:
+                    images.append(path)
+                elif key=='N' and f"HPN_{pol}CP" in img:
+                    images.append(path)
+                elif key=='O' and f"ON_{pol}CP" in img:
+                    images.append(path)
+        return images
+    
     def show_plot_browser(self):
         """ 
         Open a webrowser containg the plots to be displayed. 
@@ -3768,11 +3792,20 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
                                     # print(len(df),len(ndf),option,txt)
 
                                     if len(ndf) > 0:
+
+                                        # Show only what is requested
+
+                                        
+
                                         #print(ndf['FILENAME'])
                                         ndf=ndf.sort_values('FILENAME')
                                         ndf['plot_tag']=ndf['FILENAME'].apply(lambda x:x[:18])
 
                                         plots=list(ndf['plot_tag'])
+
+                                        # print(plots)
+
+                                        # sys.exit()
                                         
                                         # print stats
                                         print("\n--- Basic stats ---\n")
@@ -3786,8 +3819,9 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
                                         imgDir = "plots/"
                                         ls=os.listdir(imgDir)
                                      
-                                        fln=(folderName.split("_")[0]).upper()
-                                        # print(sorted(ls),fln)
+                                        # fln=(folderName.split("_")[0]).upper()
+                                        # print(sorted(ls))#,fln)
+                                        # sys.exit()
                                        
                                         msg_wrapper("info", self.log.debug,"Plotting folder "+folderName)
 
@@ -3827,44 +3861,69 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
                                         if ".DS_Store" in imageNames:
                                             imageNames.remove(".DS_Store")
 
+                                        keys=['S','N','O'] # south, north, on
+
                                         # # get images for current point
                                         for i in range(len(plots)):
 
-                                            print(imgPath,imageNames[i])
-                                            
+                                            # print('>>',imgPath,imageNames[i])
+                                            # found=0
+
+                                            # TODO: FIX this mess, i only want to see relvant data
                                             for j in range(len(imageNames)):
                                                 if plots[i] in imageNames[j]: #[:18]:
-                                                    if "SL" in option and "HPS_LCP" in imageNames[j]:
-                                                            #print(imageNames[i],plots[j])
-                                                        images.append(imgPath+imageNames[j])
-                                                    elif "SR" in option and "HPS_RCP" in imageNames[j]:
-                                                            #print(imageNames[i],plots[j])
-                                                        images.append(imgPath+imageNames[j])
-                                                    elif "NL" in option and "HPN_LCP" in imageNames[j]:
-                                                            #print(imageNames[i],plots[j])
-                                                        images.append(imgPath+imageNames[j])
-                                                    elif "NR" in option and "HPN_RCP" in imageNames[j]:
-                                                            #print(imageNames[i],plots[j])
-                                                        images.append(imgPath+imageNames[j])
-                                                    elif  "OL" in option and "ON_LCP" in imageNames[j]:
-                                                            #print(imageNames[i],plots[j])
-                                                        images.append(imgPath+imageNames[j])
-                                                    elif "OR" in option and "ON_RCP" in imageNames[j]:
-                                                            #print(imageNames[i],plots[j])
-                                                        images.append(imgPath+imageNames[j])
-                                                    else:
+                                                    # print(imageNames[j],plots[i])
+                                                    path=imgPath+imageNames[j]
+                                                    images1=self.checkKeysFound('L',option,imageNames[j],path,images,keys)
+                                                    images2=self.checkKeysFound('R',option,imageNames[j],path,images,keys)
+                                                    # checkKeysFound(pol,option,img,path,images,keys)
+                                                    if len(images1)==0 and len(images2)==0:
+                                                        # no matches found
                                                         images.append(imgPath+imageNames[i])
-                                                
+                                                    else:
+                                                        images = images + images1+images2
 
+
+
+                                                        #         images.append(imgPath+imageNames[j])
+
+                                                    # if "SL" in option and "HPS_LCP" in imageNames[j]:
+                                                    #         #print(imageNames[i],plots[j])
+                                                    #     images.append(imgPath+imageNames[j])
+                                                    # elif "SR" in option and "HPS_RCP" in imageNames[j]:
+                                                    #         #print(imageNames[i],plots[j])
+                                                    #     images.append(imgPath+imageNames[j])
+                                                    # elif "NL" in option and "HPN_LCP" in imageNames[j]:
+                                                    #         #print(imageNames[i],plots[j])
+                                                    #     images.append(imgPath+imageNames[j])
+                                                    # elif "NR" in option and "HPN_RCP" in imageNames[j]:
+                                                    #         #print(imageNames[i],plots[j])
+                                                    #     images.append(imgPath+imageNames[j])
+                                                    # elif  "OL" in option and "ON_LCP" in imageNames[j]:
+                                                    #         #print(imageNames[i],plots[j])
+                                                    #     images.append(imgPath+imageNames[j])
+                                                    # elif "OR" in option and "ON_RCP" in imageNames[j]:
+                                                    #         #print(imageNames[i],plots[j])
+                                                    #     images.append(imgPath+imageNames[j])
+                                                    # else:
+                                                    #     images.append(imgPath+imageNames[i])
+                                                
+                                        print(images)
+                                        sys.exit()
                                         htmlstart = '<html> <head>\
                                                 <meta charset = "utf-8" >\
-                                                <meta name = "viewport" content = "width=device-width, initial-scale=1" > <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous"> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script> <style> img {border: 3px solid  # ddd; /* Gray border */border-radius: 5px;  /* Rounded border */padding: 5px; /* Some padding */width: 400px; /* Set a small width */}/* Add a hover effect (blue shadow) */img:hover {box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);}</style> \
-                                                <title>Plots</title>\
+                                                <meta name = "viewport" content = "width=device-width, initial-scale=1" > <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous"> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script> \
+                                                    <style> \
+                                                        img {border: 3px solid  # ddd; /* Gray border */border-radius: 5px;  /* Rounded border */padding: 5px; /* Some padding */width: 400px; /* Set a small width */}/* Add a hover effect (blue shadow) */\
+                                                        img:hover {box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);}\
+                                                    </style> \
+                                                <title>Driftscan plots</title>\
                                                 </head>\
                                                 <div class="container-fluid"> \
                                                     <div class="row">\
                                                         <hr>\
-                                                            <h1> Plotting folder '+folderName.upper() + '</h1> <p>'
+                                                        <h1> Plotting folder '+folderName.upper() + '</h1> \
+                                                        <p>'
                                                     
                                         htmlmid=''
 
