@@ -9,6 +9,7 @@ import numpy as np
 import os, sys
 import pandas as pd
 import sqlite3
+import gc
 # =========================================================================== #
 
 try:
@@ -239,53 +240,59 @@ def create_table_cols(freq,log,src=''):
 
     return colTypes
 
-def get_source_properties(fname,path):
+def parse_source_path(path):
+    """Extracts frequency and source from a file path.
 
+    Args:
+        path (str): The file path to parse.
+
+    Returns:
+        tuple: A tuple containing the frequency (int) and source (str).
+    """
+
+    # Split the path into segments using '/'
+    path_segments = path.split('/')
+    print(path_segments)
+
+    # Try to extract frequency directly from the second-to-last segment
     try:
-        freq = int(path.split('/')[-2])
-    except:
-        freq= int(path.split('/')[-2].split('_')[-1])
+        freq = int(path_segments[-2])
+    except ValueError:
+        # If the direct extraction fails, try splitting the segment by '_' and extracting the last part
+        freq = int(path_segments[-2].split('_')[-1])
+        print('in: ',freq)
 
-    src = (path.split('/')[-3]).upper()
+    # Extract the source from the third-to-last segment and convert to uppercase
+    src = path_segments[-3].upper()
 
-    return path, fname, freq, src
+    return freq, src
 
-# def process_file(fname,path,log,DBNAME,pathToFolder=''):
+def parse_source_directory_path(path):
+    """Extracts frequency and source from a file path.
 
-#     # check if file is in the correct folder/directory by matching the source name
-#     # in file with path.
-#     pathToFile, fileName, freq, src=get_source_properties(fname,path)
-#     if pathToFolder == '':
-#         pathToFolder ='/'.join(('/'.join(pathToFile.split('.fits')[:-1])).split('/')[:-1]).upper()
-    
-#     if 'HYDRA_A' in fileName:
-#         srcNameFromFileName='HYDRAA'
-#     else:
-#         srcNameFromFileName=fileName.split('_')[-1].split('.fits')[0].upper() 
+    Args:
+        path (str): The file path to parse.
 
-#     srcNameInPath=f'{srcNameFromFileName}' in pathToFolder.upper()
+    Returns:
+        tuple: A tuple containing the frequency (int) and source (str).
+    """
 
-#     if not srcNameInPath:
+    # Split the path into segments using '/'
+    path_segments = path.split('/')
+    print(path_segments)
 
-#         # create a new directory for this src
-#         print(f'File in wrong path: {pathToFile}')
-#         with open('wrongpaths.txt','a') as f:
-#             f.write(f'{pathToFile}\n')
-#         sys.exit()
+    # Try to extract frequency directly from the second-to-last segment
+    try:
+        freq = int(path_segments[-1])
+    except ValueError:
+        # If the direct extraction fails, try splitting the segment by '_' and extracting the last part
+        freq = int(path_segments[-1].split('_')[-1])
+        # print('in: ',freq)
 
-#     else:
+    # Extract the source from the third-to-last segment and convert to uppercase
+    src = path_segments[-2].upper()
 
-#         assert pathToFile.endswith('.fits'), f'The program requires a fits file to work, got: {fileName}'
-                    
-#         # get processed files from database
-#         tableName, myCols, tableFileNames, tableNames = get_previously_processed_files(src, freq,log,DBNAME)
-
-#         if fileName in tableFileNames:
-#             print(f'Already processed: {pathToFile}')
-#         else:
-#             print(f'Processing file: {pathToFile}')
-#             process_new_file(pathToFile, log, myCols, theofit='',autofit='')
-
+    return freq, src
 
 def get_tables_from_database(dbName):
 
@@ -443,13 +450,167 @@ def generate_quick_view(arg,log,Observation):
         obs.get_data_only(qv='yes')
         sys.exit()
 
+# def get_tables_from_database(DBNAME,table):
+#     # cnx = sqlite3.connect(DBNAME)
+#     # tableData = pd.read_sql_query(f"SELECT * FROM {table}", cnx)
+#     # tableFilenames=sorted(list(tableData['FILENAME']))
+#     # dataInDBtables=dataInDBtables+tableFilenames
+#     return tables
 
-# Unused but may be useful in future
-def fast_scandir(dirname):
-    '''Scan directory for all folders in the given directory'''
+def find_table_in_database(DBNAME,table, tabFreqBand, src):
+    
+    # compare to database entries
+    tablesFromDB = get_tables_from_database(DBNAME)
+    DBtables=[d for d in tablesFromDB if 'sqlite_sequence' not in d]
 
-    print(f'Scanning the {dirname} directory')
+    dataInDBtables=[]
+    for tab in DBtables:
+        if src.strip() in tab.strip():
+            # print('found: ',src, tab)
+            tableEntryfreqBand=get_freq_band(int(tab.split('_')[-1]))
+            if tabFreqBand==tableEntryfreqBand:
+                print(f'>> Found similar {tableEntryfreqBand}-band freq in table:',tab)
+                                                    
+    return 'tab'
+
+def process_new_file(pathToFile, log, myCols, Observation, theofit='',autofit=''):
+    
+    # check if symlink
+    isSymlink=os.path.islink(f'{pathToFile}')
+    if not isSymlink:
+        obs=Observation(FILEPATH=pathToFile, theoFit=theofit, autoFit=autofit, log=log, dbCols=myCols)
+        obs.get_data()
+        del obs  
+        gc.collect()
+    else:
+        print(f'File is a symlink: {pathToFile}. Stopped processing')     
+
+
+def process_file(filePath, log, Observation, theofit='',autofit=''):
+
+    # Correct source name inconsistencies
+    srcFolderPath = os.path.dirname(filePath)
+    fileName = os.path.basename(filePath)
+    freq, src = parse_source_path(filePath)
+    srcNameFromFile = "HYDRAA" if "HYDRA_A" in fileName else fileName.split("_")[-1].split(".fits")[0].upper()
+                
+    srcNameInPath=f'{srcNameFromFile.upper()}' in srcFolderPath.upper()
+    if not srcNameInPath:
+
+        # create a new directory for this src
+        print(f'File in wrong path: {filePath}')
+        with open('wrongpaths.txt','a') as f:
+            f.write(f'{filePath}\n')
+        sys.exit()
+
+    else:
+
+        assert filePath.endswith('.fits'), f'The program requires a fits file to work, got: {fileName}'
+                    
+        # get processed files from database
+        tableName, myCols, tableFileNames, tableNames = get_previously_processed_files(src, freq,log,DBNAME)
+
+        if fileName in tableFileNames:
+            print(f'Already processed: {filePath}')
+        else:
+            print(f'Processing file: {filePath}')
+            process_new_file(filePath, log, myCols, Observation, theofit='',autofit='')
+
+
+    return
+
+def fast_scandir(dirname,log,Observation):
+    '''Scan directory for all folders in the given directory. This is slow
+    for large subfolders but works'''
+
+    print()
+    msg_wrapper('info',log.info,f'Scanning the {dirname} directory')
+
     subfolders= [f.path for f in os.scandir(dirname) if f.is_dir()]
+    files=[f.path for f in os.scandir(dirname) if f.is_file()]
+
+    print(f'Subfolders: {len(subfolders)}, Files: {len(files)}\n')
+    # print(subfolders)
+
+    if len(files) == 0:
+        # print('No files found in the directory\n')
+        pass
+    else:
+
+        # check if file has been previously processed
+        msg_wrapper('info',log.info,f'Processing files in {dirname}')
+        msg_wrapper('info',log.info,'-'*50)
+
+        try:
+            freq, src = parse_source_directory_path(dirname)
+            convertedSrcName=src.replace('-','M').replace('+','P')
+            table=f'{src}_{freq}'#.replace('-','M').replace('+','P')
+            tabFreqBand=get_freq_band(int(freq))
+            myCols=create_table_cols(freq,log,src)
+        except:
+            freq=np.nan
+            src=None
+            convertedSrcName=None
+            table=None
+            tabFreqBand=None
+            myCols=None
+
+        print(f'Frequency: {freq}, Source: {src}')
+        print(f'\nFound freq: {freq}, for src: {src}')
+        print(f'\nCreated tableName: {table}')
+
+        if src is not None:
+            tableName, myCols, tableFiles, tableNames=get_previously_processed_files(src, freq,log,DBNAME)
+
+            # get all files that havent processed yet
+            unprocessedObs=[]
+            for fl in files:  
+                if os.path.basename(fl) in tableFiles:
+                    pass
+                else:
+                    unprocessedObs.append(fl)
+
+            # print(tableFiles)
+            print(f'Found {len(unprocessedObs)} of {len(files)} unprocessed files')
+            
+            if len(unprocessedObs)>0:
+                for file in unprocessedObs:
+                    if '.fits' not in file:
+                        try:    
+                            assert file.endswith('.fits'), f'The program requires a fits file, got: {file}'
+                        except:
+                            print()
+                            msg_wrapper('info',log.info,f'The program requires a fits file, got: {file}')
+                            msg_wrapper('info',log.info,'Skipping...\n')
+
+                    else:
+                        # Process the files
+                        msg_wrapper('info',log.info,f'\nProcessing file {file}')
+                        process_file(file, log,Observation)
+                        # sys.exit()
+
+        msg_wrapper('info',log.info,'>'*50)
+
     for dirname in list(subfolders):
-        subfolders.extend(fast_scandir(dirname))
+        subfolders.extend(fast_scandir(dirname,log,Observation))
+        print('\n')
     return subfolders
+
+def run_fast_scandir(dir, ext):    # dir: str, ext: list
+    subfolders, files = [], []
+
+    for f in os.scandir(dir):
+        if f.is_dir():
+            subfolders.append(f.path)
+        if f.is_file():
+            if os.path.splitext(f.name)[1].lower() in ext:
+                files.append(f.path)
+
+
+    for dir in list(subfolders):
+        sf, f = run_fast_scandir(dir, ext)
+        subfolders.extend(sf)
+        files.extend(f)
+    return subfolders, files
+
+

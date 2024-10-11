@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.abspath('../../../'))
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'dran'
+project = 'DRAN'
 copyright = '2024, Pfesesani van Zyl'
 author = 'Pfesesani van Zyl'
 

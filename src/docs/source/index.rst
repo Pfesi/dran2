@@ -39,7 +39,7 @@ It then proceeds to
 
     * clean or filter out any RFI present in the data  
     * correct or remove any drift that may be present in the data due to telescope effects, and 
-    * tries to fit the peak of the signal (i.e. upper 50% of the beam). 
+    * attempts to fit the peak of the signal (i.e. upper 30% to 50% of the beam depending on a set of predefined criteria related to the presence or lack of sidelobes). 
 
 .. note:: 
    The software previously used to fit the top 30% for bright calibrator sources but this 

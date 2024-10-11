@@ -6,10 +6,10 @@
 # Standard library imports
 # --------------------------------------------------------------------------- #
 
-# try:
+#try:
 from .miscellaneousFunctions import catch_zeroDivError
-# except:
-    # from common.miscellaneousFunctions import catch_zeroDivError
+#except:
+#    from common.miscellaneousFunctions import catch_zeroDivError
 
 import numpy as np 
 import sys
