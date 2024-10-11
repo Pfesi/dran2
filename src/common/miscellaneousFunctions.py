@@ -479,7 +479,6 @@ def process_new_file(pathToFile, log, myCols, Observation, theofit='',autofit=''
     else:
         print(f'File is a symlink: {pathToFile}. Stopped processing')     
 
-
 def process_file(filePath, log, Observation, theofit='',autofit=''):
 
     # Correct source name inconsistencies
@@ -492,10 +491,41 @@ def process_file(filePath, log, Observation, theofit='',autofit=''):
     if not srcNameInPath:
 
         # create a new directory for this src
-        print(f'File in wrong path: {filePath}')
+        print(f'\nFound a file in wrong path: {filePath}')
         with open('wrongpaths.txt','a') as f:
             f.write(f'{filePath}\n')
-        sys.exit()
+
+        # get data from path
+        # print(src, freq, DBNAME)
+        
+        src2=filePath.split("_")[-1].split(".fits")[0]
+        newpath=filePath.replace(src,src2)
+        newDirPath=os.path.dirname(newpath)
+        print(f'\n Folder {src} should be {src2}')
+        print(f'Creating new folder {newDirPath}')
+        print(f'Old file path {filePath} \n New file path: {newpath} \n')
+
+        try:
+            os.makedirs(newDirPath)
+        except Exception as e:
+            print(f'Failed to create new folder: {os.path.dirname(newpath)}')
+            print(e,'\n')
+            # sys.exit()
+
+        print('Moving file to designated directory')
+        os.system(f'mv {filePath} {newpath}')
+        src=src2
+        tableName, myCols, tableFileNames, tableNames = get_previously_processed_files(src, freq,log,DBNAME)
+        
+        # print(fileName in tableFileNames)
+        if fileName in tableFileNames:
+            print(f'Already processed: {newpath}')
+        else:
+            print(f'Processing file: {newpath}')
+            process_new_file(filePath, log, myCols, Observation, theofit='',autofit='')
+
+        # print(fileName,src,tableName,newpath)
+        # sys.exit()
 
     else:
 
