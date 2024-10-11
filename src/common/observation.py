@@ -24,6 +24,7 @@ from common.miscellaneousFunctions import set_dict_item, create_current_scan_dir
 from common.logConfiguration import configure_logging
 from common.msgConfiguration import msg_wrapper, load_prog
 from common.sqlite_db import SQLiteDB
+from common.plotting import make_qv_plots
 # =========================================================================== #
 
 
@@ -155,7 +156,7 @@ class Observation:
             msg_wrapper("debug",self.log.debug,msg)
         return
 
-    def get_data_only(self,noqv=False):
+    def get_data_only(self,qv=False):
         """ Get data from fits file hdu. This is for the quick file view.
         """
 
@@ -212,6 +213,63 @@ class Observation:
             driftScans.process_data_only() # process the data
             del driftScans # release from memory
 
+            print(self.__dict__.keys())
+            hdulen = self.__dict__['HDULENGTH']['value']
+
+            if qv=='yes':
+                
+                print('Plotting views')
+                if hdulen==5:
+                    #Create dict objects
+                    LCP = {'date' : self.__dict__['OBSDATE']['value'],
+                        'file':os.path.basename(self.__dict__['FILEPATH']['value']).split(".fits")[0][:18],
+                        'source' :  self.__dict__['OBJECT']['value'],
+                        'offset' :  self.__dict__['ON_OFFSET']['value'], 
+                        'hpbw' :  self.__dict__['HPBW']['value'],
+                        'hfnbw' :  self.__dict__['FNBW']['value']/2.,
+                        'nu' :  self.__dict__['CENTFREQ']['value'],
+                        'centre_scan' :  self.__dict__['ON_TA_LCP']['value'],
+                        }
+
+                    RCP = {'date' : self.__dict__['OBSDATE']['value'],
+                        'file':os.path.basename(self.__dict__['FILEPATH']['value']).split(".fits")[0][:18],
+                        'source' :  self.__dict__['OBJECT']['value'],
+                        'offset' :  self.__dict__['ON_OFFSET']['value'], 
+                        'hpbw' :  self.__dict__['HPBW']['value'],
+                        'hfnbw' :  self.__dict__['FNBW']['value']/2.,
+                        'nu' :  self.__dict__['CENTFREQ']['value'],
+                        'centre_scan' :  self.__dict__['ON_TA_RCP']['value'],
+                        }
+                    
+                else:
+                    #Create dict objects
+                    LCP = {'date' : self.__dict__['OBSDATE']['value'],
+                        'file':os.path.basename(self.__dict__['FILEPATH']['value']).split(".fits")[0][:18],
+                        'source' :  self.__dict__['OBJECT']['value'],
+                        'offset' :  self.__dict__['ON_OFFSET']['value'], 
+                        'hpbw' :  self.__dict__['HPBW']['value'],
+                        'hfnbw' :  self.__dict__['FNBW']['value']/2.,
+                        'nu' :  self.__dict__['CENTFREQ']['value'],
+                        'north_scan' : self.__dict__['HPN_TA_LCP']['value'],
+                        'centre_scan' :self.__dict__['ON_TA_LCP']['value'],
+                        'south_scan' : self.__dict__['HPS_TA_LCP']['value'],
+                        }
+
+                    RCP = {'date' : self.__dict__['OBSDATE']['value'],
+                        'file':os.path.basename(self.__dict__['FILEPATH']['value']).split(".fits")[0][:18],
+                        'source' :  self.__dict__['OBJECT']['value'],
+                        'offset' :  self.__dict__['ON_OFFSET']['value'], 
+                        'hpbw' :  self.__dict__['HPBW']['value'],
+                        'hfnbw' :  self.__dict__['FNBW']['value']/2.,
+                        'nu' :  self.__dict__['CENTFREQ']['value'],
+                        'north_scan' : self.__dict__['HPN_TA_RCP']['value'],
+                        'centre_scan' :  self.__dict__['ON_TA_RCP']['value'],
+                        'south_scan' : self.__dict__['HPS_TA_RCP']['value'],
+                        }
+                    
+                # create plots
+                make_qv_plots(LCP,RCP)
+
         elif 'D' in (frontend):
             set_dict_item(self.__dict__,'BEAMTYPE',ScanType.DB.name, 'dual beam drift scan')
             # sys.exit()
@@ -220,6 +278,59 @@ class Observation:
             # sys.exit()
             driftScans.process_data_only() # process the data
             del driftScans # release from memory
+
+            if qv=='yes':
+                print('Plotting views')
+                if hdulen==5:
+                    #Create dict objects
+                    LCP = {'date' : self.__dict__['OBSDATE']['value'],
+                        'file':os.path.basename(self.__dict__['FILEPATH']['value']).split(".fits")[0][:18],
+                        'source' :  self.__dict__['OBJECT']['value'],
+                        'offset' :  self.__dict__['ON_OFFSET']['value'], 
+                        'hpbw' :  self.__dict__['HPBW']['value'],
+                        'hfnbw' :  self.__dict__['FNBW']['value']/2.,
+                        'nu' :  self.__dict__['CENTFREQ']['value'],
+                        'centre_scan' :  self.__dict__['ON_TA_LCP']['value'],
+                        }
+
+                    RCP = {'date' : self.__dict__['OBSDATE']['value'],
+                        'file':os.path.basename(self.__dict__['FILEPATH']['value']).split(".fits")[0][:18],
+                        'source' :  self.__dict__['OBJECT']['value'],
+                        'offset' :  self.__dict__['ON_OFFSET']['value'], 
+                        'hpbw' :  self.__dict__['HPBW']['value'],
+                        'hfnbw' :  self.__dict__['FNBW']['value']/2.,
+                        'nu' :  self.__dict__['CENTFREQ']['value'],
+                        'centre_scan' :  self.__dict__['ON_TA_RCP']['value'],
+                        }
+                    
+                else:
+                    #Create dict objects
+                    LCP = {'date' : self.__dict__['OBSDATE']['value'],
+                        'file':os.path.basename(self.__dict__['FILEPATH']['value']).split(".fits")[0][:18],
+                        'source' :  self.__dict__['OBJECT']['value'],
+                        'offset' :  self.__dict__['ON_OFFSET']['value'], 
+                        'hpbw' :  self.__dict__['HPBW']['value'],
+                        'hfnbw' :  self.__dict__['FNBW']['value']/2.,
+                        'nu' :  self.__dict__['CENTFREQ']['value'],
+                        'north_scan' : self.__dict__['HPN_TA_LCP']['value'],
+                        'centre_scan' :self.__dict__['ON_TA_LCP']['value'],
+                        'south_scan' : self.__dict__['HPS_TA_LCP']['value'],
+                        }
+
+                    RCP = {'date' : self.__dict__['OBSDATE']['value'],
+                        'file':os.path.basename(self.__dict__['FILEPATH']['value']).split(".fits")[0][:18],
+                        'source' :  self.__dict__['OBJECT']['value'],
+                        'offset' :  self.__dict__['ON_OFFSET']['value'], 
+                        'hpbw' :  self.__dict__['HPBW']['value'],
+                        'hfnbw' :  self.__dict__['FNBW']['value']/2.,
+                        'nu' :  self.__dict__['CENTFREQ']['value'],
+                        'north_scan' : self.__dict__['HPN_TA_RCP']['value'],
+                        'centre_scan' :  self.__dict__['ON_TA_RCP']['value'],
+                        'south_scan' : self.__dict__['HPS_TA_RCP']['value'],
+                        }
+                    
+                # create plots
+                make_qv_plots(LCP,RCP)
 
     def get_data(self):
         """ Get data from fits file hdu

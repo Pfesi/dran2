@@ -430,6 +430,7 @@ def delete_db(dbName):
             sys.exit()
 
 def generate_quick_view(arg,log,Observation):
+
     # check if file exists
     if not os.path.exists(arg):
         msg_wrapper("error",log.error,f"File {arg} does not exist, stopping quickview")
@@ -446,16 +447,9 @@ def generate_quick_view(arg,log,Observation):
         sys.exit()
             
     else:
-        obs=Observation(FILEPATH=arg, theoFit='',autoFit='',log=log)
+        obs=Observation(FILEPATH=arg, theoFit='',autoFit='',log=log,dbCols={})
         obs.get_data_only(qv='yes')
         sys.exit()
-
-# def get_tables_from_database(DBNAME,table):
-#     # cnx = sqlite3.connect(DBNAME)
-#     # tableData = pd.read_sql_query(f"SELECT * FROM {table}", cnx)
-#     # tableFilenames=sorted(list(tableData['FILENAME']))
-#     # dataInDBtables=dataInDBtables+tableFilenames
-#     return tables
 
 def find_table_in_database(DBNAME,table, tabFreqBand, src):
     

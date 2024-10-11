@@ -78,7 +78,7 @@ def run(args):
             
         # run a quickview
         if args.quickview:
-            generate_quick_view(args.f,log)
+            generate_quick_view(args.f,log,Observation)
         else:
         
             # Process the data from the specified file or folder

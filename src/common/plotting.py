@@ -77,6 +77,48 @@ def make_plot(plotlab):
         plt.close()
         sys.exit()
 
+def make_qv_plots(lcp,rcp):
+
+        # make plots of all scans
+
+        if "north_scan" in list(lcp.keys()):
+            scans=[lcp['offset'],rcp['offset'],lcp['north_scan'],lcp['centre_scan'],lcp['south_scan'],rcp['north_scan'],rcp['centre_scan'],rcp['south_scan']]
+            scanNames=['lcp offset','rcp offset','LCP North scan','LCP Center scan','LCP South scan','RCP North scan','RCP Center scan','RCP South scan']
+            
+            plt.figure(figsize=(20,10))
+
+            for i in range(1,7):
+                plt.subplot(2,3,i)
+                plt.ylabel('Ta [K]')
+                plt.xlabel('Offset [deg]')
+                if 'LCP' in scanNames[i+1]:
+                    plt.plot(scans[0],scans[i+1])
+                else:
+                    plt.plot(scans[1],scans[i+1])
+                plt.title(f'plot of {scanNames[i+1]}')
+            plt.tight_layout()
+            plt.savefig(f'quickview_{lcp["source"]}_{int(lcp["nu"])}-{lcp["file"]}.png')
+            #plt.show()
+            plt.close()
+        else:
+            scans=[lcp['offset'],rcp['offset'],lcp['centre_scan'],rcp['centre_scan']]
+            scanNames=['lcp offset','rcp offset','LCP Center scan','RCP Center scan']
+            
+            plt.figure(figsize=(10,3))
+            for i in range(1,3):
+                plt.subplot(1,2,i)
+                plt.ylabel('Ta [K]')
+                plt.xlabel('Offset [deg]')
+                if 'LCP' in scanNames[i+1]:
+                    plt.plot(scans[0],scans[i+1])
+                else:
+                    plt.plot(scans[1],scans[i+1])
+                plt.title(f'plot of {scanNames[i+1]}')
+            plt.tight_layout()
+            plt.savefig(f'quickview_{lcp["source"]}_{int(lcp["nu"])}-{lcp["file"]}.png')
+            plt.show()
+            plt.close()
+
 def fit_plot():
         pass
   
