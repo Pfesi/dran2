@@ -13,6 +13,7 @@ import sqlite3
 import numpy as np
 import gc
 import psutil
+import datetime
 
 # Module imports
 # --------------------------------------------------------------------------- #
@@ -26,10 +27,6 @@ from common.observation import Observation
 # =========================================================================== #
 
 # TODO: CLEAN THIS CODE, ASAP!
-
-
-# def 
-
 
 def run(args):
     """
@@ -102,10 +99,16 @@ def run(args):
                 
                 msg_wrapper('info',log.info,f'Working on folder: {args.f}')
                 msg_wrapper('info',log.info,'*'*50)
+
+                # print(datetime.datetime.now().date(),str(datetime.datetime.now().time()).replace(':','-')[:8] )
                 
+                today=str(datetime.datetime.now().date())
                 dirpath = args.f                
-                folders = fast_scandir(dirpath,log,Observation)
+
+                with open(f'processed_files_{today}.txt','w') as fl:
+                    folders = fast_scandir(dirpath,log,Observation,fl)
                 sys.exit()
+
     else:
         if args.db:
             print('You havent specified the file or folder to process')

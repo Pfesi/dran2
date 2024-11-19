@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to DRAN’s documentation! &mdash; dran v1.0 documentation</title>
+  <title>Welcome to DRAN’s documentation! &mdash; DRAN v1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
 
@@ -33,7 +33,7 @@
           
           
           <a href="#" class="icon icon-home">
-            dran
+            DRAN
           </a>
               <div class="version">
                 v1.0
@@ -70,6 +70,8 @@
 <p class="caption" role="heading"><span class="caption-text">Guidelines:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="extras/changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extras/calibration.html">Calibration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extras/common_issues.html">Common issues</a></li>
 <li class="toctree-l1"><a class="reference internal" href="docs/modules.html">src</a></li>
 </ul>
 
@@ -79,7 +81,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="#">dran</a>
+          <a href="#">DRAN</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -130,7 +132,7 @@ all the extracted and calculated source parmeters are stored.</p>
 <div><ul class="simple">
 <li><p>clean or filter out any RFI present in the data</p></li>
 <li><p>correct or remove any drift that may be present in the data due to telescope effects, and</p></li>
-<li><p>tries to fit the peak of the signal (i.e. upper 50% of the beam).</p></li>
+<li><p>attempts to fit the peak of the signal (i.e. upper 30% to 50% of the beam depending on a set of predefined criteria related to the presence or lack of sidelobes).</p></li>
 </ul>
 </div></blockquote>
 <div class="admonition note">

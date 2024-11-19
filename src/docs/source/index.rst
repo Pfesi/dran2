@@ -117,12 +117,24 @@ or email Dr. Pfesi van Zyl on pfesi24@gmail.com
 
    extras/radio_sources.rst
 
+
+   .. extras/contributing.rst
+   .. extras/code_style.rst
+   .. extras/tests.rst
+   .. extras/release_notes.rst
+   .. extras/code_of_conduct.rst
+   .. extras/license.rst
+
 .. toctree::
    :hidden:
    :maxdepth: 2
    :caption: Guidelines:
 
    extras/changelog.rst
+
+   extras/calibration.rst
+
+   extras/common_issues.rst
 
    docs/modules.rst
 

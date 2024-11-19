@@ -39,3 +39,8 @@ src/dran2.egg-info
 dist/*
 test.py
 moveToBootes.py
+processed*
+old*
+wrong*
+dist*
+src/dran.egg-info

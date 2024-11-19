@@ -413,12 +413,6 @@ class DriftScanData(object):
         # Get observation date and split it
         date=datetime.strptime(self.__dict__['OBSDATE']['value'], '%Y-%m-%d')
         date=date.strftime('%Y-%b-%d')
-        # year = date.year
-        # month = date.month
-        # day = date.day
-
-        # Get month of date in words
-        # mydate = datetime.date(year, month, day)
 
         # extract data from file
         try:
@@ -455,16 +449,16 @@ class DriftScanData(object):
                     'Get Jupiter AU distance from calsky data or calculation')
 
         # convert 1 arcsec to radians
-        rad=1/206264 
+        rad=4.84814e-6# 1/206264 , 1 arcsecond = 4.84814e-6 rad
 
         # calculate jupiter distance in km
         theta=self.__dict__["PLANET_ANG_DIAM"]['value']*rad # in radians
         jupDiameter = 69911*2 # from nasa jpl horizons ephemeris data, i.e. mean radius times 2, Last Updated 24/04/2024 
-        jupDistancs = jupDiameter/theta
+        jupDistance = jupDiameter/theta
 
         # convert to AU
-        au=1.45979e8 # km, from 
-        JUPITER_DIST_AU = jupDistancs/au # should be between ~ 4 and 6 AU
+        au=1.45979e8 # km, from 1 au= 149597870.700 km
+        JUPITER_DIST_AU = jupDistance/au # should be between ~ 4 and 6 AU
         set_dict_item(self.__dict__,"JUPITER_DIST_AU",np.nan,f'Distance to Jupiter in astronomical units')
         self.__dict__["JUPITER_DIST_AU"]['value']=JUPITER_DIST_AU
         self.log_multiple_entries('JUPITER_DIST_AU','PLANET_ANG_DIAM')

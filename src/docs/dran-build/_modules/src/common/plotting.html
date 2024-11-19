@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>src.common.plotting &mdash; dran v1.0 documentation</title>
+  <title>src.common.plotting &mdash; DRAN v1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
 
@@ -31,7 +31,7 @@
           
           
           <a href="../../../index.html" class="icon icon-home">
-            dran
+            DRAN
           </a>
               <div class="version">
                 v1.0
@@ -77,7 +77,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">dran</a>
+          <a href="../../../index.html">DRAN</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -185,6 +185,51 @@
         <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="make_qv_plots">
+<a class="viewcode-back" href="../../../docs/src.common.html#src.common.plotting.make_qv_plots">[docs]</a>
+<span class="k">def</span> <span class="nf">make_qv_plots</span><span class="p">(</span><span class="n">lcp</span><span class="p">,</span><span class="n">rcp</span><span class="p">):</span>
+
+        <span class="c1"># make plots of all scans</span>
+
+        <span class="k">if</span> <span class="s2">&quot;north_scan&quot;</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">lcp</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="n">scans</span><span class="o">=</span><span class="p">[</span><span class="n">lcp</span><span class="p">[</span><span class="s1">&#39;offset&#39;</span><span class="p">],</span><span class="n">rcp</span><span class="p">[</span><span class="s1">&#39;offset&#39;</span><span class="p">],</span><span class="n">lcp</span><span class="p">[</span><span class="s1">&#39;north_scan&#39;</span><span class="p">],</span><span class="n">lcp</span><span class="p">[</span><span class="s1">&#39;centre_scan&#39;</span><span class="p">],</span><span class="n">lcp</span><span class="p">[</span><span class="s1">&#39;south_scan&#39;</span><span class="p">],</span><span class="n">rcp</span><span class="p">[</span><span class="s1">&#39;north_scan&#39;</span><span class="p">],</span><span class="n">rcp</span><span class="p">[</span><span class="s1">&#39;centre_scan&#39;</span><span class="p">],</span><span class="n">rcp</span><span class="p">[</span><span class="s1">&#39;south_scan&#39;</span><span class="p">]]</span>
+            <span class="n">scanNames</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;lcp offset&#39;</span><span class="p">,</span><span class="s1">&#39;rcp offset&#39;</span><span class="p">,</span><span class="s1">&#39;LCP North scan&#39;</span><span class="p">,</span><span class="s1">&#39;LCP Center scan&#39;</span><span class="p">,</span><span class="s1">&#39;LCP South scan&#39;</span><span class="p">,</span><span class="s1">&#39;RCP North scan&#39;</span><span class="p">,</span><span class="s1">&#39;RCP Center scan&#39;</span><span class="p">,</span><span class="s1">&#39;RCP South scan&#39;</span><span class="p">]</span>
+            
+            <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">7</span><span class="p">):</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Ta [K]&#39;</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Offset [deg]&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s1">&#39;LCP&#39;</span> <span class="ow">in</span> <span class="n">scanNames</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">scans</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">scans</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">scans</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">scans</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;plot of </span><span class="si">{</span><span class="n">scanNames</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;quickview_</span><span class="si">{</span><span class="n">lcp</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">lcp</span><span class="p">[</span><span class="s2">&quot;nu&quot;</span><span class="p">])</span><span class="si">}</span><span class="s1">-</span><span class="si">{</span><span class="n">lcp</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">.png&#39;</span><span class="p">)</span>
+            <span class="c1">#plt.show()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">scans</span><span class="o">=</span><span class="p">[</span><span class="n">lcp</span><span class="p">[</span><span class="s1">&#39;offset&#39;</span><span class="p">],</span><span class="n">rcp</span><span class="p">[</span><span class="s1">&#39;offset&#39;</span><span class="p">],</span><span class="n">lcp</span><span class="p">[</span><span class="s1">&#39;centre_scan&#39;</span><span class="p">],</span><span class="n">rcp</span><span class="p">[</span><span class="s1">&#39;centre_scan&#39;</span><span class="p">]]</span>
+            <span class="n">scanNames</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;lcp offset&#39;</span><span class="p">,</span><span class="s1">&#39;rcp offset&#39;</span><span class="p">,</span><span class="s1">&#39;LCP Center scan&#39;</span><span class="p">,</span><span class="s1">&#39;RCP Center scan&#39;</span><span class="p">]</span>
+            
+            <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">):</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Ta [K]&#39;</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Offset [deg]&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s1">&#39;LCP&#39;</span> <span class="ow">in</span> <span class="n">scanNames</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">scans</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">scans</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">scans</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">scans</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;plot of </span><span class="si">{</span><span class="n">scanNames</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;quickview_</span><span class="si">{</span><span class="n">lcp</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">lcp</span><span class="p">[</span><span class="s2">&quot;nu&quot;</span><span class="p">])</span><span class="si">}</span><span class="s1">-</span><span class="si">{</span><span class="n">lcp</span><span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">.png&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="fit_plot">

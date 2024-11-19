@@ -124,24 +124,21 @@ class TimeCanvas(FigureCanvas):
     
     def replaceitem(self,x):
         '''replace an item in a list of items'''
+
         if x == None:
-            # print('*',x)
             return np.nan
         elif x == 'None':
-            # print('%',x)
             return np.nan
         elif x == 'NaT':
-            # print('+',x)
             return np.nan
         elif x =='':
             return np.nan
         else:
-            # print('&',x)
-            
             return float(x)
         
     def replaceDateItem(self,x):
         '''replace an item in a list of items'''
+
         if type(x).__name__ == 'NaTType':
             # print('*',x)
             return np.nan
@@ -202,56 +199,24 @@ class TimeCanvas(FigureCanvas):
             self.xlab=xlab
             self.ylab=ylab
            
-            if len(yerr)==0 :
+            # print(yerr)
+            # print(self.y)
+            if len(yerr)==0 or str(yerr)=='None':
                 self.ax.plot(self.x, self.y, col, label="data", picker=5)
             else:
-                # print('yerr - ',list(yerr))
-                yerr=list(map(self.replaceitem,yerr))
-                self.y=list(map(self.replaceitem,self.y))
-
-                try:
-                    self.ax.errorbar(self.x, self.y, yerr,fmt=col, label="data", picker=5)
-                    # self.ax.errorbar(data[xlab], data[ylab], data[yerr],fmt=col, label="data", picker=5)
-                except ValueError as e:
-                    print(e)
-                # self.ax.errorbar(self.x, self.y, yerr,fmt=col, label="data", picker=5)
+                self.ax.errorbar(self.x, self.y, yerr,fmt=col, label="data", picker=5)
 
             self.setLabels(self.ax, xlab, ylab, title)
-            # self.ax.tick_params(axis='x',labelrotation=45)
 
-            ## Added code here
-            
-            # now = dt.datetime.now()
-            # for i, d in enumerate([360, 30, 7, 1]):
-            #     # self.ax = axes.flatten()[i]
-            #     # earlycut = now - relativedelta(days=d)
-            #     # data = df.loc[df.index>=earlycut, :]
-            #     # self.ax.plot(data.index, data['value'])
-
-            # self.ax.xaxis.set_minor_locator() get_xaxis().set_minor_locator(self.mpl.ticker.AutoMinorLocator())
-            #     self.ax.get_yaxis().set_minor_locator(self.mpl.ticker.AutoMinorLocator())
-
-            # self.ax.grid( )#which='major', color='w', linewidth=1.5)
-            # self.ax.grid(b=True, which='minor', color='w', linewidth=0.75)
-
-            #     plt.setp(self.ax.get_xticklabels(), rotation=30, horizontalalignment='right')
-
-            
-
-            # if len(self.y) <=30:
-            #     pass
-            # else:
-            months = mdates.MonthLocator(bymonth=(1,7))#interval=6, bymonthday=-1)  ## 6 months apart & show last date
-            self.ax.xaxis.set_major_locator(months) ## Set months as major locator
-            self.ax.xaxis.set_minor_locator(mdates.MonthLocator()) 
+            if xlab=='OBSDATE':
+                months = mdates.MonthLocator(bymonth=(1,7))#interval=6, bymonthday=-1)  ## 6 months apart & show last date
+                self.ax.xaxis.set_major_locator(months) ## Set months as major locator
+                self.ax.xaxis.set_minor_locator(mdates.MonthLocator()) 
 
             # TODO: create a button to toggle grid on/off
             # TODO: create button to change grid color, line width etc
             # TODO: Button to toggle step change locations on/off
-            self.ax.grid(True,alpha=0.2)## Set months as minor locator
-            # self.ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d')) ##Display format - update here to change
-            # self.ax.tick_params(axis='x',labelrotation=20) ##Adjust angle and horizontal align right
-            # # plt.show()
+            self.ax.grid(True,alpha=0.2)
 
             connection_id_0=self.mpl_connect('pick_event', self.onpick)
             connection_id = self.mpl_connect('button_press_event', self.onclick)
@@ -398,25 +363,19 @@ class TimeCanvas(FigureCanvas):
 
         if isinstance(event.artist, Line2D):
             thisline = event.artist
-            xdata = thisline.get_xdata()
-            ydata = thisline.get_ydata()
+            xdata,ydata = thisline.get_xdata(), thisline.get_ydata()
             
             ind = event.ind
-
-            #print(xdata[ind],ydata[ind],ind,event)
-            #sys.exit()
 
             pointsx = xdata[ind]
             pointsy = ydata[ind]
 
-            # Points clicked to plot
-            #self.ax.plot(pointsx[0], pointsy[0], 'r.')
-
             try:
                 print("\n","-"*30)
                 print(f'picked: {str(pointsx[0])[:10]},{pointsy[0]} @ index: {ind[0]}')
-            except:
-                print("Require a numerical value to print points picked\n")
+            except (IndexError, TypeError):
+                print("Error: Could not process the clicked point.")
+
             self.fit_points=[]
             self.click_index=[]
 
@@ -424,74 +383,68 @@ class TimeCanvas(FigureCanvas):
             self.click_index.append(ind[0])
             self.draw()
 
-    def show_plots(self,ind):
-        """ Show plots on click event in html browser. """
+    def show_plots(self, index):
+        """ Show plots on click event in a web browser. """
 
-        obj=self.data.iloc[ind,]['OBJECT']
-        obj=obj.replace(' ','')
-        freq=int(self.data.iloc[ind,]["CENTFREQ"])
+        self.data['CENTFREQ'] = self.data['CENTFREQ'].astype(float)
+        data = self.data.iloc[index]
+        source_name = data["OBJECT"].replace(" ", "")
+        central_frequency = int(data["CENTFREQ"])
+        file_name = data["FILENAME"]
+        observation_date = str(data["OBSDATE"])[:10]
 
-        imgDir = f"plots/{obj}/{freq}"
-        print(imgDir)
-        # sys.exit()
-        # plotFolderList = os.listdir(imgDir)
-        # plotFolderName = self.data.iloc[ind,]["FILEPATH"]
-        
-        plotFileName = (self.data.iloc[ind,]["FILENAME"])
-        plotMJD = f'{(self.data.iloc[ind,]["MJD"]):.1f}'
-        plotDATE = str(self.data.iloc[ind,]["OBSDATE"])[:10] 
-        imgPaths=[]
-        imgTags=[]
+        # Check for image directory
+        img_dir = f"plots/{source_name}/{central_frequency}"
+        if not os.path.exists(img_dir):
+            print(f"Missing images for {source_name}. Try processing data first.")
+            return
 
-        imageNames = sorted(os.listdir(imgDir))
-            
-        if len(imageNames) == 0:
-            print("We are missing images for this source, try automatically processing the data first")
-        else:
-            print()
-            print('Showing: ')
-            for i in range(len(imageNames)):
-                if imageNames[i][:18] == plotFileName[:18]:
-                    print("- ",imgDir+"/"+imageNames[i])
-                    imgPaths.append(imgDir+"/"+imageNames[i])
-                    imgTags.append((imageNames[i][19:-4]))
-            print('-'*30,'\n')
-            # print(imgPaths)
+        # Get image names (filtered by file name prefix)
+        image_names = [
+            name for name in sorted(os.listdir(img_dir)) if name.startswith(file_name[:18])
+        ]
 
-            htmlstart = '<html> <head>\
-                <meta charset = "utf-8" >\
-                <meta name = "viewport" content = "width=device-width, initial-scale=1" > <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous"> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script> <style> img {border: 2px solid  #ddd; /* Gray border */border-radius: 4px;  /* Rounded border */padding: 5px; /* Some padding */width: 400px; /* Set a small width */}/* Add a hover effect (blue shadow) */img:hover {box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);}</style> \
-                <title>Plots</title>\
-                </head>\
-                <div class="container-fluid"> \
-                    <div class="row">\
-                        <hr>\
-                            <h3> Plots of '+plotFileName[:18]+' ( MJD '+str(plotMJD)+' or '+plotDATE+') for  '+plotFileName + ' at '+str(freq)+ ' </h3> <p>'
-                    
-            htmlmid=''
+        if not image_names:
+            print(f"No matching images found for {file_name}.")
+            return
 
-            for i in range(len(imgPaths)):
-                pathtoimg=imgPaths[i]
-                img = '<h5 class="card-title">'+imgTags[i]+'</h5><br/>\
-                    <a target="_blank" href="'+pathtoimg + \
-                    '"><img src="'+pathtoimg + \
-                    '" class="card-img-top" alt="image goes here"></a>'
-                imglink ='<div class = "card" style = "width: 18rem;" >\
-                        '+img+'\
-                            </div>'
-                htmlmid=htmlmid+imglink
+        # Build HTML content
+        html_start = f"""<html>
+    <head>
+     <meta charset = "utf-8" >
+    <meta name = "viewport" content = "width=device-width, initial-scale=1" > <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous"> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script> \
+                """+"""<style> img {border: 2px solid  #ddd; /* Gray border */border-radius: 4px;  /* Rounded border */padding: 5px; /* Some padding */width: 400px; /* Set a small width */}/* Add a hover effect (blue shadow) */img:hover {box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);}</style> """+f"""
+    <title>Plots</title>
+    </head>
+    <body>
+    <div class="container-fluid">
+        <div class="row">
+        <hr>
+            <h4> Plots of obs '{file_name[:18]}' (MJD {data['MJD']:.1f} or {observation_date}) for {source_name} at {central_frequency} MHz </h4>
+    """
+        html_mid = ""
+        for image_name in image_names:
+            img_path = os.path.join(img_dir, image_name)
+            img_tag = image_name[19:-4]  # Extract image tag from filename
 
-            htmlmid=htmlmid+'</p></div>'
-            htmlend = '</div></html>'
-            html = htmlstart+htmlmid+htmlend
+            html_mid += f"""<div class="card" style="width: 18rem;">
+            <h5 class="card-title">{img_tag}</h5>
+            <br/>
+            <a target="_blank" href="{img_path}"><img src="{img_path}" class="card-img-top" alt="image goes here"></a>
+            </div>"""
 
-        # create the html file
-        path = os.path.abspath('temp.html')
-        url = 'file://' + path
+        html_end = "</body></html>"
 
-        with open(path, 'w') as f:
+        html = html_start + html_mid + html_end
+
+        # Create and open the HTML file
+        path = os.path.abspath("temp.html")
+        url = f"file://{path}"
+
+        with open(path, "w") as f:
             f.write(html)
         webbrowser.open(url)
+        
 
 
 

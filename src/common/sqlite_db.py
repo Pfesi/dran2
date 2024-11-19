@@ -391,6 +391,3 @@ class SQLiteDB:
 
         return rows
     
-    # def set_table_name(self,tableName):
-    #     msg_wrapper("debug", self.log.debug, "Setting table name to: "+tableName)
-    #     return tableName

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>src.common package &mdash; dran v1.0 documentation</title>
+  <title>src.common package &mdash; DRAN v1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
 
@@ -34,7 +34,7 @@
           
           
           <a href="../index.html" class="icon icon-home">
-            dran
+            DRAN
           </a>
               <div class="version">
                 v1.0
@@ -71,6 +71,8 @@
 <p class="caption" role="heading"><span class="caption-text">Guidelines:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../extras/changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../extras/calibration.html">Calibration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../extras/common_issues.html">Common issues</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="src.html">src package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="src.html#subpackages">Subpackages</a><ul class="current">
@@ -95,7 +97,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">dran</a>
+          <a href="../index.html">DRAN</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -120,196 +122,8 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
-<section id="module-src.common.calibrate">
-<span id="src-common-calibrate-module"></span><h2>src.common.calibrate module<a class="headerlink" href="#module-src.common.calibrate" title="Link to this heading"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="src.common.calibrate.calc_dualtotFlux">
-<span class="sig-prename descclassname"><span class="pre">src.common.calibrate.</span></span><span class="sig-name descname"><span class="pre">calc_dualtotFlux</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slcp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dslcp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">srcp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dsrcp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bslcp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bdslcp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bsrcp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bdsrcp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/calibrate.html#calc_dualtotFlux"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.calibrate.calc_dualtotFlux" title="Link to this definition"></a></dt>
-<dd><p>Calculate the total flux density of the source</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="src.common.calibrate.calc_flux">
-<span class="sig-prename descclassname"><span class="pre">src.common.calibrate.</span></span><span class="sig-name descname"><span class="pre">calc_flux</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpss</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/calibrate.html#calc_flux"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.calibrate.calc_flux" title="Link to this definition"></a></dt>
-<dd><p>Calculate the flux density.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="src.common.calibrate.calc_pc_eq">
-<span class="sig-prename descclassname"><span class="pre">src.common.calibrate.</span></span><span class="sig-name descname"><span class="pre">calc_pc_eq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Ta1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ta2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">term2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/calibrate.html#calc_pc_eq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.calibrate.calc_pc_eq" title="Link to this definition"></a></dt>
-<dd><p>Calculate the pointing correction and its derivatives.
-The pointing equations are given in the method
-calc_pc_pss()</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>Ta1</strong> – first temperature</p></li>
-<li><p><strong>Ta2</strong> – second temperature</p></li>
-<li><p><strong>term2</strong> – the second term of the pointing correction equation as defined</p></li>
-<li><p><strong>thesis/reference.</strong> (<em>in</em>) – </p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the pointing correction
-der1: first derivative with respect to Ta1
-der2: first derivative with respect to Ta2</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>pc</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="src.common.calibrate.calc_pc_pss">
-<span class="sig-prename descclassname"><span class="pre">src.common.calibrate.</span></span><span class="sig-name descname"><span class="pre">calc_pc_pss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scanNum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hpsTa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errHpsTa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hpnTa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errHpnTa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">onTa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errOnTa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/calibrate.html#calc_pc_pss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.calibrate.calc_pc_pss" title="Link to this definition"></a></dt>
-<dd><p>Calculate the pss for pointing corrected observations.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>scanNum</strong> – the index of the current scan, see plot_manager.py</p></li>
-<li><p><strong>hpsTa</strong> – the half power south antenna temperature</p></li>
-<li><p><strong>errHpsTa</strong> – the error in the half power south antenna temperature</p></li>
-<li><p><strong>hpnTa</strong> – the half power north antenna temperature</p></li>
-<li><p><strong>errHpnTa</strong> – the error in the half power north antenna temperature</p></li>
-<li><p><strong>onTa</strong> – the on source antenna temperature</p></li>
-<li><p><strong>errOnTa</strong> – the error in the on source antenna temperature</p></li>
-<li><p><strong>flux</strong> – the source flux density</p></li>
-<li><p><strong>data</strong> – the dictionary containing all the drift scan parameters</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the point source sensitivity
-errPss: the error in the point source sensitivity
-appEff: the apperture effeciency
-corrTa: the corrected antenna temperature
-errCorrTa: the error in the corrected antenna temperature
-appEff: the apperture effeciency</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>pss</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="src.common.calibrate.calc_pss">
-<span class="sig-prename descclassname"><span class="pre">src.common.calibrate.</span></span><span class="sig-name descname"><span class="pre">calc_pss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flux</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errTa</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/calibrate.html#calc_pss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.calibrate.calc_pss" title="Link to this definition"></a></dt>
-<dd><p>Calculate the Point source sensitivity (PSS)
-and its error for data with no pointing correction
-applied.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>flux</strong> – the flux density of the source</p></li>
-<li><p><strong>Ta</strong> – the antenna temperature</p></li>
-<li><p><strong>errTa</strong> – the error in the antenna temperature</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the point source sensitivity
-errPSS: the error in the point source sensitivity
-appEff: the apperture effeciency</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>pss</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="src.common.calibrate.calc_tcorr">
-<span class="sig-prename descclassname"><span class="pre">src.common.calibrate.</span></span><span class="sig-name descname"><span class="pre">calc_tcorr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Ta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/calibrate.html#calc_tcorr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.calibrate.calc_tcorr" title="Link to this definition"></a></dt>
-<dd><p>Calculate the antenna temperature correction for high frequencies.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>temperature</strong> (<em>Ta - the on scan antenna</em>) – </p></li>
-<li><p><strong>correction</strong> (<em>pc - the pointing</em>) – </p></li>
-<li><p><strong>parameters</strong> (<em>data - the dictionary containing all the drift scan</em>) – </p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>corrTa - the corrected antenna temperature</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="src.common.calibrate.calc_totFlux">
-<span class="sig-prename descclassname"><span class="pre">src.common.calibrate.</span></span><span class="sig-name descname"><span class="pre">calc_totFlux</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lcp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dlcp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rcp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drcp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/calibrate.html#calc_totFlux"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.calibrate.calc_totFlux" title="Link to this definition"></a></dt>
-<dd><p>Calculate the total flux density of the source</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="src.common.calibrate.calibrate">
-<span class="sig-prename descclassname"><span class="pre">src.common.calibrate.</span></span><span class="sig-name descname"><span class="pre">calibrate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hpsTa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errHpsTa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hpnTa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errHpnTa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">onTa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errOnTa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/calibrate.html#calibrate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.calibrate.calibrate" title="Link to this definition"></a></dt>
-<dd><p>Calculate the pointing corrected antenna temperature.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>hpsTa</strong> – the half power south antenna temperature</p></li>
-<li><p><strong>errHpsTa</strong> – the error in the half power south antenna temperature</p></li>
-<li><p><strong>hpnTa</strong> – the half power north antenna temperature</p></li>
-<li><p><strong>errHpnTa</strong> – the error in the half power north antenna temperature</p></li>
-<li><p><strong>onTa</strong> – the on source antenna temperature</p></li>
-<li><p><strong>errOnTa</strong> – the error in the on source antenna temperature</p></li>
-<li><p><strong>data</strong> – the dictionary containing all the drift scan parameters</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the pointing correction
-corrTa: the corrected antenna temperature
-errCorrTa: the error in the corrected antenna temperature</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>pc</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="src.common.calibrate.get_calibrator_flux">
-<span class="sig-prename descclassname"><span class="pre">src.common.calibrate.</span></span><span class="sig-name descname"><span class="pre">get_calibrator_flux</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calibrationPaper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/calibrate.html#get_calibrator_flux"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.calibrate.get_calibrator_flux" title="Link to this definition"></a></dt>
-<dd><p>Calculate the source flux for the calibrator.
-Use the Ott and Baars system.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="src.common.calibrate.getpss">
-<span class="sig-prename descclassname"><span class="pre">src.common.calibrate.</span></span><span class="sig-name descname"><span class="pre">getpss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pssdf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/calibrate.html#getpss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.calibrate.getpss" title="Link to this definition"></a></dt>
-<dd><p>Get the PSS of a given bin time-range.</p>
-<p>pssdf: dataframe containing the pss bins.
-date: the date used to estimate the required bin range in order to extract the PSS.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="src.common.calibrate.set_corr_ta_to_zero">
-<span class="sig-prename descclassname"><span class="pre">src.common.calibrate.</span></span><span class="sig-name descname"><span class="pre">set_corr_ta_to_zero</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/calibrate.html#set_corr_ta_to_zero"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.calibrate.set_corr_ta_to_zero" title="Link to this definition"></a></dt>
-<dd><p>Set the estimation of the corrected antenna temp to zero.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="src.common.calibrate.set_pss_to_zero">
-<span class="sig-prename descclassname"><span class="pre">src.common.calibrate.</span></span><span class="sig-name descname"><span class="pre">set_pss_to_zero</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/calibrate.html#set_pss_to_zero"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.calibrate.set_pss_to_zero" title="Link to this definition"></a></dt>
-<dd><p>Set the estimation of the pss and apperture effeciency to zero</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="src.common.calibrate.test_for_nans">
-<span class="sig-prename descclassname"><span class="pre">src.common.calibrate.</span></span><span class="sig-name descname"><span class="pre">test_for_nans</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Ta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errTa</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/calibrate.html#test_for_nans"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.calibrate.test_for_nans" title="Link to this definition"></a></dt>
-<dd><p>Test if data has nans</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>antenna temperature
-errTa: error in antenna temperature</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Ta</p>
-</dd>
-</dl>
-</dd></dl>
-
+<section id="src-common-calibrate-module">
+<h2>src.common.calibrate module<a class="headerlink" href="#src-common-calibrate-module" title="Link to this heading"></a></h2>
 </section>
 <section id="module-src.common.contextManagers">
 <span id="src-common-contextmanagers-module"></span><h2>src.common.contextManagers module<a class="headerlink" href="#module-src.common.contextManagers" title="Link to this heading"></a></h2>
@@ -355,140 +169,8 @@ see <a class="reference external" href="https://docs.astropy.org/en/stable/io/fi
 </dd></dl>
 
 </section>
-<section id="module-src.common.dataProcessingFlowManager">
-<span id="src-common-dataprocessingflowmanager-module"></span><h2>src.common.dataProcessingFlowManager module<a class="headerlink" href="#module-src.common.dataProcessingFlowManager" title="Link to this heading"></a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="src.common.dataProcessingFlowManager.DataProcessingFlowManager">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.common.dataProcessingFlowManager.</span></span><span class="sig-name descname"><span class="pre">DataProcessingFlowManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq:</span> <span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x:</span> <span class="pre">&lt;built-in</span> <span class="pre">function</span> <span class="pre">array&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y:</span> <span class="pre">&lt;built-in</span> <span class="pre">function</span> <span class="pre">array&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log:</span> <span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flag:</span> <span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">applyRFIremoval:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savefolder:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">srcTag:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pol:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frontend:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">HPBW:</span> <span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">FNBW:</span> <span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theoFit:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">autoFit:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'n'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/dataProcessingFlowManager.html#DataProcessingFlowManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.dataProcessingFlowManager.DataProcessingFlowManager" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.common.dataProcessingFlowManager.DataProcessingFlowManager.FNBW">
-<span class="sig-name descname"><span class="pre">FNBW</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#src.common.dataProcessingFlowManager.DataProcessingFlowManager.FNBW" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.common.dataProcessingFlowManager.DataProcessingFlowManager.HPBW">
-<span class="sig-name descname"><span class="pre">HPBW</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#src.common.dataProcessingFlowManager.DataProcessingFlowManager.HPBW" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.common.dataProcessingFlowManager.DataProcessingFlowManager.applyRFIremoval">
-<span class="sig-name descname"><span class="pre">applyRFIremoval</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.common.dataProcessingFlowManager.DataProcessingFlowManager.applyRFIremoval" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.common.dataProcessingFlowManager.DataProcessingFlowManager.autoFit">
-<span class="sig-name descname"><span class="pre">autoFit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.common.dataProcessingFlowManager.DataProcessingFlowManager.autoFit" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.dataProcessingFlowManager.DataProcessingFlowManager.clean_data">
-<span class="sig-name descname"><span class="pre">clean_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/dataProcessingFlowManager.html#DataProcessingFlowManager.clean_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.dataProcessingFlowManager.DataProcessingFlowManager.clean_data" title="Link to this definition"></a></dt>
-<dd><p>Clean the data of possible RFI. Remove all data points
-larger that 3 times the standard deviation.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.common.dataProcessingFlowManager.DataProcessingFlowManager.fileName">
-<span class="sig-name descname"><span class="pre">fileName</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.common.dataProcessingFlowManager.DataProcessingFlowManager.fileName" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.dataProcessingFlowManager.DataProcessingFlowManager.fit_theoretical_baselines">
-<span class="sig-name descname"><span class="pre">fit_theoretical_baselines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coeff</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/dataProcessingFlowManager.html#DataProcessingFlowManager.fit_theoretical_baselines"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.dataProcessingFlowManager.DataProcessingFlowManager.fit_theoretical_baselines" title="Link to this definition"></a></dt>
-<dd><p>Fit the data at the theoretical baseline location.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.common.dataProcessingFlowManager.DataProcessingFlowManager.flag">
-<span class="sig-name descname"><span class="pre">flag</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#src.common.dataProcessingFlowManager.DataProcessingFlowManager.flag" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.common.dataProcessingFlowManager.DataProcessingFlowManager.force">
-<span class="sig-name descname"><span class="pre">force</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'n'</span></em><a class="headerlink" href="#src.common.dataProcessingFlowManager.DataProcessingFlowManager.force" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.common.dataProcessingFlowManager.DataProcessingFlowManager.freq">
-<span class="sig-name descname"><span class="pre">freq</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#src.common.dataProcessingFlowManager.DataProcessingFlowManager.freq" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.common.dataProcessingFlowManager.DataProcessingFlowManager.frontend">
-<span class="sig-name descname"><span class="pre">frontend</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.common.dataProcessingFlowManager.DataProcessingFlowManager.frontend" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.dataProcessingFlowManager.DataProcessingFlowManager.locate_baseline_blocks_fnbw">
-<span class="sig-name descname"><span class="pre">locate_baseline_blocks_fnbw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hfnbw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/dataProcessingFlowManager.html#DataProcessingFlowManager.locate_baseline_blocks_fnbw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.dataProcessingFlowManager.DataProcessingFlowManager.locate_baseline_blocks_fnbw" title="Link to this definition"></a></dt>
-<dd><p>Find the locations to fit a baseline. We assume the
-baseline gives a good fit beyond the fnbw points on either
-side of the beam.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.dataProcessingFlowManager.DataProcessingFlowManager.locate_baseline_blocks_masked">
-<span class="sig-name descname"><span class="pre">locate_baseline_blocks_masked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeff</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/dataProcessingFlowManager.html#DataProcessingFlowManager.locate_baseline_blocks_masked"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.dataProcessingFlowManager.DataProcessingFlowManager.locate_baseline_blocks_masked" title="Link to this definition"></a></dt>
-<dd><p>Locate baseline by masking the main beam. This doesn’t work
-well because the data is not perfect and may contain sidelobes
-which may not necessarily be best addressed by looking at using higher
-order polynomials.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.dataProcessingFlowManager.DataProcessingFlowManager.locate_main_beam_data">
-<span class="sig-name descname"><span class="pre">locate_main_beam_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeff</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/dataProcessingFlowManager.html#DataProcessingFlowManager.locate_main_beam_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.dataProcessingFlowManager.DataProcessingFlowManager.locate_main_beam_data" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.common.dataProcessingFlowManager.DataProcessingFlowManager.log">
-<span class="sig-name descname"><span class="pre">log</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">object</span></em><a class="headerlink" href="#src.common.dataProcessingFlowManager.DataProcessingFlowManager.log" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.dataProcessingFlowManager.DataProcessingFlowManager.make_initial_plots">
-<span class="sig-name descname"><span class="pre">make_initial_plots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotlab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plotlabCleaned</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/dataProcessingFlowManager.html#DataProcessingFlowManager.make_initial_plots"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.dataProcessingFlowManager.DataProcessingFlowManager.make_initial_plots" title="Link to this definition"></a></dt>
-<dd><p>Make initial plots of the raw and cleaned data</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.common.dataProcessingFlowManager.DataProcessingFlowManager.pol">
-<span class="sig-name descname"><span class="pre">pol</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.common.dataProcessingFlowManager.DataProcessingFlowManager.pol" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.common.dataProcessingFlowManager.DataProcessingFlowManager.savefolder">
-<span class="sig-name descname"><span class="pre">savefolder</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.common.dataProcessingFlowManager.DataProcessingFlowManager.savefolder" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.common.dataProcessingFlowManager.DataProcessingFlowManager.src">
-<span class="sig-name descname"><span class="pre">src</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.common.dataProcessingFlowManager.DataProcessingFlowManager.src" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.common.dataProcessingFlowManager.DataProcessingFlowManager.srcTag">
-<span class="sig-name descname"><span class="pre">srcTag</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.common.dataProcessingFlowManager.DataProcessingFlowManager.srcTag" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.common.dataProcessingFlowManager.DataProcessingFlowManager.theoFit">
-<span class="sig-name descname"><span class="pre">theoFit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.common.dataProcessingFlowManager.DataProcessingFlowManager.theoFit" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.common.dataProcessingFlowManager.DataProcessingFlowManager.x">
-<span class="sig-name descname"><span class="pre">x</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">array</span></em><a class="headerlink" href="#src.common.dataProcessingFlowManager.DataProcessingFlowManager.x" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.common.dataProcessingFlowManager.DataProcessingFlowManager.y">
-<span class="sig-name descname"><span class="pre">y</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">array</span></em><a class="headerlink" href="#src.common.dataProcessingFlowManager.DataProcessingFlowManager.y" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+<section id="src-common-dataprocessingflowmanager-module">
+<h2>src.common.dataProcessingFlowManager module<a class="headerlink" href="#src-common-dataprocessingflowmanager-module" title="Link to this heading"></a></h2>
 </section>
 <section id="module-src.common.dialog_app">
 <span id="src-common-dialog-app-module"></span><h2>src.common.dialog_app module<a class="headerlink" href="#module-src.common.dialog_app" title="Link to this heading"></a></h2>
@@ -529,266 +211,14 @@ Had to use this because tkinter was crashing on my mac.</p>
 </dd></dl>
 
 </section>
-<section id="module-src.common.driftScanAttributes">
-<span id="src-common-driftscanattributes-module"></span><h2>src.common.driftScanAttributes module<a class="headerlink" href="#module-src.common.driftScanAttributes" title="Link to this heading"></a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="src.common.driftScanAttributes.DriftScanAttributes">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.common.driftScanAttributes.</span></span><span class="sig-name descname"><span class="pre">DriftScanAttributes</span></span><a class="reference internal" href="../_modules/src/common/driftScanAttributes.html#DriftScanAttributes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScanAttributes.DriftScanAttributes" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class of parameters to be collected/saved to a database from the drift
-scan fits file. These are the values that will be populated in the
-CALDB or TARDB databases.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>parameters</strong> (<em>dict</em>) – dictionary of all properties to be stored.</p>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScanAttributes.DriftScanAttributes.print_dict">
-<span class="sig-name descname"><span class="pre">print_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScanAttributes.html#DriftScanAttributes.print_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScanAttributes.DriftScanAttributes.print_dict" title="Link to this definition"></a></dt>
-<dd><p>Print the dictionary key value pairs.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScanAttributes.DriftScanAttributes.print_keys">
-<span class="sig-name descname"><span class="pre">print_keys</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScanAttributes.html#DriftScanAttributes.print_keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScanAttributes.DriftScanAttributes.print_keys" title="Link to this definition"></a></dt>
-<dd><p>Print the keys of the dictionary.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScanAttributes.DriftScanAttributes.reset_dict">
-<span class="sig-name descname"><span class="pre">reset_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScanAttributes.html#DriftScanAttributes.reset_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScanAttributes.DriftScanAttributes.reset_dict" title="Link to this definition"></a></dt>
-<dd><p>Reset the dictionary.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScanAttributes.DriftScanAttributes.set_comm_weather_parameters">
-<span class="sig-name descname"><span class="pre">set_comm_weather_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScanAttributes.html#DriftScanAttributes.set_comm_weather_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScanAttributes.DriftScanAttributes.set_comm_weather_parameters" title="Link to this definition"></a></dt>
-<dd><p>Set Common weather parameters.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScanAttributes.DriftScanAttributes.set_common_parameters">
-<span class="sig-name descname"><span class="pre">set_common_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScanAttributes.html#DriftScanAttributes.set_common_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScanAttributes.DriftScanAttributes.set_common_parameters" title="Link to this definition"></a></dt>
-<dd><p>Dictionary of default values for parameters common to all scan types.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScanAttributes.DriftScanAttributes.set_db_dict">
-<span class="sig-name descname"><span class="pre">set_db_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScanAttributes.html#DriftScanAttributes.set_db_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScanAttributes.DriftScanAttributes.set_db_dict" title="Link to this definition"></a></dt>
-<dd><p>Set dual beam observation parameters.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScanAttributes.DriftScanAttributes.set_db_fit_parameters">
-<span class="sig-name descname"><span class="pre">set_db_fit_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beams</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scanDirection</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScanAttributes.html#DriftScanAttributes.set_db_fit_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScanAttributes.DriftScanAttributes.set_db_fit_parameters" title="Link to this definition"></a></dt>
-<dd><p>Set dual beam fit parameters.</p>
-<section id="attributes">
-<h3>Attributes:<a class="headerlink" href="#attributes" title="Link to this heading"></a></h3>
-<dl class="simple">
-<dt>pols<span class="classifier">list</span></dt><dd><p>List of polarizations - left circular polarization: LCP (L), : right circular polarization RCP (R).</p>
-</dd>
-<dt>beams<span class="classifier">list</span></dt><dd><p>List of drift scan beams - left (A) and right (B), beams are either +ve or -ve depending on frequency.</p>
-</dd>
-<dt>scanDirection<span class="classifier">list</span></dt><dd><p>List of scan directions - north (N), south (S) or center ON (O). Using O because C makes things confusing.</p>
-</dd>
-</dl>
+<section id="src-common-driftscanattributes-module">
+<h2>src.common.driftScanAttributes module<a class="headerlink" href="#src-common-driftscanattributes-module" title="Link to this heading"></a></h2>
 </section>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScanAttributes.DriftScanAttributes.set_db_weather_parameters">
-<span class="sig-name descname"><span class="pre">set_db_weather_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScanAttributes.html#DriftScanAttributes.set_db_weather_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScanAttributes.DriftScanAttributes.set_db_weather_parameters" title="Link to this definition"></a></dt>
-<dd><p>Set dual beam weather related parameters.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScanAttributes.DriftScanAttributes.set_nb_dict">
-<span class="sig-name descname"><span class="pre">set_nb_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScanAttributes.html#DriftScanAttributes.set_nb_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScanAttributes.DriftScanAttributes.set_nb_dict" title="Link to this definition"></a></dt>
-<dd><p>Set Narrow beam calibration data dictionary.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScanAttributes.DriftScanAttributes.set_nb_fit_parameters">
-<span class="sig-name descname"><span class="pre">set_nb_fit_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scanDirection</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScanAttributes.html#DriftScanAttributes.set_nb_fit_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScanAttributes.DriftScanAttributes.set_nb_fit_parameters" title="Link to this definition"></a></dt>
-<dd><p>Set the parameters specific to a narrow beam drift scan.</p>
-<section id="id1">
-<h3>Attributes:<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
-<blockquote>
-<div><dl class="simple">
-<dt>pols<span class="classifier">list</span></dt><dd><p>List of polarizations - left circular polarization: LCP (L), : right circular polarization RCP (R).</p>
-</dd>
-<dt>scanDirection<span class="classifier">list</span></dt><dd><p>List of scan directions - north (N), south (S) or center ON (O). Using O because C makes things confusing.</p>
-</dd>
-</dl>
-</div></blockquote>
+<section id="src-common-driftscandata-module">
+<h2>src.common.driftScanData module<a class="headerlink" href="#src-common-driftscandata-module" title="Link to this heading"></a></h2>
 </section>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScanAttributes.DriftScanAttributes.set_tau_parameters">
-<span class="sig-name descname"><span class="pre">set_tau_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScanAttributes.html#DriftScanAttributes.set_tau_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScanAttributes.DriftScanAttributes.set_tau_parameters" title="Link to this definition"></a></dt>
-<dd><p>Set tau (optical depth) parameters.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScanAttributes.DriftScanAttributes.set_tbatmos_parameters">
-<span class="sig-name descname"><span class="pre">set_tbatmos_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScanAttributes.html#DriftScanAttributes.set_tbatmos_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScanAttributes.DriftScanAttributes.set_tbatmos_parameters" title="Link to this definition"></a></dt>
-<dd><p>Set tbatmos (atmospheric temperature) parameters.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScanAttributes.DriftScanAttributes.set_wb_dict">
-<span class="sig-name descname"><span class="pre">set_wb_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScanAttributes.html#DriftScanAttributes.set_wb_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScanAttributes.DriftScanAttributes.set_wb_dict" title="Link to this definition"></a></dt>
-<dd><p>Combine wide beam common calibration parameters.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScanAttributes.DriftScanAttributes.set_wb_parameters">
-<span class="sig-name descname"><span class="pre">set_wb_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pols</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScanAttributes.html#DriftScanAttributes.set_wb_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScanAttributes.DriftScanAttributes.set_wb_parameters" title="Link to this definition"></a></dt>
-<dd><p>Set the parameters specific to a wide beam on lcp drift scan.</p>
-</dd></dl>
-
-</dd></dl>
-
-</section>
-<section id="module-src.common.driftScanData">
-<span id="src-common-driftscandata-module"></span><h2>src.common.driftScanData module<a class="headerlink" href="#module-src.common.driftScanData" title="Link to this heading"></a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="src.common.driftScanData.DriftScanData">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.common.driftScanData.</span></span><span class="sig-name descname"><span class="pre">DriftScanData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">__dict__:</span> <span class="pre">object</span> <span class="pre">=</span> <span class="pre">mappingproxy({'__module__':</span> <span class="pre">'src.common.driftScanData'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'__annotations__':</span> <span class="pre">{'__dict__':</span> <span class="pre">&lt;class</span> <span class="pre">'object'&gt;}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'__doc__':</span> <span class="pre">'\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">Class</span> <span class="pre">of</span> <span class="pre">parameters</span> <span class="pre">to</span> <span class="pre">be</span> <span class="pre">collected/saved</span> <span class="pre">to</span> <span class="pre">a</span> <span class="pre">database</span> <span class="pre">from</span> <span class="pre">the</span> <span class="pre">drift</span> <span class="pre">\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">scan</span> <span class="pre">fits</span> <span class="pre">file.</span> <span class="pre">These</span> <span class="pre">are</span> <span class="pre">the</span> <span class="pre">values</span> <span class="pre">that</span> <span class="pre">will</span> <span class="pre">be</span> <span class="pre">populated</span> <span class="pre">in</span> <span class="pre">the</span> <span class="pre">\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">CALDB</span> <span class="pre">or</span> <span class="pre">TARDB</span> <span class="pre">databases.\n\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">Args:\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">parameters</span> <span class="pre">(dict):</span> <span class="pre">dictionary</span> <span class="pre">of</span> <span class="pre">all</span> <span class="pre">properties</span> <span class="pre">to</span> <span class="pre">be</span> <span class="pre">stored.\n</span>&#160;&#160;&#160; <span class="pre">'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'__post_init__':</span> <span class="pre">&lt;function</span> <span class="pre">DriftScanData.__post_init__&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'get_missing_params':</span> <span class="pre">&lt;function</span> <span class="pre">DriftScanData.get_missing_params&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'get_frontend_header_data':</span> <span class="pre">&lt;function</span> <span class="pre">DriftScanData.get_frontend_header_data&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'get_calibration_header_data':</span> <span class="pre">&lt;function</span> <span class="pre">DriftScanData.get_calibration_header_data&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'log_multiple_entries':</span> <span class="pre">&lt;function</span> <span class="pre">DriftScanData.log_multiple_entries&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'get_driftscans':</span> <span class="pre">&lt;function</span> <span class="pre">DriftScanData.get_driftscans&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'get_chart_header_data':</span> <span class="pre">&lt;function</span> <span class="pre">DriftScanData.get_chart_header_data&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'_calc_water_vapour':</span> <span class="pre">&lt;function</span> <span class="pre">DriftScanData._calc_water_vapour&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'_calc_atmospheric_penetration':</span> <span class="pre">&lt;function</span> <span class="pre">DriftScanData._calc_atmospheric_penetration&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'calibrate_jupiter_atm':</span> <span class="pre">&lt;function</span> <span class="pre">DriftScanData.calibrate_jupiter_atm&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'get_planet_ang_diam':</span> <span class="pre">&lt;function</span> <span class="pre">DriftScanData.get_planet_ang_diam&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'get_jupiter_dist':</span> <span class="pre">&lt;function</span> <span class="pre">DriftScanData.get_jupiter_dist&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'__dict__':</span> <span class="pre">&lt;attribute</span> <span class="pre">'__dict__'</span> <span class="pre">of</span> <span class="pre">'DriftScanData'</span> <span class="pre">objects&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'__weakref__':</span> <span class="pre">&lt;attribute</span> <span class="pre">'__weakref__'</span> <span class="pre">of</span> <span class="pre">'DriftScanData'</span> <span class="pre">objects&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'__dataclass_params__':</span> <span class="pre">_DataclassParams(init=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repr=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eq=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsafe_hash=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frozen=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_args=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kw_only=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slots=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weakref_slot=False)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'__dataclass_fields__':</span> <span class="pre">{'__dict__':</span> <span class="pre">Field(name='__dict__'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type=&lt;class</span> <span class="pre">'object'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default=mappingproxy({...})</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_factory=&lt;dataclasses._MISSING_TYPE</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repr=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hash=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compare=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata=mappingproxy({})</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kw_only=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_field_type=_FIELD)}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'__init__':</span> <span class="pre">&lt;function</span> <span class="pre">DriftScanData.__init__&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'__repr__':</span> <span class="pre">&lt;function</span> <span class="pre">DriftScanData.__repr__&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'__eq__':</span> <span class="pre">&lt;function</span> <span class="pre">DriftScanData.__eq__&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'__hash__':</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'__match_args__':</span> <span class="pre">('__dict__'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">)})</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScanData.html#DriftScanData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScanData.DriftScanData" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Class of parameters to be collected/saved to a database from the drift
-scan fits file. These are the values that will be populated in the
-CALDB or TARDB databases.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>parameters</strong> (<em>dict</em>) – dictionary of all properties to be stored.</p>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScanData.DriftScanData.calibrate_jupiter_atm">
-<span class="sig-name descname"><span class="pre">calibrate_jupiter_atm</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScanData.html#DriftScanData.calibrate_jupiter_atm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScanData.DriftScanData.calibrate_jupiter_atm" title="Link to this definition"></a></dt>
-<dd><p>Calibrate the Jupiter atmosphere.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScanData.DriftScanData.get_calibration_header_data">
-<span class="sig-name descname"><span class="pre">get_calibration_header_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScanData.html#DriftScanData.get_calibration_header_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScanData.DriftScanData.get_calibration_header_data" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScanData.DriftScanData.get_chart_header_data">
-<span class="sig-name descname"><span class="pre">get_chart_header_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScanData.html#DriftScanData.get_chart_header_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScanData.DriftScanData.get_chart_header_data" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScanData.DriftScanData.get_driftscans">
-<span class="sig-name descname"><span class="pre">get_driftscans</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScanData.html#DriftScanData.get_driftscans"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScanData.DriftScanData.get_driftscans" title="Link to this definition"></a></dt>
-<dd><p>Get the driftscan data</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScanData.DriftScanData.get_frontend_header_data">
-<span class="sig-name descname"><span class="pre">get_frontend_header_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScanData.html#DriftScanData.get_frontend_header_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScanData.DriftScanData.get_frontend_header_data" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScanData.DriftScanData.get_jupiter_dist">
-<span class="sig-name descname"><span class="pre">get_jupiter_dist</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScanData.html#DriftScanData.get_jupiter_dist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScanData.DriftScanData.get_jupiter_dist" title="Link to this definition"></a></dt>
-<dd><p>Get Jupiter AU distance from NASA Planets Physical Parameters
-<a class="reference external" href="https://ssd.jpl.nasa.gov/planets/phys_par.html">https://ssd.jpl.nasa.gov/planets/phys_par.html</a>
-We use the mean radius because using the equatorial radius requires corrections.
-Ask Jon Quick again to explain.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScanData.DriftScanData.get_missing_params">
-<span class="sig-name descname"><span class="pre">get_missing_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScanData.html#DriftScanData.get_missing_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScanData.DriftScanData.get_missing_params" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScanData.DriftScanData.get_planet_ang_diam">
-<span class="sig-name descname"><span class="pre">get_planet_ang_diam</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScanData.html#DriftScanData.get_planet_ang_diam"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScanData.DriftScanData.get_planet_ang_diam" title="Link to this definition"></a></dt>
-<dd><p>Get the planet angular diameter from horizon data</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScanData.DriftScanData.log_multiple_entries">
-<span class="sig-name descname"><span class="pre">log_multiple_entries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScanData.html#DriftScanData.log_multiple_entries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScanData.DriftScanData.log_multiple_entries" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-</section>
-<section id="module-src.common.driftScans">
-<span id="src-common-driftscans-module"></span><h2>src.common.driftScans module<a class="headerlink" href="#module-src.common.driftScans" title="Link to this heading"></a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="src.common.driftScans.DriftScans">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.common.driftScans.</span></span><span class="sig-name descname"><span class="pre">DriftScans</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">__dict__:</span> <span class="pre">dict</span> <span class="pre">=</span> <span class="pre">mappingproxy({'__module__':</span> <span class="pre">'src.common.driftScans'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'__annotations__':</span> <span class="pre">{'__dict__':</span> <span class="pre">&lt;class</span> <span class="pre">'dict'&gt;}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'__doc__':</span> <span class="pre">'\n</span>&#160;&#160;&#160; <span class="pre">Driftscan</span> <span class="pre">object\n\n</span>&#160;&#160;&#160; <span class="pre">Args:\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">data</span> <span class="pre">(dict):</span> <span class="pre">dictionary</span> <span class="pre">of</span> <span class="pre">fitsfile</span> <span class="pre">data\n</span>&#160;&#160;&#160; <span class="pre">'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'add_missing_values':</span> <span class="pre">&lt;function</span> <span class="pre">DriftScans.add_missing_values&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'try_test':</span> <span class="pre">&lt;function</span> <span class="pre">DriftScans.try_test&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'fill_in_missing_data_sb':</span> <span class="pre">&lt;function</span> <span class="pre">DriftScans.fill_in_missing_data_sb&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'fill_in_missing_data_db_common':</span> <span class="pre">&lt;function</span> <span class="pre">DriftScans.fill_in_missing_data_db_common&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'fill_in_missing_data_db_beams':</span> <span class="pre">&lt;function</span> <span class="pre">DriftScans.fill_in_missing_data_db_beams&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'getScanData':</span> <span class="pre">&lt;function</span> <span class="pre">DriftScans.getScanData&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'get_scans':</span> <span class="pre">&lt;function</span> <span class="pre">DriftScans.get_scans&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'process_data':</span> <span class="pre">&lt;function</span> <span class="pre">DriftScans.process_data&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'process_data_only':</span> <span class="pre">&lt;function</span> <span class="pre">DriftScans.process_data_only&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'__dataclass_params__':</span> <span class="pre">_DataclassParams(init=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repr=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eq=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsafe_hash=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frozen=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">match_args=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kw_only=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slots=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weakref_slot=False)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'__dataclass_fields__':</span> <span class="pre">{'__dict__':</span> <span class="pre">Field(name='__dict__'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type=&lt;class</span> <span class="pre">'dict'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default=mappingproxy({...})</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_factory=&lt;dataclasses._MISSING_TYPE</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repr=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hash=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compare=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata=mappingproxy({})</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kw_only=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_field_type=_FIELD)}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'__init__':</span> <span class="pre">&lt;function</span> <span class="pre">DriftScans.__init__&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'__repr__':</span> <span class="pre">&lt;function</span> <span class="pre">DriftScans.__repr__&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'__eq__':</span> <span class="pre">&lt;function</span> <span class="pre">DriftScans.__eq__&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'__hash__':</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'__match_args__':</span> <span class="pre">('__dict__'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">)})</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScans.html#DriftScans"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScans.DriftScans" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#src.common.driftScanAttributes.DriftScanAttributes" title="src.common.driftScanAttributes.DriftScanAttributes"><code class="xref py py-class docutils literal notranslate"><span class="pre">DriftScanAttributes</span></code></a></p>
-<p>Driftscan object</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>data</strong> (<em>dict</em>) – dictionary of fitsfile data</p>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScans.DriftScans.add_missing_values">
-<span class="sig-name descname"><span class="pre">add_missing_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">myDict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">listOfKeys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScans.html#DriftScans.add_missing_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScans.DriftScans.add_missing_values" title="Link to this definition"></a></dt>
-<dd><p>Sometimes the data did not record properly and you get enitre
-missing scans. If this happens</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScans.DriftScans.fill_in_missing_data_db_beams">
-<span class="sig-name descname"><span class="pre">fill_in_missing_data_db_beams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">myDict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScans.html#DriftScans.fill_in_missing_data_db_beams"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScans.DriftScans.fill_in_missing_data_db_beams" title="Link to this definition"></a></dt>
-<dd><p>Fill in the missing data from the observing file</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScans.DriftScans.fill_in_missing_data_db_common">
-<span class="sig-name descname"><span class="pre">fill_in_missing_data_db_common</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">myDict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScans.html#DriftScans.fill_in_missing_data_db_common"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScans.DriftScans.fill_in_missing_data_db_common" title="Link to this definition"></a></dt>
-<dd><p>Fill in the missing data from the observing file</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScans.DriftScans.fill_in_missing_data_sb">
-<span class="sig-name descname"><span class="pre">fill_in_missing_data_sb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">myDict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScans.html#DriftScans.fill_in_missing_data_sb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScans.DriftScans.fill_in_missing_data_sb" title="Link to this definition"></a></dt>
-<dd><p>Fill in the missing data from the observing file</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScans.DriftScans.getScanData">
-<span class="sig-name descname"><span class="pre">getScanData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScans.html#DriftScans.getScanData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScans.DriftScans.getScanData" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScans.DriftScans.get_scans">
-<span class="sig-name descname"><span class="pre">get_scans</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scanDict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scanKey</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScans.html#DriftScans.get_scans"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScans.DriftScans.get_scans" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScans.DriftScans.process_data">
-<span class="sig-name descname"><span class="pre">process_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScans.html#DriftScans.process_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScans.DriftScans.process_data" title="Link to this definition"></a></dt>
-<dd><p>Process the drift scan observations. Get observations from the files
-and prepare it for analysis.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScans.DriftScans.process_data_only">
-<span class="sig-name descname"><span class="pre">process_data_only</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'no'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScans.html#DriftScans.process_data_only"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScans.DriftScans.process_data_only" title="Link to this definition"></a></dt>
-<dd><p>Process the drift scan observations. Get observations from the files
-and prepare it for analysis.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.driftScans.DriftScans.try_test">
-<span class="sig-name descname"><span class="pre">try_test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">myDict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/driftScans.html#DriftScans.try_test"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.driftScans.DriftScans.try_test" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+<section id="src-common-driftscans-module">
+<h2>src.common.driftScans module<a class="headerlink" href="#src-common-driftscans-module" title="Link to this heading"></a></h2>
 </section>
 <section id="module-src.common.enums">
 <span id="src-common-enums-module"></span><h2>src.common.enums module<a class="headerlink" href="#module-src.common.enums" title="Link to this heading"></a></h2>
@@ -1608,161 +1038,11 @@ Time specification: 1950 to 2100, step=1 day</p>
 </dd></dl>
 
 </section>
-<section id="module-src.common.logConfiguration">
-<span id="src-common-logconfiguration-module"></span><h2>src.common.logConfiguration module<a class="headerlink" href="#module-src.common.logConfiguration" title="Link to this heading"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="src.common.logConfiguration.configure_console_logger">
-<span class="sig-prename descclassname"><span class="pre">src.common.logConfiguration.</span></span><span class="sig-name descname"><span class="pre">configure_console_logger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">toggle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'off'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/logConfiguration.html#configure_console_logger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.logConfiguration.configure_console_logger" title="Link to this definition"></a></dt>
-<dd><p>Setup the console logger.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>toggle</strong> (<em>str</em>) – Toggle the console setting on or off. Default is ‘on’.
-When ‘on’, debugging is printed to the console; else debugging
-is printed to file.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="src.common.logConfiguration.configure_logging">
-<span class="sig-prename descclassname"><span class="pre">src.common.logConfiguration.</span></span><span class="sig-name descname"><span class="pre">configure_logging</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">toggle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'off'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/logConfiguration.html#configure_logging"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.logConfiguration.configure_logging" title="Link to this definition"></a></dt>
-<dd><p>Setup the logging configuration.</p>
-<p>This function creates the log object used to log the code in the program.
-By default, all logging information with a level of debug is saved to
-file and only information with a logging level of info and above is
-logged to the screen.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>toggle</strong> (<em>str</em>) – Toggle the console setting on or off. Default is ‘on’.
-When ‘on’, debugging is printed to the console; else debugging
-is printed to file.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The logging object.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>logger (object)</p>
-</dd>
-</dl>
-</dd></dl>
-
+<section id="src-common-logconfiguration-module">
+<h2>src.common.logConfiguration module<a class="headerlink" href="#src-common-logconfiguration-module" title="Link to this heading"></a></h2>
 </section>
-<section id="module-src.common.miscellaneousFunctions">
-<span id="src-common-miscellaneousfunctions-module"></span><h2>src.common.miscellaneousFunctions module<a class="headerlink" href="#module-src.common.miscellaneousFunctions" title="Link to this heading"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="src.common.miscellaneousFunctions.calc_log_freq">
-<span class="sig-prename descclassname"><span class="pre">src.common.miscellaneousFunctions.</span></span><span class="sig-name descname"><span class="pre">calc_log_freq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/miscellaneousFunctions.html#calc_log_freq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.miscellaneousFunctions.calc_log_freq" title="Link to this definition"></a></dt>
-<dd><p>Calculate the log(frequency)</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="src.common.miscellaneousFunctions.catch_zeroDivError">
-<span class="sig-prename descclassname"><span class="pre">src.common.miscellaneousFunctions.</span></span><span class="sig-name descname"><span class="pre">catch_zeroDivError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colerr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/miscellaneousFunctions.html#catch_zeroDivError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.miscellaneousFunctions.catch_zeroDivError" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="src.common.miscellaneousFunctions.check_for_nans">
-<span class="sig-prename descclassname"><span class="pre">src.common.miscellaneousFunctions.</span></span><span class="sig-name descname"><span class="pre">check_for_nans</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/miscellaneousFunctions.html#check_for_nans"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.miscellaneousFunctions.check_for_nans" title="Link to this definition"></a></dt>
-<dd><p>Check for missing data or incomplete data.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<em>array</em>) – A 1D array</p></li>
-<li><p><strong>log</strong> (<em>object</em>) – Logging object.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The flag value
-x (array) : A 1D array without any NAN values</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>flag (int)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="src.common.miscellaneousFunctions.create_current_scan_directory">
-<span class="sig-prename descclassname"><span class="pre">src.common.miscellaneousFunctions.</span></span><span class="sig-name descname"><span class="pre">create_current_scan_directory</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/miscellaneousFunctions.html#create_current_scan_directory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.miscellaneousFunctions.create_current_scan_directory" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="src.common.miscellaneousFunctions.delete_logs">
-<span class="sig-prename descclassname"><span class="pre">src.common.miscellaneousFunctions.</span></span><span class="sig-name descname"><span class="pre">delete_logs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/miscellaneousFunctions.html#delete_logs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.miscellaneousFunctions.delete_logs" title="Link to this definition"></a></dt>
-<dd><p>Delete the logfile if it exists</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="src.common.miscellaneousFunctions.delete_object">
-<span class="sig-prename descclassname"><span class="pre">src.common.miscellaneousFunctions.</span></span><span class="sig-name descname"><span class="pre">delete_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">objectName</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/src/common/miscellaneousFunctions.html#delete_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.miscellaneousFunctions.delete_object" title="Link to this definition"></a></dt>
-<dd><p>Delete an object from memory</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>objectName</strong> (<em>str</em>) – the name of the object to delete</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="src.common.miscellaneousFunctions.fast_scandir">
-<span class="sig-prename descclassname"><span class="pre">src.common.miscellaneousFunctions.</span></span><span class="sig-name descname"><span class="pre">fast_scandir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dirname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/miscellaneousFunctions.html#fast_scandir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.miscellaneousFunctions.fast_scandir" title="Link to this definition"></a></dt>
-<dd><p>Scan directory for all folders in the given directory</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="src.common.miscellaneousFunctions.set_dict_item">
-<span class="sig-prename descclassname"><span class="pre">src.common.miscellaneousFunctions.</span></span><span class="sig-name descname"><span class="pre">set_dict_item</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dictionary</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/src/common/miscellaneousFunctions.html#set_dict_item"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.miscellaneousFunctions.set_dict_item" title="Link to this definition"></a></dt>
-<dd><p>Set dictionary key, value and description</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>key</strong> (<em>str</em>) – the key you are creating for the dictionary entry</p></li>
-<li><p><strong>value</strong> (<em>str</em><em>,</em><em>float</em><em>,</em><em>list</em><em>,</em><em>dict</em><em> or </em><em>int</em>) – the value of the dictionary entry</p></li>
-<li><p><strong>description</strong> (<em>_type_</em>) – the description of the dictionary entry</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="src.common.miscellaneousFunctions.set_table_name">
-<span class="sig-prename descclassname"><span class="pre">src.common.miscellaneousFunctions.</span></span><span class="sig-name descname"><span class="pre">set_table_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/miscellaneousFunctions.html#set_table_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.miscellaneousFunctions.set_table_name" title="Link to this definition"></a></dt>
-<dd><p>Set the table name based on the declination.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>src</strong> (<em>str</em>) – source or table name</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="src.common.miscellaneousFunctions.sig_to_noise">
-<span class="sig-prename descclassname"><span class="pre">src.common.miscellaneousFunctions.</span></span><span class="sig-name descname"><span class="pre">sig_to_noise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signalPeak</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/miscellaneousFunctions.html#sig_to_noise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.miscellaneousFunctions.sig_to_noise" title="Link to this definition"></a></dt>
-<dd><p>Calculate the signal to noise ratio. i.e. Amplitude / (stdDeviation of noise)
-Taken from paper on ‘Signal to Noise Ratio (SNR) Enhancement Comparison of Impulse-,
-Coding- and Novel Linear-Frequency-Chirp-Based Optical Time Domain Reflectometry
-(OTDR) for Passive Optical Network (PON) Monitoring Based on Unique Combinations of
-Wavelength Selective Mirrors’</p>
-<p>Photonics 2014, 1, 33-46; doi:10.3390/photonics1010033
-https://www.mdpi.com/2304-6732/1/1/33
-https://www.mdpi.com/68484</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>signalPeak</strong> (<em>float</em>) – The maximum valueof a desired signal</p></li>
-<li><p><strong>noise</strong> (<em>array</em>) – array of fit residuals</p></li>
-<li><p><strong>log</strong> (<em>object</em>) – file logging object</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>signal to noise ratio</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>sig2noise (float)</p>
-</dd>
-</dl>
-</dd></dl>
-
+<section id="src-common-miscellaneousfunctions-module">
+<h2>src.common.miscellaneousFunctions module<a class="headerlink" href="#src-common-miscellaneousfunctions-module" title="Link to this heading"></a></h2>
 </section>
 <section id="module-src.common.msgConfiguration">
 <span id="src-common-msgconfiguration-module"></span><h2>src.common.msgConfiguration module<a class="headerlink" href="#module-src.common.msgConfiguration" title="Link to this heading"></a></h2>
@@ -1800,140 +1080,8 @@ https://www.mdpi.com/68484</p>
 </dd></dl>
 
 </section>
-<section id="module-src.common.observation">
-<span id="src-common-observation-module"></span><h2>src.common.observation module<a class="headerlink" href="#module-src.common.observation" title="Link to this heading"></a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="src.common.observation.Observation">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.common.observation.</span></span><span class="sig-name descname"><span class="pre">Observation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">FILEPATH</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theoFit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">autoFit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dbCols</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/observation.html#Observation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.observation.Observation" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Observation object containing the observation data of the observation.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.common.observation.Observation.FILEPATH">
-<span class="sig-name descname"><span class="pre">FILEPATH</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.common.observation.Observation.FILEPATH" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.common.observation.Observation.HDULENGTH">
-<span class="sig-name descname"><span class="pre">HDULENGTH</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.common.observation.Observation.HDULENGTH" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.common.observation.Observation.HDULIST">
-<span class="sig-name descname"><span class="pre">HDULIST</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.common.observation.Observation.HDULIST" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.common.observation.Observation.INFOHEADER">
-<span class="sig-name descname"><span class="pre">INFOHEADER</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.common.observation.Observation.INFOHEADER" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.common.observation.Observation.autoFit">
-<span class="sig-name descname"><span class="pre">autoFit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.common.observation.Observation.autoFit" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.observation.Observation.create_final_plot_directory">
-<span class="sig-name descname"><span class="pre">create_final_plot_directory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/observation.html#Observation.create_final_plot_directory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.observation.Observation.create_final_plot_directory" title="Link to this definition"></a></dt>
-<dd><p>Create directory where final plots will be saved. The function takes
-the source name and the frequency in MHz and creates a directory
-with the source name and the frequency in MHz. The directory is
-created if it does not already exist.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>src</strong> (<em>str</em>) – source name</p></li>
-<li><p><strong>freq</strong> (<em>float</em>) – frequency in MHz</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.common.observation.Observation.dbCols">
-<span class="sig-name descname"><span class="pre">dbCols</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#src.common.observation.Observation.dbCols" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.observation.Observation.get_data">
-<span class="sig-name descname"><span class="pre">get_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/observation.html#Observation.get_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.observation.Observation.get_data" title="Link to this definition"></a></dt>
-<dd><p>Get data from fits file hdu</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.observation.Observation.get_data_from_predefined_cols">
-<span class="sig-name descname"><span class="pre">get_data_from_predefined_cols</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/observation.html#Observation.get_data_from_predefined_cols"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.observation.Observation.get_data_from_predefined_cols" title="Link to this definition"></a></dt>
-<dd><p>Get data from fits file hdu</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.observation.Observation.get_data_only">
-<span class="sig-name descname"><span class="pre">get_data_only</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">noqv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/observation.html#Observation.get_data_only"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.observation.Observation.get_data_only" title="Link to this definition"></a></dt>
-<dd><p>Get data from fits file hdu. This is for the quick file view.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.observation.Observation.get_hdu_info">
-<span class="sig-name descname"><span class="pre">get_hdu_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hduindex</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/src/common/observation.html#Observation.get_hdu_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.observation.Observation.get_hdu_info" title="Link to this definition"></a></dt>
-<dd><p>Get information from individual hdu</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>hduindex</strong> (<em>int</em>) – index of hdu to get info from</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.common.observation.Observation.log">
-<span class="sig-name descname"><span class="pre">log</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">object</span></em><a class="headerlink" href="#src.common.observation.Observation.log" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.observation.Observation.read_data_from_hdu_lists">
-<span class="sig-name descname"><span class="pre">read_data_from_hdu_lists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hduindex</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/observation.html#Observation.read_data_from_hdu_lists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.observation.Observation.read_data_from_hdu_lists" title="Link to this definition"></a></dt>
-<dd><p>Read data from fits file hdu.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>hduindex</strong> (<em>int</em>) – index of hdu to read data from</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="src.common.observation.Observation.set_key_value_pairs">
-<span class="sig-name descname"><span class="pre">set_key_value_pairs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desc1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desc2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indexKey</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/observation.html#Observation.set_key_value_pairs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.observation.Observation.set_key_value_pairs" title="Link to this definition"></a></dt>
-<dd><p>Set key/value pairs for keys that may be missing from the dictionary</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>key1</strong> (<em>_type_</em>) – missing key</p></li>
-<li><p><strong>desc1</strong> (<em>_type_</em>) – description of missing key</p></li>
-<li><p><strong>key2</strong> (<em>_type_</em>) – reference key</p></li>
-<li><p><strong>desc2</strong> (<em>_type_</em>) – description of reference key</p></li>
-<li><p><strong>indexKey</strong> (<em>_type_</em>) – index key</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="src.common.observation.Observation.theoFit">
-<span class="sig-name descname"><span class="pre">theoFit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.common.observation.Observation.theoFit" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="src.common.observation.get_freq_band2">
-<span class="sig-prename descclassname"><span class="pre">src.common.observation.</span></span><span class="sig-name descname"><span class="pre">get_freq_band2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/observation.html#get_freq_band2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.observation.get_freq_band2" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
+<section id="src-common-observation-module">
+<h2>src.common.observation module<a class="headerlink" href="#src-common-observation-module" title="Link to this heading"></a></h2>
 </section>
 <section id="module-src.common.plotting">
 <span id="src-common-plotting-module"></span><h2>src.common.plotting module<a class="headerlink" href="#module-src.common.plotting" title="Link to this heading"></a></h2>
@@ -1947,6 +1095,11 @@ created if it does not already exist.</p>
 <span class="sig-prename descclassname"><span class="pre">src.common.plotting.</span></span><span class="sig-name descname"><span class="pre">make_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plotlab</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/plotting.html#make_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.plotting.make_plot" title="Link to this definition"></a></dt>
 <dd><p>plot data from plotting ionary</p>
 </dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.common.plotting.make_qv_plots">
+<span class="sig-prename descclassname"><span class="pre">src.common.plotting.</span></span><span class="sig-name descname"><span class="pre">make_qv_plots</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lcp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rcp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/common/plotting.html#make_qv_plots"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.common.plotting.make_qv_plots" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="src.common.plotting.plotBaselineEstimate">

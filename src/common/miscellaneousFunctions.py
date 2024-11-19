@@ -279,7 +279,7 @@ def parse_source_directory_path(path):
 
     # Split the path into segments using '/'
     path_segments = path.split('/')
-    print(path_segments)
+    # print(path_segments)
 
     # Try to extract frequency directly from the second-to-last segment
     try:
@@ -451,21 +451,21 @@ def generate_quick_view(arg,log,Observation):
         obs.get_data_only(qv='yes')
         sys.exit()
 
-def find_table_in_database(DBNAME,table, tabFreqBand, src):
+# def find_table_in_database(DBNAME,table, tabFreqBand, src):
     
-    # compare to database entries
-    tablesFromDB = get_tables_from_database(DBNAME)
-    DBtables=[d for d in tablesFromDB if 'sqlite_sequence' not in d]
+#     # compare to database entries
+#     tablesFromDB = get_tables_from_database(DBNAME)
+#     DBtables=[d for d in tablesFromDB if 'sqlite_sequence' not in d]
 
-    dataInDBtables=[]
-    for tab in DBtables:
-        if src.strip() in tab.strip():
-            # print('found: ',src, tab)
-            tableEntryfreqBand=get_freq_band(int(tab.split('_')[-1]))
-            if tabFreqBand==tableEntryfreqBand:
-                print(f'>> Found similar {tableEntryfreqBand}-band freq in table:',tab)
+#     dataInDBtables=[]
+#     for tab in DBtables:
+#         if src.strip() in tab.strip():
+#             # print('found: ',src, tab)
+#             tableEntryfreqBand=get_freq_band(int(tab.split('_')[-1]))
+#             if tabFreqBand==tableEntryfreqBand:
+#                 print(f'>> Found similar {tableEntryfreqBand}-band freq in table:',tab)
                                                     
-    return 'tab'
+#     return 'tab'
 
 def process_new_file(pathToFile, log, myCols, Observation, theofit='',autofit=''):
     
@@ -543,10 +543,11 @@ def process_file(filePath, log, Observation, theofit='',autofit=''):
 
     return
 
-def fast_scandir(dirname,log,Observation):
+def fast_scandir(dirname,log,Observation,outfile):
     '''Scan directory for all folders in the given directory. This is slow
     for large subfolders but works'''
 
+    
     print()
     msg_wrapper('info',log.info,f'Scanning the {dirname} directory')
 
@@ -555,6 +556,7 @@ def fast_scandir(dirname,log,Observation):
 
     print(f'Subfolders: {len(subfolders)}, Files: {len(files)}\n')
     # print(subfolders)
+    # sys.exit()
 
     if len(files) == 0:
         # print('No files found in the directory\n')
@@ -583,9 +585,11 @@ def fast_scandir(dirname,log,Observation):
         print(f'\nFound freq: {freq}, for src: {src}')
         print(f'\nCreated tableName: {table}')
 
+        # sys.exit()
         if src is not None:
             tableName, myCols, tableFiles, tableNames=get_previously_processed_files(src, freq,log,DBNAME)
 
+            # print(tableFiles)
             # get all files that havent processed yet
             unprocessedObs=[]
             for fl in files:  
@@ -596,8 +600,9 @@ def fast_scandir(dirname,log,Observation):
 
             # print(tableFiles)
             print(f'Found {len(unprocessedObs)} of {len(files)} unprocessed files')
-            
+            # sys.exit()
             if len(unprocessedObs)>0:
+                
                 for file in unprocessedObs:
                     if '.fits' not in file:
                         try:    
@@ -611,12 +616,14 @@ def fast_scandir(dirname,log,Observation):
                         # Process the files
                         msg_wrapper('info',log.info,f'\nProcessing file {file}')
                         process_file(file, log,Observation)
+                        outfile.write(f'{dirname}/{file}\n')
+                        # with open('processed_files.txt')
                         # sys.exit()
 
         msg_wrapper('info',log.info,'>'*50)
 
     for dirname in list(subfolders):
-        subfolders.extend(fast_scandir(dirname,log,Observation))
+        subfolders.extend(fast_scandir(dirname,log,Observation,outfile))
         print('\n')
     return subfolders
 

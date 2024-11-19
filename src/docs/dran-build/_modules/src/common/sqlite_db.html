@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>src.common.sqlite_db &mdash; dran v1.0 documentation</title>
+  <title>src.common.sqlite_db &mdash; DRAN v1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
 
@@ -31,7 +31,7 @@
           
           
           <a href="../../../index.html" class="icon icon-home">
-            dran
+            DRAN
           </a>
               <div class="version">
                 v1.0
@@ -77,7 +77,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">dran</a>
+          <a href="../../../index.html">DRAN</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -264,23 +264,27 @@
         <span class="c1"># self.c.execute(sqlStmt, values)</span>
         <span class="c1"># sys.exit()</span>
 
-        <span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="o">*</span><span class="mi">50</span><span class="p">)</span>
+        <span class="c1"># print(data)</span>
+        <span class="c1"># print(&#39;\n&#39;)</span>
+        <span class="c1"># print(&#39;*&#39;*50)</span>
         <span class="n">fp</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;FILEPATH&#39;</span><span class="p">]</span>
         <span class="n">cf</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;CENTFREQ&#39;</span><span class="p">])</span>
         <span class="n">sp</span><span class="o">=</span><span class="n">fp</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;FILEPATH: </span><span class="si">{</span><span class="n">fp</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">sp</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;CENTFREQ: </span><span class="si">{</span><span class="n">cf</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cf</span><span class="p">)</span> <span class="ow">in</span> <span class="n">fp</span><span class="p">)</span>
+        <span class="c1"># print(f&#39;FILEPATH: {fp}&#39;)</span>
+        <span class="c1"># print(sp[-2])</span>
+        <span class="c1"># print(f&#39;CENTFREQ: {cf}&#39;)</span>
+        <span class="c1"># print(str(cf) in fp)</span>
         <span class="n">x</span><span class="o">=</span><span class="n">fp</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">sp</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]),</span><span class="nb">str</span><span class="p">(</span><span class="n">cf</span><span class="p">))</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="o">*</span><span class="mi">50</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># print(x)</span>
+        <span class="c1"># print(&#39;*&#39;*50)</span>
+        <span class="c1"># print(&#39;\n&#39;)</span>
 
+        <span class="c1"># sys.exit()</span>
+        <span class="c1"># print(sqlStmt)</span>
+        <span class="c1"># print(values)</span>
         <span class="c1"># self.c.execute(sqlStmt, values)</span>
-
+        <span class="c1"># print(&#39;here&#39;)</span>
+        <span class="c1"># sys.exit()</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">create_db</span><span class="p">()</span>
@@ -524,9 +528,6 @@
 </div>
 
     
-    <span class="c1"># def set_table_name(self,tableName):</span>
-    <span class="c1">#     msg_wrapper(&quot;debug&quot;, self.log.debug, &quot;Setting table name to: &quot;+tableName)</span>
-    <span class="c1">#     return tableName</span>
 </pre></div>
 
            </div>
