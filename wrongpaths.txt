@@ -137,3 +137,13 @@
 /Users/pfesesanivanzyl/data/pks2142-75/pks2142-75_8400/2011d359_13h57m33s_Cont_mike_PKS2174-75.fits
 /Users/pfesesanivanzyl/data/Continuum/J2000-1748/22000/2024d292_17h07m56s_Cont_fanie_J2131-1207.fits
 /Users/pfesesanivanzyl/data/Continuum/J2000-1748/22000/2024d272_18h26m33s_Cont_fanie_J2131-1207.fits
+/Users/pfesesanivanzyl/data/Continuum/J2000-1748/22000/2024d292_17h07m56s_Cont_fanie_J2131-1207.fits
+/Users/pfesesanivanzyl/data/Continuum/J2000-1748/22000/2024d272_18h26m33s_Cont_fanie_J2131-1207.fits
+/Users/pfesesanivanzyl/data/Continuum/J2000-1748/22000/2024d320_15h32m10s_Cont_fanie_J2131-1207.fits
+/Users/pfesesanivanzyl/data/Continuum/J2000-1748/22000/2024d318_16h08m44s_Cont_fanie_J2131-1207.fits
+/Users/pfesesanivanzyl/data/Continuum/J2000-1748/22000/2024d321_15h41m54s_Cont_fanie_J2131-1207.fits
+/Users/pfesesanivanzyl/data/Continuum/J2000-1748/22000/2024d292_17h07m56s_Cont_fanie_J2131-1207.fits
+/Users/pfesesanivanzyl/data/Continuum/J2000-1748/22000/2024d272_18h26m33s_Cont_fanie_J2131-1207.fits
+/Users/pfesesanivanzyl/data/Continuum/J2000-1748/22000/2024d320_15h32m10s_Cont_fanie_J2131-1207.fits
+/Users/pfesesanivanzyl/data/Continuum/J2000-1748/22000/2024d318_16h08m44s_Cont_fanie_J2131-1207.fits
+/Users/pfesesanivanzyl/data/Continuum/J2000-1748/22000/2024d321_15h41m54s_Cont_fanie_J2131-1207.fits

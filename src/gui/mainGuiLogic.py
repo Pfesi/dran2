@@ -22,6 +22,7 @@ import webbrowser
 # import pandas as pd
 import sqlite3
 import re
+from datetime import datetime
 
 # Local Imports
 sys.path.append("src/")
@@ -207,6 +208,10 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
         self.plot_ui.btnShow.clicked.connect(self.show_plot_browser)
         self.plot_ui.btnDelete.clicked.connect(self.delete_obs)
 
+        # file_path = sys.path[0]
+        # from pathlib import Path
+        # print(Path(file_path).parent)
+        # sys.exit()
         # Show the window
         self.plot_window.show()
 
@@ -1039,6 +1044,10 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
             self.plot_tables = sorted(dbTableList['name'].tolist())
             self.plot_table=self.plot_tables[0]
             self.plot_df = pd.read_sql_query(f"SELECT * FROM {self.plot_table}", cnx)
+            self.plot_df.sort_values('FILENAME',inplace=True)
+            self.plot_df['OBSDATE'] = self.plot_df.apply(lambda row: self.parse_time(row['OBSDATE']), axis=1)
+            self.plot_df["OBSDATE"] = pd.to_datetime(self.plot_df["OBSDATE"], format="%Y-%m-%d")   
+
             self.orig_df=self.plot_df.copy()
             cnx.close()
 
@@ -1081,7 +1090,7 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.plot_ui.comboBoxFilter.clear()
         self.plot_ui.comboBoxFilter.clear()
-        self.plot_ui.comboBoxFilter.addItems(['','>','>=','=','<','<='])#,'between'])
+        self.plot_ui.comboBoxFilter.addItems(['','>','>=','<','<='])#,'between']'=',)
 
     # def on_filter_changed(self):
     #     """Handles filter changes in the plot UI.
@@ -1125,6 +1134,8 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
         # Add table names to the main combo box
         self.plot_ui.comboBox.addItems(sorted(self.plot_tables))
 
+    # def get_filter_date(self,period):
+    #     return 
     def write(self,msg,logType=""):
         """ Write to screen and gui """
 
@@ -1150,12 +1161,14 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
             print("Please select a filter type.")
             return
         
+        if not filter_value:
+            print("Please enter a filter value.")
+            return
+        
         start=self.plot_ui.txtBoxStart.text()
         end=self.plot_ui.txtBoxEnd.text()
 
-        if start.upper()=='START':
-            print(f"Start date. '{start}'")
-            return
+        
         if start=='':
             print("Please select a start date. 'YYYY-MM-DD'")
             return
@@ -1167,28 +1180,60 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
         
         # Get data from the database
         # folder_name = self.plot_ui.comboBox.currentText()
-        df=self.plot_df
+        df=self.plot_df.copy()
 
+        print('\n','='*50,'\n')
+        if start.upper()=='START':
+            start=df['OBSDATE'].iloc[0].date()
+            print(f"Start date. '{start}'")
+            return
+        
+        if end.upper()=='END':
+            start=df['OBSDATE'].iloc[-1].date()
+            print(f"End date. '{end}'")
+            return
+        
         # Filter data based on the selected criteria
       
         try:
             filter_value = float(filter_value)
             # print(self.plot_df)
-
-            df[option]=df[option].astype(float)
-            print(f"*** Performing operation: self.plot_df['{option}'] {filter_type} {filter_value}")
-
-            df = df[eval(f"df['{option}'] {filter_type} {filter_value}")].sort_values('FILENAME')
-        
         except ValueError:
             print("Invalid filter value.")
             return
+        
+        df[option]=df[option].astype(float)
+        print(f"*** Performing operation: self.plot_df['{option}'] {filter_type} {filter_value}")
+
+        # first filter by date
+        df=df[(df['OBSDATE']>=datetime.strptime(start, '%Y-%m-%d')) & (df['OBSDATE']<=datetime.strptime(end, '%Y-%m-%d'))]
+
+        # then filter by condition
+        if filter_type == '>':
+            df = df[df[option] > filter_value].sort_values('FILENAME')
+        elif filter_type == '>=':
+            df = df[df[option] >= filter_value].sort_values('FILENAME')
+        elif filter_type == '<':
+            df = df[df[option] < filter_value].sort_values('FILENAME')
+        elif filter_type == '<=':
+            df = df[df[option] <= filter_value].sort_values('FILENAME')
+        # elif filter_type == 'between':
+        #     df = df[(df[f'{option}'] >= filter_value[0]) & (df[f'{option}'] <= filter_value[1])].sort_values('FILENAME')
+        # df =df[df['OBSDATE']>=start and df['OBSDATE']<=end]
+        
+        # print(df.iloc[0])
             
         print(f'\nFound: {len(df)} rows")\n')
+        # sys.exit()
+
         # Print basic statistics
         if len(df)>0:
+
+            print(df[option])
             self.print_basic_stats(df, option)
 
+            # sys.exit()
+            
             # src info
             srcname=df['OBJECT'].iloc[0]
             freq = int(df['CENTFREQ'].iloc[0])
@@ -1207,77 +1252,161 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
 
                 # print(image_names)
                 # sys.exit()
+
+            file_path = sys.path[0]
+            from pathlib import Path
+            path=Path(file_path).parent
+            # print()
+            # sys.exit()
+
             for _, row in df.iterrows():
                     plot_tag = row['FILENAME'][:18]
                     # print(plot_tag)
+                    # sys.exit()
                     for image_name in image_names:
                         if plot_tag in image_name:
-                            image_paths.append(os.path.join(image_dir, image_name))
-                            # print(os.path.join(image_dir, image_name))
+                            for pos in ['N','S','O']:
+                                for pol in ['L','R']:
+                                    # print(option, f'{pos}{pol}'  ,image_name, f'HP{pos}_{pol}CP')
+                                    # if f'{pos}{pol}' in option:
+                                    if (f'HP{pos}_{pol}CP' in image_name) and (f'{pos}{pol}' in option):
+                                            print( f'HP{pos}_{pol}CP' ,image_name, f'{pos}{pol}',option )
+                                            image_paths.append(f'{path}/{os.path.join(image_dir, image_name)}')
+                                            break
+                                    elif (f'O{pos}_{pol}CP' in image_name) and (f'O{pol}' in option):
+                                            print( f'O{pos}_{pol}CP' ,image_name, f'O{pos}{pol}',option )
+                                            image_paths.append(f'{path}/{os.path.join(image_dir, image_name)}')
+                                            break
+            print(image_paths)
+            
+
+            if len(image_paths)==0:
+                for _, row in df.iterrows():
+                    plot_tag = row['FILENAME'][:18]
+                    for image_name in image_names:
+                            if plot_tag in image_name: 
+                                # print(plot_tag, image_name)
+                                image_paths.append(f'{path}/{os.path.join(image_dir, image_name)}')
+     
+            print(image_paths)
+            # sys.exit()
+            # htmlstart = '<html> <head>\
+            #                 <meta charset = "utf-8" >\
+            #                 <meta http-equiv="X-UA-Compatible" content="IE=edge">\
+            #                 <meta name = "viewport" content = "width=device-width, initial-scale=1" > <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous"> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script> \
+            #                         <style> \
+            #                             img {border: 3px solid  # ddd; /* Gray border */border-radius: 5px;  /* Rounded border */padding: 5px; /* Some padding */width: 400px; /* Set a small width */}/* Add a hover effect (blue shadow) */\
+            #                             img:hover {box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);}\
+            #                         </style> \
+            #                     <title>Driftscan plots</title>\
+            #                     </head>\
+            #                     <div class="container-fluid"> \
+            #                         <div class="row">\
+            #                             <hr>\
+            #                             <h1> Plotting folder '+srcname.upper() + ' @ '+ str(int(freq)) +' MHz </h1> \
+            #                             <p>'
+
+            script = ''' const images='''+f'{image_paths}'+''';
+            const imagesPerPage = 20;
+      let currentPage = 1;
+
+      function displayImages(page) {
+        const gallery = document.getElementById("image-gallery");
+        gallery.innerHTML = "";
+
+        const startIndex = (page - 1) * imagesPerPage;
+        const endIndex = startIndex + imagesPerPage;
+
+        for (let i = startIndex; i < endIndex && i < images.length; i++) {
+          const img = document.createElement("img");
+          img.src = images[i];
+          gallery.appendChild(img);
+        }
+      }
+
+      function buildPagination() {
+        const pagination = document.getElementById("pagination");
+        pagination.innerHTML = "";
+
+        const totalPages = Math.ceil(images.length / imagesPerPage);
+
+        for (let i = 1; i <= totalPages; i++) {
+          const li = document.createElement("li");
+          li.classList.add("page-item");
+          const a = document.createElement("a");
+          a.classList.add("page-link");
+          a.href = "#";
+          a.textContent = i;
+          a.addEventListener("click", () => {
+            currentPage = i;
+            displayImages(currentPage);
+            updateActivePage();
+          });
+          li.appendChild(a);
+          pagination.appendChild(li);
+        }
+      }
+
+      function updateActivePage() {
+        const pagination = document.getElementById("pagination");
+        const pageItems = pagination.querySelectorAll(".page-item");
+        pageItems.forEach((item, index) => {
+          if (index + 1 === currentPage) {
+            item.classList.add("active");
+          } else {
+            item.classList.remove("active");
+          }
+        });
+      }
+
+      displayImages(currentPage);
+      buildPagination();
+      updateActivePage();
+
+            '''
+
+            file_path = sys.path[0]
+            # print(file_path)
+            with open(f'{file_path}/gui/assets/script2.js','w+') as f:
+                f.write(script)
 
             htmlstart = '<html> <head>\
                             <meta charset = "utf-8" >\
-                            <meta name = "viewport" content = "width=device-width, initial-scale=1" > <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous"> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script> \
-                                    <style> \
-                                        img {border: 3px solid  # ddd; /* Gray border */border-radius: 5px;  /* Rounded border */padding: 5px; /* Some padding */width: 400px; /* Set a small width */}/* Add a hover effect (blue shadow) */\
-                                        img:hover {box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);}\
-                                    </style> \
+                            <meta http-equiv="X-UA-Compatible" content="IE=edge">\
+                            <meta name = "viewport" content = "width=device-width, initial-scale=1" > \
+                            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>\
+                               <link rel="stylesheet" href="src/gui/assets/style.css">\
                                 <title>Driftscan plots</title>\
                                 </head>\
-                                <div class="container-fluid"> \
-                                    <div class="row">\
-                                        <hr>\
-                                        <h1> Plotting folder '+srcname.upper() + '</h1> \
-                                        <p>'
-                                                        
+                                <body>\
+                                        <h1> Plotting folder '+srcname.upper() + ' @ '+ str(int(freq)) +' MHz </h1> \
+                                        <div class="gallery" id="image-gallery">\
+                                            </div>\
+                                        <ul class="pagination justify-content-center mt-4" id="pagination"></ul>\
+                                <script src="src/gui/assets/script2.js"></script>\
+                                </body></html>'        
+                                                                     
             htmlmid=''
+      
+            # for img in image_paths:
+                    # print(f'Showing: {img}')
 
-            images=[]
-
-                # BEAMS=['A','B']
-                # POLS=['L','R']
-                # POS=['S','N','O']
-
-                # for 
-            pols=['NL','SL','OL','NR','SR','OR']
-            for p in pols:
-                    if p in option:
-                        for img in image_paths:
-                            if 'O' not in option:
-                                k=f'HP{p[0]}_{p[1]}'
-                                if k in img:
-                                    # print(img,k)
-                                    images.append(img)
-                            else:
-                                k=f'{p[0]}N_{p[1]}'
-                                if k in img:
-                                    # print(img,k)
-                                    images.append(img)
-                        break
-                    else:
-                        images = image_paths
-                
-            images=set(sorted(images))
-            images=list(images)
-                
-            for img in images:
-                    print(f'Showing: {img}')
-
-            for i in range(len(images)):
+            # for i in range(len(image_paths)):
                     #print(images.split("/")[1],images.split("/")[2])
-                    pathtoimg = images[i]
-                    img = '<small class="card-title">'+images[i].split("/")[3]+'</small><br/>\
-                            <a target="_blank" href="'+pathtoimg + \
-                            '"><img src="'+pathtoimg + \
-                            '" class="card-img-top" alt="image goes here"></a>'
-                    imglink ='<div class = "card" style = "width: 13rem;" >\
-                                '+img+'\
-                                    </div>'
-                    htmlmid=htmlmid+imglink
+                    # pathtoimg = images[i]
+                    # img = '<small class="card-title">'+img.split("/")[3]+'</small><br/>\
+                    #         <a target="_blank" href="'+img + \
+                    #         '"><img src="'+img + \
+                    #         '" class="card-img-top" alt="image goes here"></a>'
+                    # imglink ='<div class = "card" style = "width: 13rem;" >\
+                    #             '+img+'\
+                    #                 </div>'
+                    # htmlmid=htmlmid+imglink
 
-            htmlmid=htmlmid+'</p></div>'
-            htmlend = '</div></html>'
-            html = htmlstart+htmlmid+htmlend
+            # htmlmid=htmlmid+'</p></div>'
+            # htmlend = '</div></html>'
+            # html = htmlstart+htmlmid+htmlend
+            html=htmlstart
 
                 # create the html file
             path = os.path.abspath('temp.html')
