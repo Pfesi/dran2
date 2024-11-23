@@ -3,9 +3,7 @@ DRAN README
 
 **DRAN** (**D**ata **R**eduction and **AN**alysis) is a recently developed software pipeline specifically designed to streamline the reduction and analysis of drift scan data acquired with [HartRAO's ](http://www.hartrao.ac.za) [26m telescope](http://www.hartrao.ac.za/hh26m_factsfile.html). DRAN supersedes the older **LINES** continuum data reduction and analysis program previously employed at HartRAO.
 
-Originally conceived as part of Dr. Pfesesani Van Zyl's Ph.D. project, **DRAN** is currently maintained by the author, a postdoctoral researcher at [SARAO (the South African Radio AStronomy Observatory](http://www.sarao.ac.za/).
-
-To get started with DRAN and read more on the full documentations of the program you can go to the DRAN [READTHEDOCS](https://dran2.readthedocs.io/en/latest/) page.
+To get started with DRAN and read more on the full documentations of the program you can go to the DRAN [READ THE DOCS](https://dran2.readthedocs.io/en/latest/) page.
 
 Acknowledging DRAN
 -------------------

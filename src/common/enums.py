@@ -17,23 +17,6 @@ class ScanType(Enum):
     SBN=auto()
     DB=auto()
 
-
-
-# class ScanBeamWidth(Enum):
-#     """
-#     Drift scan beam type
-
-#     Args:
-#         Enum (enum): Enum of the different beam types
-
-#     Attributes:    
-#         NB - narrow beam
-#         WB - wide beam        
-#     """
-    
-#     NB=auto
-#     WB=auto
-
 # class Weekday(Enum):
 #     MONDAY = 1
 #     TUESDAY = 2
