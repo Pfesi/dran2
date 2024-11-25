@@ -58,17 +58,24 @@ def main():
     Usage:
         dran-gui -h
     """
-
+    version=get_version()
     parser = argparse.ArgumentParser(prog='DRAN-GUI', 
         description="Begin processing HartRAO drift scan data")
     parser.add_argument("-f", help="process file or folder at given path e.g.\
                         -f data/HydraA/HydraA_13NB/2019d133_16h12m15s_Cont_mike_\
                             HYDRA_A.fits or -f data/HydraA_13NB", type=str, 
                             required=False)
-    parser.add_argument('--version', action='version', version='%(prog)s 1.0')
+    parser.add_argument('--version', action='version', version='%(prog)s'.lower()+f' v{version}')
     parser.set_defaults(func=run)
     args = parser.parse_args()
     args.func(args)
+
+def get_version():
+    """ Get version from config file."""
+    with open('src/config.py', 'r') as f:
+        for line in f:
+            if 'VERSION' in line:
+                return (line.split("=")[-1]).replace("'",'').replace("\n",'')
 
 if __name__ == "__main__":
     main()

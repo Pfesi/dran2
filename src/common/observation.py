@@ -10,7 +10,7 @@ from dataclasses import dataclass, field
 import numpy as np
 from datetime import datetime
 import argparse
-from config import VERSION, DBNAME
+from dran2.config import VERSION, DBNAME
 import pandas as pd
 import sqlite3
 

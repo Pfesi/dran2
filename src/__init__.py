@@ -1,8 +1,4 @@
-# Do not delete
-logFile="logfile.txt"
-__appname__ = "dran"
-__author__ = "Pfesesani van Zyl"
-__authoremail__ = "pfesi24@gmail.com"
-__package__ ="DRAN"
-__DBNAME__='HART26DATA.db'
-
+import src.dran2._auto as _auto
+import src.dran2._gui as _gui
+import src.dran2._cli as _cli
+import src.dran2._docs as _docs

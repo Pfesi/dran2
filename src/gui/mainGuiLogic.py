@@ -19,15 +19,12 @@ from PyQt5 import QtWidgets
 from astropy.time import Time
 import glob
 import webbrowser
-# import pandas as pd
 import sqlite3
-import re
 from datetime import datetime
 
 # Local Imports
 sys.path.append("src/")
 from common.msgConfiguration import msg_wrapper
-# from common.sqlite_db import SQLiteDB
 from common.observation import Observation
 from common.calibrate import calibrate,calc_pc_pss
 import common.fitting as fit
@@ -208,10 +205,6 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
         self.plot_ui.btnShow.clicked.connect(self.show_plot_browser)
         self.plot_ui.btnDelete.clicked.connect(self.delete_obs)
 
-        # file_path = sys.path[0]
-        # from pathlib import Path
-        # print(Path(file_path).parent)
-        # sys.exit()
         # Show the window
         self.plot_window.show()
 
@@ -279,8 +272,6 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
         # Get the database file path
         self.dbFile='/Users/pfesesanivanzyl/dran/resultsFromAnalysis/JUPITER/JUPITER.db'
         # self.dbFile = self.open_file_name_dialog("*.db")
-
-        
 
         if not self.dbFile:
             print("No file selected")
@@ -1415,9 +1406,7 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
             with open(path, 'w') as f:
                     f.write(html)
             webbrowser.open(url)
-                
-       
-
+    
     def print_basic_stats(self, df, option):
         """Prints basic statistics for the given DataFrame and option."""
 

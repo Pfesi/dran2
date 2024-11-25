@@ -11,7 +11,7 @@ from .sqlite_db import SQLiteDB
 from .calibrate import calibrate
 import pandas as pd
 import matplotlib.pyplot as plt
-from config import DBNAME
+from dran2.config import DBNAME
 import sqlite3
 
 @dataclass

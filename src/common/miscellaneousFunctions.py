@@ -17,16 +17,16 @@ try:
 except:
     from msgConfiguration import msg_wrapper
 try:
-    from ..config import LOGFILE
+    from ..dran2.config import VERSION, DBNAME, LOGFILE
 except:
-    from config import LOGFILE
+    from dran2.config import VERSION, DBNAME, LOGFILE
     
 from .variables import sbCols, nbCols, nbCols22, nbCols22jup, dbCols
 from .contextManagers import open_database
 # from .observation import Observation
 
-sys.path.append("..")
-from config import VERSION, DBNAME 
+# sys.path.append("..")
+# from config import VERSION, DBNAME, LOGFILE
 
 def set_dict_item(dictionary: dict,key,value,description) -> None:
     """

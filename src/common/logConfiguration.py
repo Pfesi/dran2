@@ -11,7 +11,7 @@ import sys
 # Local imports
 # --------------------------------------------------------------------------- #
 sys.path.append("src/")
-from config import LOGFILE
+from dran2.config import LOGFILE
 # =========================================================================== #
 
 # Setup logger object

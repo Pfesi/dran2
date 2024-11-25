@@ -17,7 +17,7 @@ import datetime
 
 # Module imports
 # --------------------------------------------------------------------------- #
-from config import VERSION, DBNAME 
+from .config import VERSION, DBNAME
 from common.miscellaneousFunctions import process_file,process_new_file,fast_scandir,run_fast_scandir,parse_source_path, get_previously_processed_files, generate_quick_view, convert_database_to_table, delete_db, get_freq_band, get_tables_from_database, create_table_cols, create_current_scan_directory, delete_logs
 from common.logConfiguration import configure_logging
 from common.msgConfiguration import msg_wrapper, load_prog
@@ -100,8 +100,6 @@ def run(args):
                 msg_wrapper('info',log.info,f'Working on folder: {args.f}')
                 msg_wrapper('info',log.info,'*'*50)
 
-                # print(datetime.datetime.now().date(),str(datetime.datetime.now().time()).replace(':','-')[:8] )
-                
                 today=str(datetime.datetime.now().date())
                 dirpath = args.f                
 
@@ -176,22 +174,9 @@ def main():
     args = parser.parse_args()
 
     args.func(args)
-    # try:
-    #     args.func(args)
-    # except:
-    #     proc = psutil.Process(os.getpid())
-    #     print('\n>>>>> Program interrupted. Terminating program.')
-    #     proc.terminate()
 
 if __name__ == '__main__':   
 
     proc = psutil.Process(os.getpid())
     main()
-    # try:
-    #     main()
-    # except KeyboardInterrupt:
-    #     print('\n>>>>> Program interrupted. Terminating program.')
-
     proc.terminate()
-
-

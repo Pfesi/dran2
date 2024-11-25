@@ -45,7 +45,6 @@ src/gui/edit_driftscan_window1.py
 src/gui/edit_timeseries_window.py
 src/gui/mainGuiLogic.py
 src/gui/main_window.py
-src/gui/main_window1.py
 src/gui/secondaryCanvasManager.py
 src/gui/timeseries_canvas.py
 src/gui/view_plots_window.py
