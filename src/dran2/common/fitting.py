@@ -1652,22 +1652,22 @@ def fit_beam(x, y, p, fnbw, force, log, saveTag, fitTheoretical, autoFit=None):
                         yCorrected), ", mid: ", len(yCorrected)/2)
 
                     #print(data)
-                    pl.title("Baseline corrected data")
-                    pl.xlabel("Scandist [Deg]")
-                    pl.ylabel("Ta [K]")
-                    pl.plot(x,y)
-                    pl.plot(x, yCorrected, 'k',label="baseline corrected data")
-                    pl.plot(x[main_beam], yCorrected[main_beam])
-                    pl.plot(x[baseLocsl], yCorrected[baseLocsl],".")
-                    pl.plot(x[baseLocsr], yCorrected[baseLocsr],".")
-                    #pl.plot(x,s)
-                    pl.plot(x,np.zeros_like(x),'k')
-                    #pl.grid()
-                    pl.legend(loc="best")
-                    #pl.savefig(saveFolder+"baseline_corrected_data.png")
-                    pl.show()
-                    pl.close()
-
+                    # pl.title("Baseline corrected data")
+                    # pl.xlabel("Scandist [Deg]")
+                    # pl.ylabel("Ta [K]")
+                    # pl.plot(x,y)
+                    # pl.plot(x, yCorrected, 'k',label="baseline corrected data")
+                    # pl.plot(x[main_beam], yCorrected[main_beam])
+                    # pl.plot(x[baseLocsl], yCorrected[baseLocsl],".")
+                    # pl.plot(x[baseLocsr], yCorrected[baseLocsr],".")
+                    # #pl.plot(x,s)
+                    # pl.plot(x,np.zeros_like(x),'k')
+                    # #pl.grid()
+                    # pl.legend(loc="best")
+                    # #pl.savefig(saveFolder+"baseline_corrected_data.png")
+                    # pl.show()
+                    # pl.close()
+                    print('problem')
                     sys.exit()
                     
                     # peak shifted left
@@ -2105,25 +2105,32 @@ def fit_beam(x, y, p, fnbw, force, log, saveTag, fitTheoretical, autoFit=None):
 
                     
                     # sys.exit()
-                    plt.title("Plot of final peak fitted data")
-                    plt.xlabel("Scandist [Deg]")
-                    plt.ylabel("Ta [K]")
-                    plt.plot(x, yCorrected, "k", label="corrected data")
-                    #pl.plot(x[main_beam],yCorrected[main_beam])
-                    plt.plot(x[hmain_beamp], yCorrected[hmain_beamp])
-                    #pl.plot(x,fit)
-                    plt.plot(x[hmain_beamp],ypeak,"r",label="Ta[K] = %.3f +- %.3f" %(max(ypeak),err_peak))
-                    plt.plot(x,np.zeros(scanLen),"k")
-                    #pl.grid()
-                    plt.legend(loc="best")
-                    # try:
-                    #     plt.savefig(saveFolder+"peak_fit_data.png")
-                    # except:
-                    #     pass
-                    plt.show()
-                    plt.close()
-                    sys.exit()
-
+                    # plt.title("Plot of final peak fitted data")
+                    # plt.xlabel("Scandist [Deg]")
+                    # plt.ylabel("Ta [K]")
+                    # plt.plot(x, yCorrected, "k", label="corrected data")
+                    # #pl.plot(x[main_beam],yCorrected[main_beam])
+                    # plt.plot(x[hmain_beamp], yCorrected[hmain_beamp])
+                    # #pl.plot(x,fit)
+                    # plt.plot(x[hmain_beamp],ypeak,"r",label="Ta[K] = %.3f +- %.3f" %(max(ypeak),err_peak))
+                    # plt.plot(x,np.zeros(scanLen),"k")
+                    # #pl.grid()
+                    # plt.legend(loc="best")
+                    # # try:
+                    # #     plt.savefig(saveFolder+"peak_fit_data.png")
+                    # # except:
+                    # #     pass
+                    # plt.show()
+                    # plt.close()
+                    # sys.exit()
+                    # x={
+                    #     "peakFit":max(ypeak),"peakModel":ypeak, "peakRms":err_peak,"correctedData":yCorrected,"peakPts":hmain_beamp,
+                    #     "msg":"","driftRes":driftRes,"driftRms":driftRms,"driftCoeffs":driftCoeffs,"fitRes":fitRes,"midXValue":coeff[1],
+                    #     "flag":flag,"baseLocsLeft":baseLocsl,"baseLocsRight":baseLocsr,"baseLocsCombined":baseLocs,"peakLoc":peakLoc,
+                    #     "baseLeft":lb,"baseRight":rb,
+                    # }
+                    # print(x)
+                    # sys.exit()
                     return {
                         "peakFit":max(ypeak),"peakModel":ypeak, "peakRms":err_peak,"correctedData":yCorrected,"peakPts":hmain_beamp,
                         "msg":"","driftRes":driftRes,"driftRms":driftRms,"driftCoeffs":driftCoeffs,"fitRes":fitRes,"midXValue":coeff[1],

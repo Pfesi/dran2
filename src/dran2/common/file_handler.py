@@ -14,9 +14,9 @@ from pathlib import Path
 # Local imports
 # --------------------------------------------------------------------------- #
 sys.path.append("src/")
-import common.exceptions as ex
-from common.dialog_app import App
-from common.msgConfiguration import msg_wrapper
+from .exceptions import InvalidFileExtensionError
+from .dialog_app import App
+from .msgConfiguration import msg_wrapper
 # =========================================================================== #
 
 
@@ -162,8 +162,8 @@ class FileHandler:
         try:
             fileExt = self.get_file_extension()
             if fileExt != extension:
-                raise ex.InvalidFileExtensionError
-        except ex.InvalidFileExtensionError:
+                raise InvalidFileExtensionError
+        except InvalidFileExtensionError:
             msg_wrapper("error", self.log.error,
                         "{} has an invalid file extension. Program processes *.fits files\n ".format(self.fileName))
 

@@ -19,7 +19,7 @@ from matplotlib.ticker import MaxNLocator
 # Local imports
 # --------------------------------------------------------------------------- #
 sys.path.append("src/")
-from common.msgConfiguration import msg_wrapper
+from ..common.msgConfiguration import msg_wrapper
 # from common.miscellaneousFunctions import reset_list
 # =========================================================================== #
 

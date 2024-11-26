@@ -24,21 +24,23 @@ from datetime import datetime
 
 # Local Imports
 sys.path.append("src/")
-from common.msgConfiguration import msg_wrapper
-from common.observation import Observation
-from common.calibrate import calibrate,calc_pc_pss
-import common.fitting as fit
-from gui.main_window import Ui_MainWindow
-from gui.edit_driftscan_window1 import Ui_DriftscanWindow
-from gui.edit_timeseries_window import Ui_TimeSeriesWindow
-from gui.view_plots_window import Ui_PlotViewer
-from common.file_handler import FileHandler
-import common.calibrate as cp
-from gui.canvasManager import CanvasManager
-from gui.secondaryCanvasManager import SecondaryCanvasManager
-from gui.timeseries_canvas import TimeCanvas
-import common.fitting as fit
-import common.miscellaneousFunctions as misc
+from ..common.msgConfiguration import msg_wrapper
+from ..common.observation import Observation
+from ..common.calibrate import calibrate,calc_pc_pss
+from ..common import fitting as fit
+from ..common.file_handler import FileHandler
+from ..common import calibrate as cp
+from ..common import miscellaneousFunctions as misc
+
+from .main_window import Ui_MainWindow
+from .edit_driftscan_window1 import Ui_DriftscanWindow
+from .edit_timeseries_window import Ui_TimeSeriesWindow
+from .view_plots_window import Ui_PlotViewer
+from .canvasManager import CanvasManager
+from .secondaryCanvasManager import SecondaryCanvasManager
+from .timeseries_canvas import TimeCanvas
+# import ..common.fitting as fit
+
 # =========================================================================== #
 
 class Main(QtWidgets.QMainWindow, Ui_MainWindow):

@@ -13,10 +13,10 @@ from PyQt5 import QtWidgets
 
 # Local imports
 # --------------------------------------------------------------------------- #
-from common.msgConfiguration import msg_wrapper, load_prog
-from common.miscellaneousFunctions import delete_logs
-from common.logConfiguration import configure_logging
-from gui.mainGuiLogic import Main
+from .common.msgConfiguration import msg_wrapper, load_prog
+from .common.miscellaneousFunctions import delete_logs
+from .common.logConfiguration import configure_logging
+from .gui.mainGuiLogic import Main
 
 def run(args):
 

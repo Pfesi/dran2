@@ -17,14 +17,11 @@ import datetime
 
 # Module imports
 # --------------------------------------------------------------------------- #
-from dran2.config import VERSION, DBNAME
-# from . import common
-# sys.path.append("..")
-# try:
-from common.miscellaneousFunctions import process_file,fast_scandir, generate_quick_view, convert_database_to_table, delete_db, create_current_scan_directory, delete_logs
-from common.logConfiguration import configure_logging
-from common.msgConfiguration import msg_wrapper, load_prog
-from common.observation import Observation
+from .config import VERSION, DBNAME
+from .common.miscellaneousFunctions import process_file,fast_scandir, generate_quick_view, convert_database_to_table, delete_db, create_current_scan_directory, delete_logs
+from .common.logConfiguration import configure_logging
+from .common.msgConfiguration import msg_wrapper, load_prog
+from .common.observation import Observation
 
 
 # =========================================================================== #
