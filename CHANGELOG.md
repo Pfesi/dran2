@@ -1,6 +1,22 @@
 # CHANGELOG
 
 
+##### v1.4.3 (2024-11-25 14:57)
+- same
+
+
+##### v1.4.2 (2024-11-25 14:54)
+- same
+
+
+##### v1.4.1 (2024-11-25 14:52)
+- fixed bug - couldn't locate config file
+
+
+##### v1.3.2 (2024-11-25 14:49)
+- fixed bug - couldn't locate config file
+
+
 ##### v1.4.0 (2024-11-25 14:46)
 - Enabled GUI functionality
 

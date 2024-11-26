@@ -58,7 +58,10 @@ def main():
     Usage:
         dran-gui -h
     """
-    version=get_version()
+    try:    
+        version=get_version()
+    except:
+        version='1.0.0'
     parser = argparse.ArgumentParser(prog='DRAN-GUI', 
         description="Begin processing HartRAO drift scan data")
     parser.add_argument("-f", help="process file or folder at given path e.g.\
@@ -71,12 +74,12 @@ def main():
     args.func(args)
 
 def get_version():
+    # TODO: Need to fix this, it causes problems on astro1, code can't find the config file if the try block is removed.
     """ Get version from config file."""
-    with open('src/config.py', 'r') as f:
+    with open('config.py', 'r') as f:
         for line in f:
             if 'VERSION' in line:
                 return (line.split("=")[-1]).replace("'",'').replace("\n",'')
 
 if __name__ == "__main__":
-    main()
-    
+    main()  

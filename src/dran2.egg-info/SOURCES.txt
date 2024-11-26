@@ -5,7 +5,6 @@ pyproject.toml
 reqs.txt
 reqs2.txt
 src/__init__.py
-src/config.py
 src/__pycache__/__init__.cpython-310.pyc
 src/__pycache__/__init__.cpython-311.pyc
 src/__pycache__/__init__.cpython-312.pyc
