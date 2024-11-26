@@ -346,7 +346,6 @@ src/dran.egg-info/entry_points.txt
 src/dran.egg-info/requires.txt
 src/dran.egg-info/top_level.txt
 src/dran2/__init__.py
-src/dran2/_auto.py
 src/dran2/_cli.py
 src/dran2/_docs.py
 src/dran2/_gui.py

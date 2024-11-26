@@ -1,3 +1,3 @@
 [console_scripts]
-dran-auto = dran2._auto:main
+dran-auto = _auto:main
 dran-gui = dran2._gui:main

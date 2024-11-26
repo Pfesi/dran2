@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+##### v1.4.5 (2024-11-26 08:43)
+- same
+
+
+##### v1.4.4 (2024-11-26 08:42)
+- moved _auto.py to src to fix moduleNotFound error
+
+
 ##### v1.4.3 (2024-11-25 14:57)
 - same
 

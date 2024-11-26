@@ -191,18 +191,22 @@ class DataProcessingFlowManager:
                     # sys.exit()
                     ret = fit_beam(self.xCleaned, self.yCleaned, p0, self.FNBW, self.force, self.log, saveTag, self.theoFit['value'], self.autoFit['value'])
 
-                    # print(len(ret['correctedData'])>1)
-                    print(ret.keys())
+                    vals=[float(item) for item in ret['peakModel']]
+                    # print(vals,len(vals),min(vals))
+                    # print(len(ret['correctedData'])>1, vals,ret['peakRms'] > 1.)
+                    # # print(ret.keys())
                     # sys.exit()
+                    
+                    # print(vals)
                     if len(ret['correctedData'])>1:
-                        if max(ret['peakModel']) < 0:
+                        if max(vals) < 0:
                             # self.flag=12
                             ret['flag']=12
                             saveTo=f'{plotSavePath}/{self.plotName}_{self.srcTag}{ext}'
                             plot_no_fit(self.x, self.y, "Plot of fitting error: Peak max < 0","", saveTo, 'Peak max < 0', xlabel="", ylabel="")
                             # ret['s2n']=np.nan
                             # print(ret)
-                            sys.exit()
+                            # sys.exit()
 
                         elif ret['peakRms'] > 1.:
                             # self.flag=13

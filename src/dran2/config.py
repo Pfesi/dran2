@@ -3,7 +3,7 @@
 
 # App configuration
 APPNAME = 'DRAN2'
-VERSION ='1.4.3'
+VERSION ='1.4.5'
 
 # Logging configuration
 LOGFILE = "logfile.txt"

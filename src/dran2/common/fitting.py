@@ -1953,6 +1953,7 @@ def fit_beam(x, y, p, fnbw, force, log, saveTag, fitTheoretical, autoFit=None):
             hmain_beamp = np.where(yMainBeam[hmain_beamn] >= 0.5*maxp)[0]
             flag = 9
             msg_wrapper("warning", log.warning, "large sidelobes detected")
+            
         else:
             hmain_beamp = np.where(yMainBeam[hmain_beamn] >= 0.7*maxp)[0]
             flag = 0
@@ -2020,6 +2021,7 @@ def fit_beam(x, y, p, fnbw, force, log, saveTag, fitTheoretical, autoFit=None):
         msg=f'Test fit makes sense - left: {ypeak[0]:.3f}, center: {max(ypeak):.3f}, right: {ypeak[-1]:.3f}'
         msg_wrapper("debug", log.debug, msg)
         # print(max(ypeak),ypeak[0],ypeak[-1])
+        # print(max(ypeak) == ypeak[0] , max(ypeak) == ypeak[-1])
         if max(ypeak) == ypeak[0] or max(ypeak) == ypeak[-1]:
 
             # peak is concave, try fitting wider range
@@ -2027,6 +2029,7 @@ def fit_beam(x, y, p, fnbw, force, log, saveTag, fitTheoretical, autoFit=None):
             hmain_beam = hmain_beamp + hmain_beamn[0]+main_beam[0]
             ypeak = np.polyval(np.polyfit(x[hmain_beam],
                                         yCorrected[hmain_beam],  2), x[hmain_beam])
+
 
             if (max(ypeak) == ypeak[0]) or (max(ypeak) == ypeak[-1]):
                 # still struggling to fit ?, try this then stop fitting
@@ -2101,25 +2104,25 @@ def fit_beam(x, y, p, fnbw, force, log, saveTag, fitTheoretical, autoFit=None):
                     flag = 37
 
                     
-                    sys.exit()
-                    pl.title("Plot of final peak fitted data")
-                    pl.xlabel("Scandist [Deg]")
-                    pl.ylabel("Ta [K]")
-                    pl.plot(x, yCorrected, "k", label="corrected data")
+                    # sys.exit()
+                    plt.title("Plot of final peak fitted data")
+                    plt.xlabel("Scandist [Deg]")
+                    plt.ylabel("Ta [K]")
+                    plt.plot(x, yCorrected, "k", label="corrected data")
                     #pl.plot(x[main_beam],yCorrected[main_beam])
-                    pl.plot(x[hmain_beamp], yCorrected[hmain_beamp])
+                    plt.plot(x[hmain_beamp], yCorrected[hmain_beamp])
                     #pl.plot(x,fit)
-                    pl.plot(x[hmain_beamp],ypeak,"r",label="Ta[K] = %.3f +- %.3f" %(max(ypeak),err_peak))
-                    pl.plot(x,np.zeros(scanLen),"k")
+                    plt.plot(x[hmain_beamp],ypeak,"r",label="Ta[K] = %.3f +- %.3f" %(max(ypeak),err_peak))
+                    plt.plot(x,np.zeros(scanLen),"k")
                     #pl.grid()
-                    pl.legend(loc="best")
-                    try:
-                        pl.savefig(saveFolder+"peak_fit_data.png")
-                    except:
-                        pass
-                    #pl.show()
-                    pl.close()
-                    #sys.exit()
+                    plt.legend(loc="best")
+                    # try:
+                    #     plt.savefig(saveFolder+"peak_fit_data.png")
+                    # except:
+                    #     pass
+                    plt.show()
+                    plt.close()
+                    sys.exit()
 
                     return {
                         "peakFit":max(ypeak),"peakModel":ypeak, "peakRms":err_peak,"correctedData":yCorrected,"peakPts":hmain_beamp,

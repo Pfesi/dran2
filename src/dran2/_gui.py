@@ -18,7 +18,6 @@ from common.miscellaneousFunctions import delete_logs
 from common.logConfiguration import configure_logging
 from gui.mainGuiLogic import Main
 
-
 def run(args):
 
     # initiate and configure logging
