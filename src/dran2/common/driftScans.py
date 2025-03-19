@@ -1070,4 +1070,3 @@ class DriftScans(DriftScanAttributes):
         else:
             print(f"Unknown source frontend value : {self.__dict__[frontend]['value']}. Contact author to have it included.")
             sys.exit()
-

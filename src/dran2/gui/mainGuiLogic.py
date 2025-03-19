@@ -7,10 +7,14 @@
 import sys
 import os
 from datetime import datetime
+from sqlalchemy import create_engine
 
 # Third-Party Library Imports
 import numpy as np
 import pandas as pd
+# pd.options.mode.copy_on_write = True  # https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+pd.set_option("mode.copy_on_write", True)
+
 import matplotlib.pyplot as pl
 from matplotlib.backends.backend_qtagg import (FigureCanvasQTAgg as FigureCanvas, 
  NavigationToolbar2QT as NavigationToolbar)
@@ -24,13 +28,13 @@ from datetime import datetime
 
 # Local Imports
 sys.path.append("src/")
-from ..common.msgConfiguration import msg_wrapper
-from ..common.observation import Observation
-from ..common.calibrate import calibrate,calc_pc_pss
-from ..common import fitting as fit
-from ..common.file_handler import FileHandler
-from ..common import calibrate as cp
-from ..common import miscellaneousFunctions as misc
+from common.msgConfiguration import msg_wrapper
+# from common.observation import Observation
+from common.calibrate import calibrate,calc_pc_pss
+from common import fitting as fit
+from common.file_handler import FileHandler
+# from common.calibrate import calc_ta_and_ferrs, calc_pss_and_ferrs_db
+from common import miscellaneousFunctions as misc
 
 from .main_window import Ui_MainWindow
 from .edit_driftscan_window1 import Ui_DriftscanWindow
@@ -151,12 +155,13 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
         # Configure UI elements for timeseries editing
         self.time_ui.BtnResetPoint.setVisible(False)
         self.time_ui.BtnFit.setVisible(True)
-        self.time_ui.BtnQuit.setVisible(False)#.setText("Update db")  # Consider a more descriptive verb
+        self.time_ui.BtnQuit.setVisible(False) #.setText("Update db")  # Consider a more descriptive verb
         self.time_ui.EdtSplKnots.setVisible(False)
         self.time_ui.LblSplKnots.setVisible(False)
         self.time_ui.BtnUpdateDB.setVisible(False)
         self.time_ui.BtnOpenDB.clicked.connect(self.open_db)
         self.time_ui.comboBoxColsYerr.setVisible(True)
+
         # Hide x-axis limits and y-axis limits for timeseries (optional)
         self.time_ui.Lblxlim.setVisible(False)
         self.time_ui.Lblylim.setVisible(False)
@@ -177,7 +182,9 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
         # Connect combo box selection changes
         self.time_ui.comboBoxTables.currentIndexChanged.connect(self.on_table_name_changed)
         self.time_ui.comboBoxFitTypes.currentIndexChanged.connect(self.on_fit_changed)
-
+        
+        # self.time_ui.BtnDelBoth.clicked.connect(self.delete_obs)
+        # self.plot_ui.btnDelete.clicked.connect(self.delete_obs)
         # Show the window
         self.time_window.show()
 
@@ -239,7 +246,7 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
         else:
             return timeCol.split(' ')[0]
 
-    def create_df_from_db(self):
+    def create_df_from_db(self,table=''):
         """
         Creates a pandas DataFrame from a specified table in the database.
 
@@ -252,15 +259,22 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
 
         print('\n***** Running create_df_from_db\n')
 
+
         cnx = sqlite3.connect(self.dbFile)
-        self.df = pd.read_sql_query(f"SELECT * FROM {self.tables[0]}", cnx)
+        # print(self.tables)
+        # sys.exit()
+
+        if table:
+            self.df = pd.read_sql_query(f"SELECT * FROM {table}", cnx)
+        else:
+            self.df = pd.read_sql_query(f"SELECT * FROM {self.tables[0]}", cnx)
+            
         self.df.sort_values('FILENAME',inplace=True)
         self.df['OBSDATE'] = self.df.apply(lambda row: self.parse_time(row['OBSDATE']), axis=1)
         self.df["OBSDATE"] = pd.to_datetime(self.df["OBSDATE"], format="%Y-%m-%d")    
 
         # Correct all errors, ensure errors are positive, i.e. err > 0
         # ---------------------------------------------------------------
-
         errCols=[col for col in (self.df.columns) if 'ERR' in col]
         for col in errCols:
             self.df[col] = self.df.apply(lambda row: self.make_positive(row[col]), axis=1)
@@ -272,8 +286,10 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
 
         print('\n***** Running open_db\n')
         # Get the database file path
-        self.dbFile='/Users/pfesesanivanzyl/dran/resultsFromAnalysis/JUPITER/JUPITER.db'
-        # self.dbFile = self.open_file_name_dialog("*.db")
+        # self.dbFile='/Users/pfesesanivanzyl/dran/HART26DATA.db'#resultsFromAnalysis/JUPITER/JUPITER.db'
+        self.dbFile = self.open_file_name_dialog("*.db")
+        # self.dbFile='/Users/pfesesanivanzyl/dran-analysis/resultsFromAnalysis/3C48/3C48.db'#resultsFromAnalysis/JUPITER/JUPITER.db'
+        
 
         if not self.dbFile:
             print("No file selected")
@@ -287,20 +303,24 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.time_ui.EdtDB.setText(self.dbFile)
         self.time_ui.EdtDB.setEnabled(True)
-
+        
         msg_wrapper("debug", self.log.debug, f"\nOpening database: {self.dbFile}")
         cnx = sqlite3.connect(self.dbFile)
         try:
             # Create your connection and read data from database.
             cnx = sqlite3.connect(self.dbFile)
             dbTableList=pd.read_sql_query("SELECT name FROM sqlite_schema WHERE type='table'", cnx)
-            self.tables = dbTableList['name'].tolist()
+            self.tables = sorted(dbTableList['name'].tolist())
             self.table=self.tables[0]
             self.df = pd.read_sql_query(f"SELECT * FROM {self.table}", cnx)
             self.orig_df=self.df.copy()
             cnx.close()
 
+            self.tables=[c for c in self.tables if 'sqlite' not in c]
             print(f"Working with Tables: {self.tables}")
+            self.time_ui.comboBoxTables.clear()
+            self.time_ui.comboBoxTables.clear()
+            self.time_ui.comboBoxTables.addItems(self.tables)
             
         except Exception as e:
             # Handle exceptions gracefully
@@ -311,9 +331,10 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
             self.time_ui.EdtDB.setEnabled(False)
             sys.exit()
 
-        finally:
-            msg_wrapper("debug", self.log.debug, f"Closing database: {self.dbFile}")
+        # finally:
+        #     msg_wrapper("debug", self.log.debug, f"Closing database: {self.dbFile}")
 
+        # sys.exit()
         # make floats
         colList = list(self.df.columns)
         floatList = [col for col in colList if 'FILE' not in col and 'FRONT' not in col and 'OBJ' not in col \
@@ -347,7 +368,76 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
         """ update combobox when table name changes. """
 
         print('\n***** Running on_table_name_changed\n')
-        self.populate_cols()
+        table=self.time_ui.comboBoxTables.currentText()
+        self.create_df_from_db(table)
+
+        self.colNames = self.df.columns.tolist()
+        
+        # setup error columns
+        errcols=[]
+        for name in self.colNames:
+            if   'ERR' in name:
+                errcols.append(name)
+            else:
+                pass
+
+        yerr=['None']
+        self.yErr=list(yerr)+list(errcols)
+
+        # setup X and Y columns
+        xCols=['OBSDATE','MJD','HA','ELEVATION']
+        xCols=xCols+[c for c in self.colNames if 'RMS' in c or 'SLOPE' in c]
+
+
+        # xcol=self.time_ui.comboBoxColsX.currentText()
+        # ycol=self.time_ui.comboBoxColsY.currentText()
+        
+        print(f'Getting data from table: {table}')
+
+        # get column names from db and put them in combobox
+        colNames=self.df.columns.tolist()
+
+        plotCols=[]
+
+        for name in colNames:
+            if 'id' in name  or 'LOGFREQ' in name or 'CURDATETIME' in name or \
+                'FILE' in name or 'OBSD' in name \
+                    or 'MJD' in name or 'OBS' in name or 'OBJ' in name or 'id' == name \
+                        or 'RAD' in name or 'TYPE' in name or 'PRO' in name or 'TELE' in\
+                              name or 'UPGR' in name  or 'INST' in name or \
+                                'SCANDIR' in name or 'SRC' in name or 'COORDSYS' in name or 'LONGITUD' in name \
+                                    or 'LATITUDE' in name  or 'POINTING' in name \
+                                       or 'DICHROIC' in name \
+                                            or 'PHASECAL' in name or 'HPBW' in name or 'FNBW' in name or 'SNBW' in name\
+                                                or 'FRONTEND' in name or 'BASE' in name: 
+                pass
+            else:
+                plotCols.append(name)
+
+        # print(colNames)
+
+        # print(plotCols)
+
+        # prep columns
+        # print('cols: ',xcol,ycol,yerrcol)
+        self.time_ui.comboBoxColsX.clear()
+        self.time_ui.comboBoxColsX.clear()
+        # if xcol!='':
+        #     self.time_ui.comboBoxColsX.setCurrentText(xcol)
+        # else:
+        self.time_ui.comboBoxColsX.addItems(xCols)
+        self.time_ui.comboBoxColsY.clear()
+        self.time_ui.comboBoxColsY.clear()
+
+        self.time_ui.comboBoxColsY.addItems(plotCols)
+       
+        self.time_ui.comboBoxColsYerr.clear()
+        self.time_ui.comboBoxColsYerr.clear()
+
+        self.time_ui.comboBoxColsYerr.addItems(self.yErr)
+
+        self.plot_cols(xcol=xCols[0], ycol=plotCols[0] ,yerr="")
+        # self.populate_cols(xcol=xcol,ycol=ycol,table=table)
 
     def on_fit_changed(self):
         """  Toggle labels and edit boxes on or off when fit type is changed."""
@@ -473,20 +563,18 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
             print("Please select a table")
             self.time_ui.comboBoxTables.clear()
             self.time_ui.comboBoxTables.clear()
-
             self.time_ui.comboBoxTables.addItems(self.tables)
 
         # tableCols = self.df.columns.tolist()
 
         # Get column names from UI or default values
-        print('ycol :',ycol)
+        # print('ycol :',ycol)
         xcol = xcol if xcol else self.time_ui.comboBoxColsX.currentText()
         ycol = ycol if ycol else self.time_ui.comboBoxColsY.currentText()
         yerr = yerr if yerr else self.time_ui.comboBoxColsYerr.currentText()
-        print('ycol :',ycol)
+        # print('ycol :',ycol)
 
-        print(f"Plotting {xcol} vs {ycol} in table {self.table}")
-
+        print(f"\nPlotting {xcol} vs {ycol} in table {self.table}")
 
         try:
             self.df[xcol]=self.df[xcol].astype(float)
@@ -496,14 +584,15 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
         if xcol!='OBSDATE':
             self.df[xcol].fillna(value=0, inplace=True)
             self.df[xcol]=self.df[xcol].replace(np.nan, 0.0)
-
         try:
             self.df[ycol]=self.df[ycol].astype(float)
         except:
             pass
 
-        
-        self.df[ycol].fillna(value=0, inplace=True)
+        # 'df.method({col: value}, inplace=True)' or df[col] = df[col].method(value)
+        # self.df[ycol].fillna(value=0, inplace=True)
+
+        self.df.fillna({ycol:0}, inplace=True)
         self.df[ycol]=self.df[ycol].replace(np.nan, 0.0)
 
         # sometimes xx-axis is obsdate so need to account for that
@@ -517,6 +606,7 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
         yvalues=yvalues.replace(0,np.nan)
 
         isNotNone = str(yerr)=='None'
+        # print(isNotNone)
 
         if isNotNone == False: 
             self.df[yerr] = self.df.apply(lambda row: self.make_positive(row[yerr]), axis=1)
@@ -527,6 +617,7 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
             self.canvas.plot_fig(xvalues, yvalues, xcol, ycol, data=self.df, yerr=yerrvalues)
         else:
             self.canvas.plot_fig(xvalues, yvalues, xcol, ycol, data=self.df)
+            # print('what')
 
     def filter_timeseries_data(self):
         """Filter the timeseries data based on user selection."""
@@ -663,6 +754,7 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
         """
 
         print('\n***** Running update_point\n')
+
         # Get selected point and data
         fit_points = self.canvas.fit_points
         click_index = self.canvas.click_index
@@ -671,88 +763,36 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
             print("No point selected.")
             return
 
-        i = int(click_index[0])  # Point index to delete
-
-        df=self.df.iloc[i]
-
-        # Get data from DataFrame
-        x_col = self.canvas.xlab
-        y_col = self.canvas.ylab
-        
-        xp = self.df[x_col]
-        yp = self.df[y_col]
+        pos = int(click_index[0])  # Point index to delete
+        df_row = self.df.iloc[pos]
 
         # Print confirmation message
-        print(f'\nDeleting points from row: {i}')
-        print(f'Object: {df["OBJECT"]}')
-        print(f'Date: {df["OBSDATE"].date()}\n')
-        print(f'Frequency: {df["CENTFREQ"]}\n')
-        print(f"- x: {fit_points[0][0]}\n"
-            f"- y: {fit_points[0][1]}\n"
+        print(f'\nDeleting points from row: {pos}')
+        print(f'Object: {df_row["OBJECT"]}')
+        print(f'Date: {df_row["OBSDATE"].date()}')
+        print(f'Frequency: {df_row["CENTFREQ"]}\n')
+        print(f"- (x: {fit_points[0][0]})\n"
+            f"- (y: {fit_points[0][1]})\n"
             )
-
-        freq=int(df['CENTFREQ'])
-        srcname=df['OBJECT']
-
-
+        
         # Update value in DataFrame
-        try:
-            self.df.at[i, y_col] = np.nan
-        except ValueError:
-            self.df.at[i, y_col] = 0.0
-            print(f"Warning: Setting {y_col} to 0.0 instead of NaN")
+        ycol=self.canvas.ylab
+        self.df.at[pos, ycol] = np.nan  # Example update, change as needed
 
-        # sanity check
-        cols=self.df.columns.tolist()
+        # print(self.df['MJD'].to_list())
+        # print(self.df[self.df['MJD']<=2])
 
-        for c in cols:
-            if c.endswith('_'):
-                self.df.drop(c, axis=1, inplace=True)
+        # Clear the plot and re-plot the updated data
+        self.canvas.clear_figure()
+        self.plot_cols(self.canvas.xlab, self.canvas.ylab)
 
-        for c in cols:
-            for n in range(4):
-                if f'_{n}' in c:
-                    # print(c)
-                    self.df.drop(c, axis=1, inplace=True)
+        # update db
+        print(f'\nUpdating table "{self.table}" in database "{self.dbFile}"\n')
+        # print()
+        cnx = sqlite3.connect(self.dbFile)
+        self.df.to_sql(self.table,cnx,if_exists='replace',index=False)
+        cnx.close()
 
-        if freq>22000:
-            POS=['S','N','O']#,'CO']
-            BEAMS=['']
-            POLS=['L','R']
-
-            ta=[]
-            for b in BEAMS:
-                for l in POLS:
-                    for s in POS:
-                        # print(f'{b}{s}{l}TA',f'{b}{s}{l}TAERR')
-                        ta.append(f'{b}{s}{l}TA')
-                        ta.append(f'{b}{s}{l}TAERR')
-                        self.df[f'{b}{s}{l}TAFERR'] = self.df[f'{b}{s}{l}TAERR']/self.df[f'{b}{s}{l}TA'].astype(float) 
-                    print()
-
-                    print(ta,'\n')
-                    print(srcname)
-                    if 'JUPITER' in srcname.upper():
-                        self.df[f'CORR_{b}{s}{l}DATA'] = self.df.apply(lambda row: calc_pc_pss(row[ta[0]], row[ta[1]],row[ta[2]], row[ta[3]],row[ta[4]], row[ta[5]], row['TOTAL_PLANET_FLUX_D'],df), axis=1)
-                        # print(f'{b}{s}{l}PSS', f'{b}{s}{l}PSSERR',f'{b}{s}{l}PC',f'C{b}{s}{l}TA',f'C{b}{s}{l}TAERR',f'{b}{s}{l}PPEFF')
-                        self.df[[f'{b}{s}{l}PSS', f'{b}{s}{l}PSSERR',f'{b}{s}{l}PC',f'C{b}{s}{l}TA',f'C{b}{s}{l}TAERR',f'{b}{s}{l}APPEFF']] = pd.DataFrame(self.df[f'CORR_{b}{s}{l}DATA'].tolist(), index=self.df.index)
-    
-                        self.df[f'{b}{s}{l}PSS'] = self.df[f'{b}{s}{l}PSS'].replace(0, np.nan)
-                        self.df.drop(f'CORR_{b}{s}{l}DATA', axis=1, inplace=True)
-                        # self.df[[f'{b}{s}{l}PC',f'C{b}{s}{l}TA',f'C{b}{s}{l}TAERR']] = pd.DataFrame(self.df[f'CORR_{b}{s}{l}DATA'].tolist(), index=self.df.index)
-                    else:
-                        self.df[f'CORR_{b}{s}{l}DATA'] = self.df.apply(lambda row: calibrate(row[ta[0]], row[ta[1]],row[ta[2]], row[ta[3]],row[ta[4]], row[ta[5]], df), axis=1)
-                        # print(f'{b}{s}{l}PC',f'C{b}{s}{l}TA',f'C{b}{s}{l}TAERR')
-                        self.df[[f'{b}{s}{l}PC',f'C{b}{s}{l}TA',f'C{b}{s}{l}TAERR']] = pd.DataFrame(self.df[f'CORR_{b}{s}{l}DATA'].tolist(), index=self.df.index)
-                        self.df.drop(f'CORR_{b}{s}{l}DATA', axis=1, inplace=True)
-                    ta=[]
-
-                    # sys.exit()
-                    cnx = sqlite3.connect(self.dbFile)
-                    self.df.to_sql(self.table,cnx,if_exists='replace',index=False)
-                    cnx.close()
-
-            self.plot_cols(x_col,y_col)
 
     def set_to_zero(self,on,val):
         """set value to zero based on value from another column. 
@@ -787,109 +827,352 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
             return
 
         # Extract data from DataFrame
-        i = int(click_index[0]) # Point index to delete
-
-        df=self.df.iloc[i]
-
-        # Get data from DataFrame
-        x_col = self.canvas.xlab
-        y_col = self.canvas.ylab
-
-        xp = self.df[x_col]
-        yp = self.df[y_col]
+        pos = int(click_index[0])  # Point index to delete
+        df_row = self.df.iloc[pos]
 
         # Print confirmation message
-        print(f'\nDeleting points from row: {i}')
-        print(f'Object: {df["OBJECT"]}')
-        print(f'Date: {df["OBSDATE"].date()}\n')
-        print(f'Frequency: {df["CENTFREQ"]}\n')
-        print(f"- x: {fit_points[0][0]}\n"
-            f"- y: {fit_points[0][1]}\n"
+        print(f'\nDeleting points from row: {pos}')
+        print(f'Object: {df_row["OBJECT"]}')
+        print(f'Date: {df_row["OBSDATE"].date()}')
+        print(f'Frequency: {df_row["CENTFREQ"]}\n')
+        print(f"- (x: {fit_points[0][0]})\n"
+            f"- (y: {fit_points[0][1]})\n"
             )
 
-        freq=int(df['CENTFREQ'])
-        srcname=df['OBJECT']
+        #Deleting points from row: 4
+        # Object: 3C48
+        # Date: 2025-02-16
+        # Frequency: 2270.0
 
-        # sanity check
-        cols=self.df.columns.tolist()
-        for c in cols:
-            if c.endswith('_'):
-                self.df.drop(c, axis=1, inplace=True)
+        # - (x: 2025-02-16T00:00:00.000000000)
+        # - (y: 5.0)
 
-        for c in cols:
-            for n in range(4):
-                if f'_{n}' in c:
-                    # print(c)
-                    self.df.drop(c, axis=1, inplace=True)
+        # 2270 3C48
 
-        if freq>22000:
-            POS=['S','N','O']
-            BEAMS=['']
-            POLS=['L','R']
+        freq=int(df_row['CENTFREQ'])
+        srcname=df_row['OBJECT']
+        beam=df_row['FRONTEND']
 
+        print(freq,srcname,beam)
+        print([c for c in self.df.columns])
+        # sys.exit()
+
+        POLS=['L','R'] # POLARIZATION
+
+        if beam == '13.0S':
+            #['id', 'FILENAME', 'FILEPATH', 'CURDATETIME', 'MJD', 'OBSDATE',
+    #    'OBSTIME', 'OBSDATETIME', 'FRONTEND', 'HDULENGTH', 'OBJECT', 'SRC',
+    #    'OBSERVER', 'OBSLOCAL', 'OBSNAME', 'PROJNAME', 'PROPOSAL', 'TELESCOP',
+    #    'UPGRADE', 'CENTFREQ', 'BANDWDTH', 'LOGFREQ', 'BEAMTYPE', 'HPBW',
+    #    'FNBW', 'SNBW', 'FEEDTYPE', 'LONGITUD', 'LATITUDE', 'COORDSYS',
+    #    'EQUINOX', 'RADECSYS', 'FOCUS', 'TILT', 'TAMBIENT', 'PRESSURE',
+    #    'HUMIDITY', 'WINDSPD', 'SCANDIR', 'POINTING', 'BMOFFHA', 'BMOFFDEC',
+    #    'DICHROIC', 'PHASECAL', 'NOMTSYS', 'SCANDIST', 'SCANTIME', 'INSTRUME',
+    #    'INSTFLAG', 'HZPERK1', 'HZKERR1', 'HZPERK2', 'HZKERR2', 'TCAL1',
+    #    'TCAL2', 'TSYS1', 'TSYSERR1', 'TSYS2', 'TSYSERR2', 'ELEVATION', 'ZA',
+    #    'HA', 'ATMOSABS', 'PWV', 'SVP', 'AVP', 'DPT', 'WVD', 'OLTA', 'OLTAERR',
+    #    'OLMIDOFFSET', 'OLS2N', 'OLFLAG', 'OLBRMS', 'OLSLOPE', 'OLBASELEFT',
+    #    'OLBASERIGHT', 'OLRMSB', 'OLRMSA', 'ORTA', 'ORTAERR', 'ORMIDOFFSET',
+    #    'ORS2N', 'ORFLAG', 'ORBRMS', 'ORSLOPE', 'ORBASELEFT', 'ORBASERIGHT',
+    #    'ORRMSB', 'ORRMSA', 'time', 'FLUX', 'OLPSS', 'OLPSSERR', 'OLAPPEFF',
+    #    'ORPSS', 'ORPSSERR', 'ORAPPEFF']
             ta=[]
             del_ta=[]
-            for b in BEAMS:
-                for l in POLS:
-                    for s in POS:
-                        ta.append(f'{b}{s}{l}TA')
-                        ta.append(f'{b}{s}{l}TAERR')
 
-                        del_ta.append(f'{b}{s}{l}TA')
-                        del_ta.append(f'{b}{s}{l}TAERR')
+            POSITION=['O']
+            
+            for l in POLS:
+                for p in POSITION:
+                    print(f'{p}{l}')
+                    ta.append(f'{p}{l}TA')
+                    ta.append(f'{p}{l}TAERR')
 
-                        del_ta.append(f'{b}{s}{l}S2N')
-                        del_ta.append(f'{b}{s}{l}FLAG')
-                        del_ta.append(f'{b}{s}{l}BRMS')
-                        del_ta.append(f'{b}{s}{l}SLOPE')
-                        del_ta.append(f'{b}{s}{l}BASELEFT')
-                        del_ta.append(f'{b}{s}{l}BASERIGHT')
-                        del_ta.append(f'{b}{s}{l}RMSB')
-                        del_ta.append(f'{b}{s}{l}RMSA')
+                    del_ta.append(f'{p}{l}TA')
+                    del_ta.append(f'{p}{l}TAERR')
+                    del_ta.append(f'{p}{l}S2N')
+                    del_ta.append(f'{p}{l}FLAG')
+                    del_ta.append(f'{p}{l}BRMS')
+                    del_ta.append(f'{p}{l}SLOPE')
+                    del_ta.append(f'{p}{l}BASELEFT')
+                    del_ta.append(f'{p}{l}BASERIGHT')
+                    del_ta.append(f'{p}{l}MIDOFFSET')
+                    del_ta.append(f'{p}{l}RMSB')
+                    del_ta.append(f'{p}{l}RMSA')    
 
-                        if s=='O':
-                            del_ta.append(f'{b}{s}{l}PSS')
-                            del_ta.append(f'{b}{s}{l}PSSERR')
-                            del_ta.append(f'{b}{s}{l}PC')
-                            del_ta.append(f'C{b}{s}{l}TA')
-                            del_ta.append(f'C{b}{s}{l}TAERR')
-                            del_ta.append(f'{b}{s}{l}APPEFF')
-                        
-                        print(f'{b}{s}{l}FERR')
-                        self.df[f'{b}{s}{l}TAFERR'] = self.df[f'{b}{s}{l}TAERR'].astype(float)/self.df[f'{b}{s}{l}TA'].astype(float) 
+                    if p=='O':
+                        del_ta.append(f'{p}{l}PSS')
+                        del_ta.append(f'{p}{l}PSSERR')
+                        del_ta.append(f'{p}{l}APPEFF')
 
-                    print()
+                for c in del_ta:
+                    try:
+                        self.df.at[pos, c] = np.nan
+                    except ValueError:
+                        self.df.at[pos, c] = 0.0
+                        print(f"Warning: Setting df[{c}] to 0.0 instead of NaN")
+
+            # for c in del_ta:
+            #     if 'PSS' in c:
+
+            # print(ta,'\n') 
+                print(del_ta,'\n') 
+                del_ta=[]
+                ta=[]
+
+            # sys.exit()
+            print(f'\nUpdating table "{self.table}" in database "{self.dbFile}"\n')
+
+            cnx = sqlite3.connect(self.dbFile)
+            self.df.to_sql(self.table,cnx,if_exists='replace',index=False)
+            cnx.close()
+            pass
+
+        elif beam == '01.3S' or beam == '02.5S':
+            #['id', 'FILENAME', 'FILEPATH', 'CURDATETIME', 'MJD', 'OBSDATE', 'OBSTIME', 
+            # 'OBSDATETIME', 'FRONTEND', 'HDULENGTH', 'OBJECT', 'SRC', 'OBSERVER', 
+            # 'OBSLOCAL', 'OBSNAME', 'PROJNAME', 'PROPOSAL', 'TELESCOP', 'UPGRADE', 
+            # 'CENTFREQ', 'BANDWDTH', 'LOGFREQ', 'BEAMTYPE', 'HPBW', 'FNBW', 'SNBW', 
+            # 'FEEDTYPE', 'LONGITUD', 'LATITUDE', 'COORDSYS', 'EQUINOX', 'RADECSYS', 
+            # 'FOCUS', 'TILT', 'TAMBIENT', 'PRESSURE', 'HUMIDITY', 'WINDSPD', 'SCANDIR', 
+            # 'POINTING', 'BMOFFHA', 'BMOFFDEC', 'HABMSEP', 'DICHROIC', 'PHASECAL', 'NOMTSYS', 
+            # 'SCANDIST', 'SCANTIME', 'INSTRUME', 'INSTFLAG', 'HZPERK1', 'HZKERR1', 'HZPERK2', 
+            # 'HZKERR2', 'TCAL1', 'TCAL2', 'TSYS1', 'TSYSERR1', 'TSYS2', 'TSYSERR2', 'ELEVATION', 
+            # 'ZA', 'HA', 'PWV', 'SVP', 'AVP', 'DPT', 'WVD', 'HPBW_ARCSEC', 'ADOPTED_PLANET_TB', 
+            # 'PLANET_ANG_DIAM', 'JUPITER_DIST_AU', 'SYNCH_FLUX_DENSITY', 'PLANET_ANG_EQ_RAD', 
+            # 'PLANET_SOLID_ANG', 'THERMAL_PLANET_FLUX_D', 'TOTAL_PLANET_FLUX_D', 'TOTAL_PLANET_FLUX_D_WMAP', 
+            # 'SIZE_FACTOR_IN_BEAM', 'SIZE_CORRECTION_FACTOR', 'MEASURED_TCAL1', 'MEASURED_TCAL2', 
+            # 'MEAS_TCAL1_CORR_FACTOR', 'MEAS_TCAL2_CORR_FACTOR', 'ATMOS_ABSORPTION_CORR', 'ZA_RAD', 
+            # 'TAU221', 'TAU2223', 'TBATMOS221', 'TBATMOS2223', 'NLTA', 'NLTAERR', 'NLMIDOFFSET', 'NLS2N', 
+            # 'NLFLAG', 'NLBRMS', 'NLSLOPE', 'NLBASELEFT', 'NLBASERIGHT', 'NLRMSB', 'NLRMSA', 'SLTA', 
+            # 'SLTAERR', 'SLMIDOFFSET', 'SLS2N', 'SLFLAG', 'SLBRMS', 'SLSLOPE', 'SLBASELEFT', 'SLBASERIGHT', 
+            # 'SLRMSB', 'SLRMSA', 'OLTA', 'OLTAERR', 'OLMIDOFFSET', 'OLS2N', 'OLFLAG', 'OLBRMS', 'OLSLOPE', 
+            # 'OLBASELEFT', 'OLBASERIGHT', 'OLRMSB', 'OLRMSA', 'OLPC', 'COLTA', 'COLTAERR', 'NRTA', 'NRTAERR', 
+            # 'NRMIDOFFSET', 'NRS2N', 'NRFLAG', 'NRBRMS', 'NRSLOPE', 'NRBASELEFT', 'NRBASERIGHT', 'NRRMSB', 
+            # 'NRRMSA', 'SRTA', 'SRTAERR', 'SRMIDOFFSET', 'SRS2N', 'SRFLAG', 'SRBRMS', 'SRSLOPE', 'SRBASELEFT', 
+            # 'SRBASERIGHT', 'SRRMSB', 'SRRMSA', 'ORTA', 'ORTAERR', 'ORMIDOFFSET', 'ORS2N', 'ORFLAG', 'ORBRMS', 
+            # 'ORSLOPE', 'ORBASELEFT', 'ORBASERIGHT', 'ORRMSB', 'ORRMSA', 'ORPC', 'CORTA', 'CORTAERR', 'SLTAFERR', 
+            # 'NLTAFERR', 'OLTAFERR', 'OLPSS', 'OLPSSERR', 'OLAPPEFF', 'SRTAFERR', 'NRTAFERR', 'ORTAFERR', 'ORPSS',
+            #  'ORPSSERR', 'ORAPPEFF', 'time', 'OLPSSFERR', 'ORPSSFERR', 'TSYS1FERR', 'TSYS2FERR', 'OLPCs', 
+            # 'COLTAs', 'COLTAERRs', 'OLPCn', 'COLTAn', 'COLTAERRn', 'ORPCs', 'CORTAs', 'CORTAERRs', 'ORPCn', 
+            # 'CORTAn', 'CORTAERRn', 'SLCP', 'SLCPERR', 'SRCP', 'SRCPERR', 'STOT', 'STOTERR']
+            ta=[]
+            del_ta=[]
+
+            POSITION=['S','N','O']
+            
+            for l in POLS:
+                for p in POSITION:
+                    # print(f'{p}{l}')
+                    # ta.append(f'{p}{l}TA')
+                    # ta.append(f'{p}{l}TAERR')
+
+                    del_ta.append(f'{p}{l}TA')
+                    del_ta.append(f'{p}{l}TAERR')
+                    del_ta.append(f'{p}{l}S2N')
+                    del_ta.append(f'{p}{l}FLAG')
+                    del_ta.append(f'{p}{l}BRMS')
+                    del_ta.append(f'{p}{l}SLOPE')
+                    del_ta.append(f'{p}{l}BASELEFT')
+                    del_ta.append(f'{p}{l}BASERIGHT')
+                    del_ta.append(f'{p}{l}MIDOFFSET')
+                    del_ta.append(f'{p}{l}RMSB')
+                    del_ta.append(f'{p}{l}RMSA')    
+
+                    if p=='O':
+                        del_ta.append(f'{p}{l}PC')
+                        del_ta.append(f'C{p}{l}TA')
+                        del_ta.append(f'C{p}{l}TAERR')
+                        del_ta.append(f'{p}{l}PSS')
+                        del_ta.append(f'{p}{l}PSSERR')
+                        del_ta.append(f'{p}{l}APPEFF')
+
+                for c in del_ta:
+                    try:
+                        self.df.at[pos, c] = np.nan
+                    except ValueError:
+                        self.df.at[pos, c] = 0.0
+                        print(f"Warning: Setting df[{c}] to 0.0 instead of NaN")
+                                
+                # print(ta,'\n') 
+                print('\n',del_ta,'\n') 
+                del_ta=[]
+                ta=[]
+
+            sys.exit()
+            print(f'\nUpdating table "{self.table}" in database "{self.dbFile}"\n')
+
+            cnx = sqlite3.connect(self.dbFile)
+            self.df.to_sql(self.table,cnx,if_exists='replace',index=False)
+            cnx.close()
+            pass
+
+        elif beam == "06.0D" or beam=="03.5D":
+            #['id', 'FILENAME', 'FILEPATH', 'CURDATETIME', 'MJD', 'OBSDATE', 
+            # 'OBSTIME', 'OBSDATETIME', 'FRONTEND', 'HDULENGTH', 'OBJECT', 'SRC', 
+            # 'OBSERVER', 'OBSLOCAL', 'OBSNAME', 'PROJNAME', 'PROPOSAL', 
+            # 'TELESCOP', 'UPGRADE', 'CENTFREQ', 'BANDWDTH', 'LOGFREQ', 
+            # 'BEAMTYPE', 'HPBW', 'FNBW', 'SNBW', 'FEEDTYPE', 'LONGITUD', 
+            # 'LATITUDE', 'COORDSYS', 'EQUINOX', 'RADECSYS', 'FOCUS', 'TILT', 
+            # 'TAMBIENT', 'PRESSURE', 'HUMIDITY', 'WINDSPD', 'SCANDIR', 'POINTING',
+            #  'BMOFFHA', 'BMOFFDEC', 'HABMSEP', 'DICHROIC', 'PHASECAL', 'NOMTSYS',
+            #  'SCANDIST', 'SCANTIME', 'INSTRUME', 'INSTFLAG', 'HZPERK1', 
+            # 'HZKERR1', 'HZPERK2', 'HZKERR2', 'TCAL1', 'TCAL2', 'TSYS1', 
+            # 'TSYSERR1', 'TSYS2', 'TSYSERR2', 'ELEVATION', 'ZA', 'HA', 'PWV', 
+            # 'SVP', 'AVP', 'DPT', 'WVD', 'SEC_Z', 'X_Z', 'DRY_ATMOS_TRANSMISSION',
+            #  'ZENITH_TAU_AT_1400M', 'ABSORPTION_AT_ZENITH', 'ANLTA', 'ANLTAERR', 
+            # 'ANLMIDOFFSET', 'ANLS2N', 'BNLTA', 'BNLTAERR', 'BNLMIDOFFSET', 
+            # 'BNLS2N', 'NLFLAG', 'NLBRMS', 'NLSLOPE', 'ANLBASELOCS', 
+            # 'BNLBASELOCS', 'NLRMSB', 'NLRMSA', 'ASLTA', 'ASLTAERR', 
+            # 'ASLMIDOFFSET', 'ASLS2N', 'BSLTA', 'BSLTAERR', 'BSLMIDOFFSET', 'BSLS2N', 'SLFLAG', 'SLBRMS', 'SLSLOPE', 'ASLBASELOCS', 'BSLBASELOCS', 'SLRMSB', 'SLRMSA', 'AOLTA', 'AOLTAERR', 'AOLMIDOFFSET', 'AOLS2N', 'BOLTA', 'BOLTAERR', 'BOLMIDOFFSET', 'BOLS2N', 'OLFLAG', 'OLBRMS', 'OLSLOPE', 'AOLBASELOCS', 'BOLBASELOCS', 'OLRMSB', 'OLRMSA', 'AOLPC', 'ACOLTA', 'ACOLTAERR', 'BOLPC', 'BCOLTA', 'BCOLTAERR', 'ANRTA', 'ANRTAERR', 'ANRMIDOFFSET', 'ANRS2N', 'BNRTA', 'BNRTAERR', 'BNRMIDOFFSET', 'BNRS2N', 'NRFLAG', 'NRBRMS', 'NRSLOPE', 'ANRBASELOCS', 'BNRBASELOCS', 'NRRMSB', 'NRRMSA', 'ASRTA', 'ASRTAERR', 'ASRMIDOFFSET', 'ASRS2N', 'BSRTA', 'BSRTAERR', 'BSRMIDOFFSET', 'BSRS2N', 'SRFLAG', 'SRBRMS', 'SRSLOPE', 'ASRBASELOCS', 'BSRBASELOCS', 'SRRMSB', 'SRRMSA', 'AORTA', 'AORTAERR', 'AORMIDOFFSET', 'AORS2N', 'BORTA', 'BORTAERR', 'BORMIDOFFSET', 'BORS2N', 'ORFLAG', 'ORBRMS', 'ORSLOPE', 'AORBASELOCS', 'BORBASELOCS', 'ORRMSB', 'ORRMSA', 'AORPC', 'ACORTA', 'ACORTAERR', 'BORPC', 'BCORTA', 'BCORTAERR', 'time', 'FLUX', 'AOLPSS', 'AOLPSSERR', 'CAOLTA', 'CAOLTAERR', 'AOLAPPEFF', 'ASLTAFERR', 'ANLTAFERR', 'AOLTAFERR', 'AOLPSSFERR', 'AORPSS', 'AORPSSERR', 'CAORTA', 'CAORTAERR', 'AORAPPEFF', 'ASRTAFERR', 'ANRTAFERR', 'AORTAFERR', 'AORPSSFERR', 'TSYS1FERR', 'TSYS2FERR', 'BOLPSS', 'BOLPSSERR', 'CBOLTA', 'CBOLTAERR', 'BOLAPPEFF', 'BSLTAFERR', 'BNLTAFERR', 'BOLTAFERR', 'BOLPSSFERR', 'BORPSS', 'BORPSSERR', 'CBORTA', 'CBORTAERR', 'BORAPPEFF', 'BSRTAFERR', 'BNRTAFERR', 'BORTAFERR', 'BORPSSFERR', 'AOLPCs', 'CACOLTAs', 'CACOLTAERRs', 'AOLPCn', 'CACOLTAn', 'ACOLTAERRn', 'AORPCs', 'CACORTAs', 'CACORTAERRs', 'AORPCn', 'CACORTAn', 'ACORTAERRn', 'BOLPCs', 'CBCOLTAs', 'CBCOLTAERRs', 'BOLPCn', 'CBCOLTAn', 'BCOLTAERRn', 'BORPCs', 'CBCORTAs', 'CBCORTAERRs', 'BORPCn', 'CBCORTAn', 'BCORTAERRn']
+        
+            ta=[]
+            del_ta=[]
+
+            POSITION=['S','N','O']
+            BEAMS=['A','B']
+            
+            for l in POLS:
+                if l=='L':
+                    del_ta.append(f'TSYS1')
+                    del_ta.append(f'TSYSERR1')
+                else:
+                    del_ta.append(f'TSYS2')
+                    del_ta.append(f'TSYSERR2')
+                for b in BEAMS:
+                    for p in POSITION:
+                        # print(f'{p}{l}')
+                        # ta.append(f'{p}{l}TA')
+                        # ta.append(f'{p}{l}TAERR')
+
+                        del_ta.append(f'{b}{p}{l}TA')
+                        del_ta.append(f'{b}{p}{l}TAERR')
+                        del_ta.append(f'{b}{p}{l}S2N')
+                        del_ta.append(f'{b}{p}{l}FLAG')
+                        del_ta.append(f'{b}{p}{l}BRMS')
+                        del_ta.append(f'{b}{p}{l}SLOPE')
+                        del_ta.append(f'{b}{p}{l}BASELEFT')
+                        del_ta.append(f'{b}{p}{l}BASERIGHT')
+                        del_ta.append(f'{b}{p}{l}MIDOFFSET')
+                        del_ta.append(f'{b}{p}{l}RMSB')
+                        del_ta.append(f'{b}{p}{l}RMSA')    
+
+                        if p=='O':
+                            del_ta.append(f'{b}{p}{l}PC')
+                            del_ta.append(f'{b}C{p}{l}TA')
+                            del_ta.append(f'{b}C{p}{l}TAERR')
+                            del_ta.append(f'{b}{p}{l}PSS')
+                            del_ta.append(f'{b}{p}{l}PSSERR')
+                            del_ta.append(f'{b}{p}{l}APPEFF')
 
                     for c in del_ta:
                         try:
-                            self.df.at[i, c] = np.nan
+                            self.df.at[pos, c] = np.nan
                         except ValueError:
-                            self.df.at[i, c] = 0.0
-                            print(f"Warning: Setting {c} to 0.0 instead of NaN")
-                            
-                    print(ta,'\n')
-
-                    if 'JUPITER' in srcname.upper():
-                        self.df[f'CORR_{b}{s}{l}DATA'] = self.df.apply(lambda row: calc_pc_pss(row[ta[0]], row[ta[1]],row[ta[2]], row[ta[3]],row[ta[4]], row[ta[5]], row['TOTAL_PLANET_FLUX_D'], df), axis=1)
-                        print(f'{b}{s}{l}PSS', f'{b}{s}{l}PSSERR',f'{b}{s}{l}PC',f'C{b}{s}{l}TA',f'C{b}{s}{l}TAERR',f'{b}{s}{l}PPEFF')
-                        self.df[[f'{b}{s}{l}PSS', f'{b}{s}{l}PSSERR',f'{b}{s}{l}PC',f'C{b}{s}{l}TA',f'C{b}{s}{l}TAERR',f'{b}{s}{l}APPEFF']] = pd.DataFrame(self.df[f'CORR_{b}{s}{l}DATA'].tolist(), index=self.df.index)
-                        self.df[f'{b}{s}{l}PSS'] = self.df[f'{b}{s}{l}PSS'].replace(0, np.nan)
-                        self.df.drop(f'CORR_{b}{s}{l}DATA', axis=1, inplace=True)
-                    
-                    else:
-                        self.df[f'CORR_{b}{s}{l}DATA'] = self.df.apply(lambda row: calibrate(row[ta[0]], row[ta[1]],row[ta[2]], row[ta[3]],row[ta[4]], row[ta[5]], df), axis=1)
-                        print(f'{b}{s}{l}PC',f'C{b}{s}{l}TA',f'C{b}{s}{l}TAERR')
-                        self.df[[f'{b}{s}{l}PC',f'C{b}{s}{l}TA',f'C{b}{s}{l}TAERR']] = pd.DataFrame(self.df[f'CORR_{b}{s}{l}DATA'].tolist(), index=self.df.index)
-                        self.df.drop(f'CORR_{b}{s}{l}DATA', axis=1, inplace=True)
-                    
-                    cnx = sqlite3.connect(self.dbFile)
-                    self.df.to_sql(self.table,cnx,if_exists='replace',index=False)
-                    cnx.close()
-
-                    ta=[]
+                            self.df.at[pos, c] = 0.0
+                            print(f"Warning: Setting df[{c}] to 0.0 instead of NaN")
+                                    
+                    # print(ta,'\n') 
+                    print('\n',del_ta,'\n') 
                     del_ta=[]
+                    ta=[]
 
-            self.plot_cols(x_col,y_col)
+            # sys.exit()
+            print(f'\nUpdating table "{self.table}" in database "{self.dbFile}"\n')
+
+            cnx = sqlite3.connect(self.dbFile)
+            self.df.to_sql(self.table,cnx,if_exists='replace',index=False)
+            cnx.close()
+            pass
+
+        else:
+            print(f'Invalid beam: {beam}')
+            sys.exit()
+        # Clear the plot and re-plot the updated data
+        self.canvas.clear_figure()
+        self.plot_cols(self.canvas.xlab, self.canvas.ylab)
+
+        # sys.exit()
+
+
+        # # beam=self.df['BEAMTYPE'].iloc[-1]
+        # if freq>22000:
+        #     POS=['S','N','O']
+        #     BEAMS=['']
+        #     POLS=['L','R']
+
+        #     ta=[]
+        #     del_ta=[]
+        #     for b in BEAMS:
+        #         for l in POLS:
+        #             for s in POS:
+        #                 ta.append(f'{b}{s}{l}TA')
+        #                 ta.append(f'{b}{s}{l}TAERR')
+
+        #                 del_ta.append(f'{b}{s}{l}TA')
+        #                 del_ta.append(f'{b}{s}{l}TAERR')
+
+        #                 del_ta.append(f'{b}{s}{l}S2N')
+        #                 del_ta.append(f'{b}{s}{l}FLAG')
+        #                 del_ta.append(f'{b}{s}{l}BRMS')
+        #                 del_ta.append(f'{b}{s}{l}SLOPE')
+        #                 del_ta.append(f'{b}{s}{l}BASELEFT')
+        #                 del_ta.append(f'{b}{s}{l}BASERIGHT')
+        #                 del_ta.append(f'{b}{s}{l}RMSB')
+        #                 del_ta.append(f'{b}{s}{l}RMSA')
+
+        #                 if s=='O':
+        #                     del_ta.append(f'{b}{s}{l}PSS')
+        #                     del_ta.append(f'{b}{s}{l}PSSERR')
+        #                     del_ta.append(f'{b}{s}{l}PC')
+        #                     del_ta.append(f'C{b}{s}{l}TA')
+        #                     del_ta.append(f'C{b}{s}{l}TAERR')
+        #                     del_ta.append(f'{b}{s}{l}APPEFF')
+                        
+        #                 print(f'{b}{s}{l}FERR')
+        #                 self.df[f'{b}{s}{l}TAFERR'] = self.df[f'{b}{s}{l}TAERR'].astype(float)/self.df[f'{b}{s}{l}TA'].astype(float) 
+
+        #             print()
+
+        #             for c in del_ta:
+        #                 try:
+        #                     self.df.at[i, c] = np.nan
+        #                 except ValueError:
+        #                     self.df.at[i, c] = 0.0
+        #                     print(f"Warning: Setting {c} to 0.0 instead of NaN")
+                            
+        #             print(ta,'\n')
+
+        #             if 'JUPITER' in srcname.upper():
+        #                 self.df[f'CORR_{b}{s}{l}DATA'] = self.df.apply(lambda row: calc_pc_pss(row[ta[0]], row[ta[1]],row[ta[2]], row[ta[3]],row[ta[4]], row[ta[5]], row['TOTAL_PLANET_FLUX_D'], df), axis=1)
+        #                 print(f'{b}{s}{l}PSS', f'{b}{s}{l}PSSERR',f'{b}{s}{l}PC',f'C{b}{s}{l}TA',f'C{b}{s}{l}TAERR',f'{b}{s}{l}PPEFF')
+        #                 self.df[[f'{b}{s}{l}PSS', f'{b}{s}{l}PSSERR',f'{b}{s}{l}PC',f'C{b}{s}{l}TA',f'C{b}{s}{l}TAERR',f'{b}{s}{l}APPEFF']] = pd.DataFrame(self.df[f'CORR_{b}{s}{l}DATA'].tolist(), index=self.df.index)
+        #                 self.df[f'{b}{s}{l}PSS'] = self.df[f'{b}{s}{l}PSS'].replace(0, np.nan)
+        #                 self.df.drop(f'CORR_{b}{s}{l}DATA', axis=1, inplace=True)
+                    
+        #             else:
+        #                 self.df[f'CORR_{b}{s}{l}DATA'] = self.df.apply(lambda row: calibrate(row[ta[0]], row[ta[1]],row[ta[2]], row[ta[3]],row[ta[4]], row[ta[5]], df), axis=1)
+        #                 print(f'{b}{s}{l}PC',f'C{b}{s}{l}TA',f'C{b}{s}{l}TAERR')
+        #                 self.df[[f'{b}{s}{l}PC',f'C{b}{s}{l}TA',f'C{b}{s}{l}TAERR']] = pd.DataFrame(self.df[f'CORR_{b}{s}{l}DATA'].tolist(), index=self.df.index)
+        #                 self.df.drop(f'CORR_{b}{s}{l}DATA', axis=1, inplace=True)
+                    
+        #             cnx = sqlite3.connect(self.dbFile)
+        #             self.df.to_sql(self.table,cnx,if_exists='replace',index=False)
+        #             cnx.close()
+
+        #             ta=[]
+        #             del_ta=[]
+
+            # self.plot_cols(x_col,y_col)
+
+        # if beam=='03.5D' or beam=='06.0D':
+        #     print()
+            
+        #     sys.exit()
+        #     POS=['S','N','O']
+        #     BEAMS=['A','B']
+        #     POLS=['L','R']
+
+
 
     def reset_timeseries(self):
         """
@@ -926,15 +1209,17 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
         self.df.to_csv(filename, index=False)  # Save without row indices
         print(f"Saved results to {filename}")
 
-    def populate_cols(self,xcol='',ycol='',yerrcol=''):
+    def populate_cols(self,xcol='',ycol='',yerrcol='',table=''):
         """Fetches data from the database and populates UI elements."""
         
         print('\n***** Running populate_cols\n')
         # create dataframe from current database table -> self.df
-        self.create_df_from_db()
+        self.create_df_from_db(table)
 
         # Handle empty table selection
         self.table = self.time_ui.comboBoxTables.currentText()
+        # print(self.tables)
+        # sys.exit()
 
         if not self.table:
             self.time_ui.comboBoxTables.clear()
@@ -1002,8 +1287,6 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
         # self.time_ui.comboBoxColsY.addItems(plotCols)
         # self.time_ui.comboBoxColsYerr.addItems(self.yErr)
 
-    ### Pot viewer ###
-    ### ----------- ###
     def open_db_path(self):
         # Open a database
 
@@ -1011,8 +1294,8 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
 
         print('\n***** Running open_db\n')
         # Get the database file path
-        self.dbFile='/Users/pfesesanivanzyl/dran/resultsFromAnalysis/JUPITER/JUPITER.db'
-        # self.dbFilePath = self.open_file_name_dialog("*.db")
+        # self.dbFile='/Users/pfesesanivanzyl/dran/resultsFromAnalysis/JUPITER/JUPITER.db'
+        self.dbFilePath = self.open_file_name_dialog("*.db")
 
         if self.dbFile == None:
             self.write("You need to select a file to open",'info')
@@ -1085,25 +1368,6 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
         self.plot_ui.comboBoxFilter.clear()
         self.plot_ui.comboBoxFilter.addItems(['','>','>=','<','<='])#,'between']'=',)
 
-    # def on_filter_changed(self):
-    #     """Handles filter changes in the plot UI.
-
-    #     Toggles the visibility of the second filter (range filter) based on
-    #     the selected filter type.
-    #     """
-
-    #     filter_type = self.plot_ui.comboBoxFilter.currentText()
-    #     # print(filter_type)
-
-    #     if filter_type == "between":
-    #         # Enable range filter
-    #         self.toggle_range_filter(True)
-    #         self.plot_ui.txtBoxFilter.setVisible(False)
-    #     else:
-    #         # Disable range filter
-    #         self.toggle_range_filter(False)
-    #         self.plot_ui.txtBoxFilter.setVisible(True)
-
     def toggle_range_filter(self,toggle):
 
         self.plot_ui.LblRangeFilter.setVisible(toggle)
@@ -1127,8 +1391,6 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
         # Add table names to the main combo box
         self.plot_ui.comboBox.addItems(sorted(self.plot_tables))
 
-    # def get_filter_date(self,period):
-    #     return 
     def write(self,msg,logType=""):
         """ Write to screen and gui """
 
@@ -1434,11 +1696,4 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
         print(f'Len:" {len(df)}')
 
         print("-" * 20, "\n")
-        
-    def delete_obs(self):
-        ''' Delete an observation. '''
-
-        option=self.plot_ui.comboBoxOptions.currentText()
-        filter=self.plot_ui.comboBoxFilter.currentText()
-        txt=self.plot_ui.txtBoxFilter.text()
         

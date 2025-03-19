@@ -22,7 +22,7 @@ import matplotlib.dates as mdates ## Import required library
 # Local imports
 # --------------------------------------------------------------------------- #
 # sys.path.append("src/")
-from ..common.msgConfiguration import msg_wrapper
+from common.msgConfiguration import msg_wrapper
 sys.path.append("plots/")
 # =========================================================================== #
 
@@ -104,13 +104,12 @@ class TimeCanvas(FigureCanvas):
 
         self.data=data # drift scan data
 
+        self.clear_figure()
+
         if len(x) == 0:
-            self.clear_figure()
             self.setLabelsNoLegend(self.ax, title)
 
         else:
-            
-            self.clear_figure()
             plt.xticks(rotation=70)
             self.x=x
             self.y=y
@@ -185,14 +184,13 @@ class TimeCanvas(FigureCanvas):
 
         # print(type(x))
         # sys.exit()
+        
+        self.clear_figure()
 
-        if len(x) == 0:
-            self.clear_figure()
+        if len(x) == 0: 
             self.setLabelsNoLegend(self.ax, title)
 
         else:
-            
-            self.clear_figure()
             plt.xticks(rotation=45)
             self.x=x
             self.y=y
@@ -200,7 +198,8 @@ class TimeCanvas(FigureCanvas):
             self.ylab=ylab
            
             # print(yerr)
-            # print(self.y)
+            self.clear_figure()
+            # print(self.data[self.data['MJD']<=2])
             if len(yerr)==0 or str(yerr)=='None':
                 self.ax.plot(self.x, self.y, col, label="data", picker=5)
             else:

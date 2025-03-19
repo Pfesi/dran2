@@ -1,6 +1,5 @@
 # CHANGELOG
 
-
 ##### v1.4.8 (2024-11-26 09:29)
 - fixed issue with skipping data processing for continuum sources at 22 GHz if fit was difficult. probably need to redo all 22ghz obs for all sources, especially the faint ones
 

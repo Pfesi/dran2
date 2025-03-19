@@ -17,15 +17,15 @@ import sqlite3
 # Module imports
 # --------------------------------------------------------------------------- #
 
-from ..common import exceptions as ex
-from ..common.contextManagers import open_file
-from ..common.driftScans import DriftScans
-from ..common.enums import ScanType
-from ..common.miscellaneousFunctions import set_dict_item, create_current_scan_directory, delete_logs, set_table_name,fast_scandir, get_freq_band2
-from ..common.logConfiguration import configure_logging
-from ..common.msgConfiguration import msg_wrapper, load_prog
-from ..common.sqlite_db import SQLiteDB
-from ..common.plotting import make_qv_plots
+# from exceptions import as ex
+from .contextManagers import open_file
+from .driftScans import DriftScans
+from .enums import ScanType
+from .miscellaneousFunctions import set_dict_item, create_current_scan_directory, delete_logs, set_table_name,fast_scandir, get_freq_band2
+from .logConfiguration import configure_logging
+from .msgConfiguration import msg_wrapper, load_prog
+from .sqlite_db import SQLiteDB
+from .plotting import make_qv_plots
 # =========================================================================== #
 
 
@@ -377,8 +377,9 @@ class Observation:
 
         # print(freq,type(freq))
         if str(freq)=="nan":
-            print('Fronend is nan')
+            print('Frontend is nan')
             freq='nans'
+            return
 
         try :
             f=int(freq)

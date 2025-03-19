@@ -604,6 +604,8 @@ def fast_scandir(dirname,log,Observation,outfile):
             if len(unprocessedObs)>0:
                 
                 for file in unprocessedObs:
+                    # print(file)
+                    # sys.exit()
                     if '.fits' not in file:
                         try:    
                             assert file.endswith('.fits'), f'The program requires a fits file, got: {file}'
@@ -614,9 +616,12 @@ def fast_scandir(dirname,log,Observation,outfile):
 
                     else:
                         # Process the files
-                        msg_wrapper('info',log.info,f'\nProcessing file {file}')
-                        process_file(file, log,Observation)
-                        outfile.write(f'{dirname}/{file}\n')
+                        if file.endswith('.fits'):
+                            msg_wrapper('info',log.info,f'\nProcessing file {file}')
+                            process_file(file, log,Observation)
+                            outfile.write(f'{dirname}/{file}\n')
+                        else:
+                            msg_wrapper('warning',log.warning,f"\nCan't process invalid file: {file}")
                         # with open('processed_files.txt')
                         # sys.exit()
 

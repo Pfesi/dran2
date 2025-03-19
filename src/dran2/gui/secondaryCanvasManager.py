@@ -12,8 +12,8 @@ import matplotlib.gridspec as gridspec
 # Plot backends
 from matplotlib.backends.backend_qt5agg import (
     FigureCanvasQTAgg as FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
-from matplotlib.lines import Line2D
-from matplotlib.ticker import MaxNLocator
+# from matplotlib.lines import Line2D
+# from matplotlib.ticker import MaxNLocator
 
 import warnings
 
@@ -28,7 +28,7 @@ with warnings.catch_warnings():
 # Local imports
 # --------------------------------------------------------------------------- #
 sys.path.append("src/")
-from ..common.msgConfiguration import msg_wrapper
+from common.msgConfiguration import msg_wrapper
 # =========================================================================== #
 
 class SecondaryCanvasManager(FigureCanvas):

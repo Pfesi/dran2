@@ -567,3 +567,140 @@ def get_calibrator_flux(data,calibrationPaper=''):
                 print('Contact author about this.')
                 data['FLUX']=0.0
                 # sys.exit()
+
+def calc_ta_and_ferrs(df,pol,pos):
+    print('\n> Calculating TA and FERRS')
+    c=[]
+
+    for p in pol:
+        ta=[]
+        for s in pos:
+#             print(f'{p}{pol}TA',f'{p}{pol}TAERR')
+            ta.append(f'{s}{p}TA')
+            ta.append(f'{s}{p}TAERR')
+
+#         if key=='s':
+        df[f'PC_{s}{p}DATAs'] = df.apply(lambda row: calibrate(0,0,row[ta[2]], row[ta[3]],row[ta[4]], row[ta[5]], row), axis=1)
+        df[[f'{s}{p}PCs',f'C{s}{p}TAs',f'C{s}{p}TAERRs']] = pd.DataFrame(df[f'PC_{s}{p}DATAs'].tolist(), index=df.index)  
+            
+#         elif key=='n':
+        df[f'PC_{s}{p}DATAn'] = df.apply(lambda row: calibrate(row[ta[0]], row[ta[1]],0,0,row[ta[4]], row[ta[5]], row), axis=1)
+        df[[f'{s}{p}PCn',f'C{s}{p}TAn',f'C{s}{p}TAERRn']] = pd.DataFrame(df[f'PC_{s}{p}DATAn'].tolist(), index=df.index)  
+#         else:
+        df[f'PC_{s}{p}DATA'] = df.apply(lambda row: calibrate(row[ta[0]], row[ta[1]],row[ta[2]], row[ta[3]],row[ta[4]], row[ta[5]], row), axis=1)
+        df[[f'{s}{p}PC',f'C{s}{p}TA',f'C{s}{p}TAERR']] = pd.DataFrame(df[f'PC_{s}{p}DATA'].tolist(), index=df.index)  
+#     return dfx
+
+# #         # estimate fractional errors
+        df[f'{ta[0]}FERR']=abs(df[ta[1]]/df[ta[0]]).astype(float)
+        df[f'{ta[2]}FERR']=abs(df[ta[3]]/df[ta[2]]).astype(float)
+        df[f'{ta[4]}FERR']=abs(df[ta[5]]/df[ta[4]]).astype(float)
+        
+    df['TSYS1FERR']=(df['TSYSERR1']/df['TSYS1']).astype(float)
+    df['TSYS2FERR']=(df['TSYSERR1']/df['TSYS2']).astype(float) 
+
+def calc_pss_and_ferrs(df,pol,pos):
+    print('\n> Calculating PSS and FERRS')
+
+    for s in pol:
+        ta=[]
+        for p in pos:
+            # print(f'{p}{s}TA',f'{p}{s}TAERR')
+            ta.append(f'{p}{s}TA')
+            ta.append(f'{p}{s}TAERR')
+
+#         pss, errPss, pc, corrTa, errCorrTa, appEff = calc_pc_pss(hpsTa, errHpsTa, hpnTa, errHpnTa, onTa, errOnTa, flux,data)
+#         print(row[ta[0]], row[ta[1]],row[ta[2]], row[ta[3]],row[ta[4]],row[ta[5]], row['SYNCH_FLUX_DENSITY'])
+        df[f'PC_{p}{s}DATA'] = df.apply(lambda row: calc_pc_pss(row[ta[0]], row[ta[1]],row[ta[2]], row[ta[3]],row[ta[4]], row[ta[5]], row['TOTAL_PLANET_FLUX_D'], row), axis=1)
+        df[[f'{p}{s}PSS', f'{p}{s}PSSERR',f'{p}{s}PC',f'C{p}{s}TA',f'C{p}{s}TAERR',f'{p}{s}APPEFF']] = pd.DataFrame(df[f'PC_{p}{s}DATA'].tolist(), index=df.index)
+    
+        df[f'{p}{s}PSS'] = df[f'{p}{s}PSS'].replace(0, np.nan)
+            
+        # estimate fractional errors
+        df[f'{ta[0]}FERR']=abs(df[ta[1]]/df[ta[0]]).astype(float)
+        df[f'{ta[2]}FERR']=abs(df[ta[3]]/df[ta[2]]).astype(float)
+        df[f'{ta[4]}FERR']=abs(df[ta[5]]/df[ta[4]]).astype(float)
+        
+        # print(f'{p}{s}PSSFERR')
+        df[f'{p}{s}PSSFERR']=abs(df[f'{p}{s}PSSERR']/df[f'{p}{s}PSS']).astype(float)
+            
+    df['TSYS1FERR']=(df['TSYSERR1']/df['TSYS1']).astype(float)
+    df['TSYS2FERR']=(df['TSYSERR1']/df['TSYS2']).astype(float) 
+
+def calc_ta_and_ferrs_db(df,pol,pos,beams):
+    print('\n> Calculating TA and FERRS')
+    c=[]
+
+    for b in beams:
+        for p in pol:
+            ta=[]
+            for s in pos:
+                key=f'{b}{s}{p}'
+#                 print(f'{b}{s}{p}TA',f'{s}{p}TAERR')
+                ta.append(f'{key}TA')
+                ta.append(f'{key}TAERR')
+#             print()
+            print(ta,'\n')
+
+    #         if key=='s':
+            df[f'PC_{key}DATAs'] = df.apply(lambda row: calibrate(0,0,row[ta[2]], row[ta[3]],row[ta[4]], row[ta[5]], row), axis=1)
+            df[[f'{key}PCs',f'C{key}TAs',f'C{key}TAERRs']] = pd.DataFrame(df[f'PC_{key}DATAs'].tolist(), index=df.index)  
+
+    #         elif key=='n':
+            df[f'PC_{key}DATAn'] = df.apply(lambda row: calibrate(row[ta[0]], row[ta[1]],0,0,row[ta[4]], row[ta[5]], row), axis=1)
+            df[[f'{key}PCn',f'C{key}TAn',f'C{key}TAERRn']] = pd.DataFrame(df[f'PC_{key}DATAn'].tolist(), index=df.index)  
+    #         else:
+            df[f'PC_{key}DATA'] = df.apply(lambda row: calibrate(row[ta[0]], row[ta[1]],row[ta[2]], row[ta[3]],row[ta[4]], row[ta[5]], row), axis=1)
+            df[[f'{key}PC',f'C{key}TA',f'C{key}TAERR']] = pd.DataFrame(df[f'PC_{key}DATA'].tolist(), index=df.index)  
+    #     return dfx
+
+    # #         # estimate fractional errors
+            df[f'{ta[0]}FERR']=abs(df[ta[1]]/df[ta[0]]).astype(float)
+            df[f'{ta[2]}FERR']=abs(df[ta[3]]/df[ta[2]]).astype(float)
+            df[f'{ta[4]}FERR']=abs(df[ta[5]]/df[ta[4]]).astype(float)
+
+        df['TSYS1FERR']=(df['TSYSERR1']/df['TSYS1']).astype(float)
+        df['TSYS2FERR']=(df['TSYSERR1']/df['TSYS2']).astype(float)
+
+def calc_pss_and_ferrs_db(df,pol,pos,beams):
+    print('\n> Calculating PSS and FERRS')
+    pssvals=[]
+    c=[]
+
+    df['FLUX']=''
+    for r,c in df.iterrows():
+        flux=get_calibrator_flux(c)
+
+        df.at[r,'FLUX']=flux
+        
+    for b in beams:
+        for p in pol:
+            ta=[]
+            for s in pos:
+                key=f'{b}{s}{p}'
+                # print(f'{p}{s}TA',f'{p}{s}TAERR')
+                ta.append(f'{key}TA')
+                ta.append(f'{key}TAERR')
+                pssvals.append(f'{key}TA')
+                pssvals.append(f'{key}TAERR')
+
+            # print()
+            print(ta)
+            df[f'PC_{key}DATA'] = df.apply(lambda row: calc_pc_pss(row[ta[0]], row[ta[1]],row[ta[2]], row[ta[3]],row[ta[4]], row[ta[5]], row['FLUX'], row), axis=1)
+            df[[f'{key}PSS', f'{key}PSSERR',f'{key}PC',f'C{key}TA',f'C{key}TAERR',f'{key}APPEFF']] = pd.DataFrame(df[f'PC_{key}DATA'].tolist(), index=df.index)
+
+            df[f'{key}PSS'] = df[f'{key}PSS'].replace(0, np.nan)
+
+            if b=='B': 
+                df[f'{key}PSS'] = -1*df[f'{key}PSS']
+
+#             # estimate fractional errors
+            df[f'{ta[0]}FERR']=abs(df[ta[1]]/df[ta[0]]).astype(float)
+            df[f'{ta[2]}FERR']=abs(df[ta[3]]/df[ta[2]]).astype(float)
+            df[f'{ta[4]}FERR']=abs(df[ta[5]]/df[ta[4]]).astype(float)
+
+            # print(f'{p}{s}PSSFERR')
+            df[f'{key}PSSFERR']=abs(df[f'{key}PSSERR']/df[f'{key}PSS']).astype(float)
+
+        df['TSYS1FERR']=(df['TSYSERR1']/df['TSYS1']).astype(float)
+        df['TSYS2FERR']=(df['TSYSERR1']/df['TSYS2']).astype(float) 
