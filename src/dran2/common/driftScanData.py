@@ -44,12 +44,6 @@ class DriftScanData(object):
 
         self.get_missing_params()
 
-        # print(lenhdu)
-        # sys.exit()
-
-        # print(self.__dict__)
-        # sys.exit()
-
         if(int(lenhdu)>5):
             self.get_chart_header_data(lenhdu-1)
 

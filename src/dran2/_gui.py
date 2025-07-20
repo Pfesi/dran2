@@ -16,7 +16,8 @@ from PyQt5 import QtWidgets
 from common.msgConfiguration import msg_wrapper, load_prog
 from common.miscellaneousFunctions import delete_logs
 from common.logConfiguration import configure_logging
-from gui.mainGuiLogic import Main
+# from gui.mainGuiLogic import Main
+from gui.mainGuiLogic2 import Main
 
 def run(args):
     """Run the GUI application with optional file processing."""
@@ -30,6 +31,8 @@ def run(args):
     # Initialize the Qt application
     app = QtWidgets.QApplication(sys.argv)
 
+    # if args.p
+
     if args.f:
 
         # Check if the provided path is a file
@@ -37,11 +40,11 @@ def run(args):
 
         # load GUI with the given file
         msg_wrapper("info", log.info, f"Switching to GUI, opening file: {args.f}")
-        gui=Main(log,is_file)
+        gui=Main(log,is_file,args.p)
     else:
         # load GUI without a given file
         msg_wrapper("info", log.info, "Switching to GUI")
-        gui=Main(log)
+        gui=Main(log,args.p)
     
     gui.show()
     sys.exit(app.exec())
@@ -79,6 +82,16 @@ def main():
         help="process file or folder at given path e.g.\
                         -f data/HydraA/HydraA_13NB/2019d133_16h12m15s_Cont_mike_\
                             HYDRA_A.fits or -f data/HydraA_13NB", 
+        type=str, 
+        required=False
+    )
+
+    parser.add_argument(
+        "-p", 
+        help="path to save directory e.g.\
+                        -p /Users/pfesi/results/\
+                        required if you want to \
+                        recalculate pss/flux during changes. please use full path.", 
         type=str, 
         required=False
     )

@@ -1,5 +1,5 @@
 # ============================================================================#
-# File: _auto.py                                                              #
+# File: observation.py                                                              #
 # Author: Pfesesani V. van Zyl                                                #
 # =========================================================================== #
 
@@ -46,7 +46,7 @@ class Observation:
 
     # -- Observation parameters not initialized when class called
     HDULIST: str = field(init=False)        # list of HDU objects
-    HDULENGTH: str = field(init=False)      # length of HDULIST
+    HDULENGTH: str = field(init=False)      # list of HDU objects
     INFOHEADER: str = field(init=False)     # summarizes the content of the opened FITS file
     
     
@@ -165,8 +165,6 @@ class Observation:
         msg_wrapper("debug",self.log.debug,f"Create dict object to store read parameters")
         self.__dict__['CARDS']={} #{'value':[], 'description':"Placeholder for hdu card titles or names"} # holds hdu card titles or names
 
-        # 
-        
         CURDATETIME = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         msg_wrapper("info",self.log.info,f"Date and time of data processing: {CURDATETIME}")
         self.__dict__["CURDATETIME"]={'value':CURDATETIME, 'description':"Current date and time of the data processing"}
@@ -244,7 +242,8 @@ class Observation:
                     
                 else:
                     #Create dict objects
-                    LCP = {'date' : self.__dict__['OBSDATE']['value'],
+                    LCP = {
+                        'date' : self.__dict__['OBSDATE']['value'],
                         'file':os.path.basename(self.__dict__['FILEPATH']['value']).split(".fits")[0][:18],
                         'source' :  self.__dict__['OBJECT']['value'],
                         'offset' :  self.__dict__['ON_OFFSET']['value'], 
@@ -590,7 +589,7 @@ class Observation:
                 None
         """
 
-        msg_wrapper("debug",self.log.debug,f"Getting hdulist info for index {hduindex}")
+        msg_wrapper("debug",self.log.debug,f"Retrieving hdulist info for index {hduindex}")
         return (self.HDULIST['value'])[hduindex].header
     
     def read_data_from_hdu_lists(self, hduindex:int):
@@ -608,7 +607,8 @@ class Observation:
 
         # print(hduIndexName)
         # sys.exit()
-        msg_wrapper("debug",self.log.debug,f"Getting observing parameters from {hduIndexName} HEADER")
+        msg_wrapper("debug",self.log.debug,
+                    f"Getting observing parameters from {hduIndexName} HEADER")
 
 
         # TODO: Decide on which data you want to save in the database

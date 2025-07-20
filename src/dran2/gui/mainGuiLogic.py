@@ -7,9 +7,14 @@
 import sys
 import os
 from datetime import datetime
+import datetime as dt
 from sqlalchemy import create_engine
 
+import matplotlib
+matplotlib.use('WebAgg')
+
 # Third-Party Library Imports
+import matplotlib.dates as mdates 
 import numpy as np
 import pandas as pd
 # pd.options.mode.copy_on_write = True  # https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
@@ -25,110 +30,90 @@ import glob
 import webbrowser
 import sqlite3
 from datetime import datetime
+from pathlib import Path
+
 
 # Local Imports
 sys.path.append("src/")
 from common.msgConfiguration import msg_wrapper
-# from common.observation import Observation
-from common.calibrate import calibrate,calc_pc_pss
+from common.calibrate import _get_pss_values,getpss,calc_dualtotFlux2, calibrate, calc_pc_pss, calc_flux, calc_totFlux, calc_dualtotFlux, get_fluxes_df
 from common import fitting as fit
 from common.file_handler import FileHandler
-# from common.calibrate import calc_ta_and_ferrs, calc_pss_and_ferrs_db
 from common import miscellaneousFunctions as misc
 
 from .main_window import Ui_MainWindow
 from .edit_driftscan_window1 import Ui_DriftscanWindow
-from .edit_timeseries_window import Ui_TimeSeriesWindow
+from .edit_timeseries_window3 import Ui_TimeSeriesWindow
 from .view_plots_window import Ui_PlotViewer
 from .canvasManager import CanvasManager
 from .secondaryCanvasManager import SecondaryCanvasManager
 from .timeseries_canvas import TimeCanvas
-# import ..common.fitting as fit
 
 # =========================================================================== #
 
-class Main(QtWidgets.QMainWindow, Ui_MainWindow):
-    """The main class that handles all GUI operations."""
 
+class Main(QtWidgets.QMainWindow, Ui_MainWindow):
+    """Main application window handling GUI operations and core functionality.
+    
+    Args:
+        log: Logger instance for application logging
+    """
+    
     def __init__(self, log):
-        super().__init__() #super(Main, self).__init__()
+        super().__init__()
         self.setupUi(self)
 
+        # Initialize dependencies
         self.log = log
-        self.file_path = ""
-        self.deleted = []
-        self.initial_status = [0, 0, 0, 0, 0, 0]
-
-        self.log.debug("GUI initiated") #msg_wrapper("debug", self.log.debug,"GUI initiated")
-
+        self._initialize_application_state()
+        self._setup_components()
+        
+        self.log.debug("GUI initiated successfully")
+        
+    def _initialize_application_state(self):
+        """Initialize all application state variables."""
+        self.file_path = ""  # Current active file path
+        self.deleted_items = []  # Track deleted items for undo functionality
+        self.initial_status = [0, 0, 0, 0, 0, 0]  # Default status values
+        
+    def _setup_components(self):
+        """Initialize and configure all UI components."""
+        
         self.setup_initial_state()
-        self.setup_file_handler()
+        # self._setup_file_handler()
+        # self._connect_signals()
 
     def setup_initial_state(self):
-        """Sets up the initial state of the GUI based on the file path."""
+        """Sets up the initial GUI state based on whether a file is loaded.
         
-        print('\n***** Running setup_initial_state\n')
-        if not self.file_path:
-            self.set_button_properties(self.btn_edit_driftscan, "white", "black")
-            self.set_button_properties(self.btn_edit_timeseries, "white", "black")
-            self.set_button_properties(self.btn_view_plots, "white", "black")
+        Configures button properties and connections differently depending on whether
+        a file is currently loaded (self.file_path exists) or not.
+        """
+        self.log.debug("Initializing GUI state")
+        
+        try:
+            if not self.file_path:
+                self._setup_no_file_state()
+            else:
+                self._setup_with_file_state()
+        except Exception as e:
+            self.log.error(f"Failed to initialize GUI state: {str(e)}")
+            self.statusBar().showMessage("Initialization error")
+            raise
 
-            self.btn_edit_driftscan.clicked.connect(self.open_drift_window)
-            self.btn_edit_timeseries.clicked.connect(self.open_timeseries_window)
-            self.btn_view_plots.clicked.connect(self.open_plots_window)
-        else:
-            self.open_drift_window()
-
-    def set_button_properties(self, button, bg_color, text_color):
-        """Sets the background color and text color of a button."""
-
-        print('\n***** Running set_button_properties\n')
-        button.setStyleSheet(f"QPushButton {{background-color: {bg_color}; color: {text_color};}}")
-
-    def setup_file_handler(self):
-        print('\n***** Running setup_file_handler\n')
-        self.file = FileHandler(self.log)
-
-    # === Windows setup   ===
-    def open_drift_window(self):
-        """Opens the drift scan editing window and sets up its components."""
-
-        print('\n***** Running open_drift_window\n')
-        msg_wrapper("debug", self.log.debug, "Initiating drift scan editing window")
-
-        # Create drift scan window and UI elements
-        self.drift_window = QtWidgets.QMainWindow()
-        self.drift_ui = Ui_DriftscanWindow()
-        self.drift_ui.setupUi(self.drift_window)
-
-        # Initialize canvas managers
-        self.canvas = CanvasManager(log=self.log)
-        self.secondary_canvas = SecondaryCanvasManager(log=self.log)
-
-        # Create navigation toolbar
-        self.ntb = NavigationToolbar(self.canvas, self)
-
-        # Set up layouts
-        plot_layout = self.drift_ui.PlotLayout
-        other_plot_layout = self.drift_ui.otherPlotsLayout
-
-        # Add elements to layouts
-        plot_layout.addWidget(self.ntb)
-        plot_layout.addWidget(self.canvas)
-        other_plot_layout.addWidget(self.secondary_canvas)
-
-        # Connect buttons (consider moving this to a separate function for better organization)
-        self.connect_ui_events()
-
-        # Welcome messages
-        self.write("** DRAN GUI loaded successfully.", "info")
-        self.write("** Open a file to get started.", "info")
-
-        # Set initial status (consider using a dedicated class to manage status)
-        self.status = self.initial_status  # Maybe use a status class with meaningful names for flags
-
-        # Show the window
-        self.drift_window.show()
+    def _setup_no_file_state(self):
+        """Configure UI for state when no file is loaded."""
+        buttons_config = [
+            (self.btn_edit_driftscan, self.open_drift_window, "white", "black"),
+            (self.btn_edit_timeseries, self.open_timeseries_window, "white", "black"), 
+            # (self.btn_view_plots, self.open_plots_window, "white", "black")
+        ]
+        
+        for btn, handler, bg_color, text_color in buttons_config:
+            self._configure_button(btn, bg_color, text_color)
+            btn.clicked.connect(handler)
+        
+        self.log.debug("Configured UI for no-file state")
 
     def open_timeseries_window(self):
         """Opens the timeseries editing window and initializes its components."""
@@ -159,6 +144,8 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
         self.time_ui.EdtSplKnots.setVisible(False)
         self.time_ui.LblSplKnots.setVisible(False)
         self.time_ui.BtnUpdateDB.setVisible(False)
+        self.time_ui.BtnDeleteZoomedPoints.setVisible(True)
+        self.time_ui.BtnViewZoomedArea.setVisible(True)
         self.time_ui.BtnOpenDB.clicked.connect(self.open_db)
         self.time_ui.comboBoxColsYerr.setVisible(True)
 
@@ -179,400 +166,70 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
         self.time_ui.LblEndDate.setVisible(False)
         self.time_ui.LblStartDate.setVisible(False)
 
+        # self.time_ui.BtnDeleteZoomedPoints.setVisible(False)
+        # self.time_ui.BtnViewZoomedArea.setVisible(False)
+
         # Connect combo box selection changes
         self.time_ui.comboBoxTables.currentIndexChanged.connect(self.on_table_name_changed)
         self.time_ui.comboBoxFitTypes.currentIndexChanged.connect(self.on_fit_changed)
         
+        
+        # self.time_ui.BtnDeleteZoomedPoints.cl
         # self.time_ui.BtnDelBoth.clicked.connect(self.delete_obs)
         # self.plot_ui.btnDelete.clicked.connect(self.delete_obs)
         # Show the window
         self.time_window.show()
-
-    def open_plots_window(self):
-        """Opens the plot viewer window and initializes its components."""
-
-        print('\n***** Running open_plots_window\n')
-        self.log.debug("** Initiating plot viewer window")
-
-        # Create plot viewer window and UI elements
-        self.plot_window = QtWidgets.QMainWindow()
-        self.plot_ui = Ui_PlotViewer()
-        self.plot_ui.setupUi(self.plot_window)
-
-        # Disable UI elements initially
-        self.disable_plot_controls()
-
-        # Enable functions related to opening database
-        self.plot_ui.btnOpen.clicked.connect(self.open_db_path)
-
-        # Connect combo box selection changes
-        self.plot_ui.comboBox.currentIndexChanged.connect(self.on_combo_changed)
-        # self.plot_ui.comboBoxFilter.currentIndexChanged.connect(self.on_filter_changed)
-
-        # Connect buttons (consider separate functions for complex logic)
-        self.plot_ui.btnRefreshPlotList.clicked.connect(self.add_items_to_combobox)
-        self.plot_ui.btnShow.clicked.connect(self.show_plot_browser)
-        self.plot_ui.btnDelete.clicked.connect(self.delete_obs)
-
-        # Show the window
-        self.plot_window.show()
-
-    def disable_plot_controls(self):
-        """Disables UI elements related to plot manipulation."""
-
-        print('\n***** Running disable_plot_controls\n')
-        self.plot_ui.btnDelete.setEnabled(False)
-        self.plot_ui.btnRefreshPlotList.setEnabled(False)
-        self.plot_ui.btnShow.setEnabled(False)
-        self.plot_ui.comboBox.setEnabled(False)
-        self.plot_ui.comboBoxFilter.setEnabled(False)
-        self.plot_ui.comboBoxOptions.setEnabled(False)
         
-    # def enable_plot_controls(self):
-    #     """Enable UI elements related to plot manipulation"""
-    #     self.plot_ui.txtBoxEnd.setEnabled(True)
-    #     self.plot_ui.txtBoxStart.setEnabled(True)
-
-    def parse_time(self,timeCol):
-        """
-        Parses the time column and returns only the date part.
-
-        Args:
-            timeCol (str): The time column to parse"""
-        
-        # print('\n***** Running parse_time\n')
-        if 'T' in timeCol:
-            return timeCol.split('T')[0]
-        else:
-            return timeCol.split(' ')[0]
-
-    def create_df_from_db(self,table=''):
-        """
-        Creates a pandas DataFrame from a specified table in the database.
-
-        Args:
-            table (str): Name of the table to read data from.
-
-        Returns:
-            pd.DataFrame: The created DataFrame containing table data.
-        """
-
-        print('\n***** Running create_df_from_db\n')
-
-
-        cnx = sqlite3.connect(self.dbFile)
-        # print(self.tables)
-        # sys.exit()
-
-        if table:
-            self.df = pd.read_sql_query(f"SELECT * FROM {table}", cnx)
-        else:
-            self.df = pd.read_sql_query(f"SELECT * FROM {self.tables[0]}", cnx)
-            
-        self.df.sort_values('FILENAME',inplace=True)
-        self.df['OBSDATE'] = self.df.apply(lambda row: self.parse_time(row['OBSDATE']), axis=1)
-        self.df["OBSDATE"] = pd.to_datetime(self.df["OBSDATE"], format="%Y-%m-%d")    
-
-        # Correct all errors, ensure errors are positive, i.e. err > 0
-        # ---------------------------------------------------------------
-        errCols=[col for col in (self.df.columns) if 'ERR' in col]
-        for col in errCols:
-            self.df[col] = self.df.apply(lambda row: self.make_positive(row[col]), axis=1)
-
-        cnx.close()
-             
-    def open_db(self):
-        """Open the database."""
-
-        print('\n***** Running open_db\n')
-        # Get the database file path
-        # self.dbFile='/Users/pfesesanivanzyl/dran/HART26DATA.db'#resultsFromAnalysis/JUPITER/JUPITER.db'
-        self.dbFile = self.open_file_name_dialog("*.db")
-        # self.dbFile='/Users/pfesesanivanzyl/dran-analysis/resultsFromAnalysis/3C48/3C48.db'#resultsFromAnalysis/JUPITER/JUPITER.db'
-        
-
-        if not self.dbFile:
-            print("No file selected")
-            return
-
-        if os.path.isfile(self.dbFile):
-            pass
-        else:
-            print(f'File: "{self.dbFile}" does not exists\n')
-            return 
-
-        self.time_ui.EdtDB.setText(self.dbFile)
-        self.time_ui.EdtDB.setEnabled(True)
-        
-        msg_wrapper("debug", self.log.debug, f"\nOpening database: {self.dbFile}")
-        cnx = sqlite3.connect(self.dbFile)
-        try:
-            # Create your connection and read data from database.
-            cnx = sqlite3.connect(self.dbFile)
-            dbTableList=pd.read_sql_query("SELECT name FROM sqlite_schema WHERE type='table'", cnx)
-            self.tables = sorted(dbTableList['name'].tolist())
-            self.table=self.tables[0]
-            self.df = pd.read_sql_query(f"SELECT * FROM {self.table}", cnx)
-            self.orig_df=self.df.copy()
-            cnx.close()
-
-            self.tables=[c for c in self.tables if 'sqlite' not in c]
-            print(f"Working with Tables: {self.tables}")
-            self.time_ui.comboBoxTables.clear()
-            self.time_ui.comboBoxTables.clear()
-            self.time_ui.comboBoxTables.addItems(self.tables)
-            
-        except Exception as e:
-            # Handle exceptions gracefully
-            # print(f"Error opening database: {e}")
-            self.log.error(f"Error opening database: {e}")
-
-            # Consider disabling UI elements or providing feedback to the user
-            self.time_ui.EdtDB.setEnabled(False)
-            sys.exit()
-
-        # finally:
-        #     msg_wrapper("debug", self.log.debug, f"Closing database: {self.dbFile}")
-
-        # sys.exit()
-        # make floats
-        colList = list(self.df.columns)
-        floatList = [col for col in colList if 'FILE' not in col and 'FRONT' not in col and 'OBJ' not in col \
-            and 'SRC' not in col and 'OBS' not in col and 'PRO' not in col and 'TELE' not in col and 'HDU' not in col\
-            and 'id' not in col and 'DATE' not in col and 'UPGR' not in col and 'TYPE' not in col and 'COOR' not in col\
-            and 'EQU' not in col and 'RADEC' not in col and 'SCAND' not in col and 'BMO' not in col and 'DICH' not in col\
-            and 'PHAS' not in col and 'POINTI' not in col and 'TIME' not in col and 'INSTRU' not in col and 'INSTFL' not in col\
-            and 'time' not in col and \
-                    
-            'HABM' not in col
-            ]
-
-        # Rather than fail, we might want 'pandas' to be considered a missing/bad 
-        # numeric value. We can coerce invalid values to NaN as follows using the 
-        # errors keyword argument:
-        self.df[floatList] = self.df[floatList].apply(pd.to_numeric, errors='coerce')
-
-        # Ensure all errors are +ve
-        errCols=[c for c in self.df.columns if 'ERR' in c]
-        for c in errCols:
-            self.df[c]=self.df.apply(lambda row: self.make_positive(row[c]), axis=1)
-            
-        # Connect buttons
-        self.enable_time_buttons()
-        self.connect_ui_events()
-        self.populate_cols()
-            
-        # self.time_ui.BtnRefreshDB.clicked.connect(self.refresh_db)  # Implement refresh the database
-
     def on_table_name_changed(self):
-        """ update combobox when table name changes. """
-
+        """Update UI components when the selected table changes in the combobox."""
+    
         print('\n***** Running on_table_name_changed\n')
+
+        # Get selected table and update dataframe
         table=self.time_ui.comboBoxTables.currentText()
         self.create_df_from_db(table)
 
+        # Initialize column lists
         self.colNames = self.df.columns.tolist()
         
-        # setup error columns
-        errcols=[]
-        for name in self.colNames:
-            if   'ERR' in name:
-                errcols.append(name)
-            else:
-                pass
+        # Process error columns
+        self._process_error_columns()
 
-        yerr=['None']
-        self.yErr=list(yerr)+list(errcols)
+        # Process X and Y axis columns
+        xCols = self._get_x_columns()
+        plotCols = self._get_plot_columns()
 
-        # setup X and Y columns
-        xCols=['OBSDATE','MJD','HA','ELEVATION']
-        xCols=xCols+[c for c in self.colNames if 'RMS' in c or 'SLOPE' in c]
-
-
-        # xcol=self.time_ui.comboBoxColsX.currentText()
-        # ycol=self.time_ui.comboBoxColsY.currentText()
-        
         print(f'Getting data from table: {table}')
 
-        # get column names from db and put them in combobox
-        colNames=self.df.columns.tolist()
+        # Update UI components
+        self._update_column_comboboxes(xCols, plotCols)
+        
+        # Plot with default columns
+        self.plot_cols(xcol=xCols[0], ycol=plotCols[0], yerr="")
 
-        plotCols=[]
-
-        for name in colNames:
-            if 'id' in name  or 'LOGFREQ' in name or 'CURDATETIME' in name or \
-                'FILE' in name or 'OBSD' in name \
-                    or 'MJD' in name or 'OBS' in name or 'OBJ' in name or 'id' == name \
-                        or 'RAD' in name or 'TYPE' in name or 'PRO' in name or 'TELE' in\
-                              name or 'UPGR' in name  or 'INST' in name or \
-                                'SCANDIR' in name or 'SRC' in name or 'COORDSYS' in name or 'LONGITUD' in name \
-                                    or 'LATITUDE' in name  or 'POINTING' in name \
-                                       or 'DICHROIC' in name \
-                                            or 'PHASECAL' in name or 'HPBW' in name or 'FNBW' in name or 'SNBW' in name\
-                                                or 'FRONTEND' in name or 'BASE' in name: 
-                pass
-            else:
-                plotCols.append(name)
-
-        # print(colNames)
-
-        # print(plotCols)
-
-        # prep columns
-        # print('cols: ',xcol,ycol,yerrcol)
-        self.time_ui.comboBoxColsX.clear()
-        self.time_ui.comboBoxColsX.clear()
-        # if xcol!='':
-        #     self.time_ui.comboBoxColsX.setCurrentText(xcol)
-        # else:
-        self.time_ui.comboBoxColsX.addItems(xCols)
-        self.time_ui.comboBoxColsY.clear()
-        self.time_ui.comboBoxColsY.clear()
-
-        self.time_ui.comboBoxColsY.addItems(plotCols)
-       
-        self.time_ui.comboBoxColsYerr.clear()
-        self.time_ui.comboBoxColsYerr.clear()
-
-        self.time_ui.comboBoxColsYerr.addItems(self.yErr)
-
-        self.plot_cols(xcol=xCols[0], ycol=plotCols[0] ,yerr="")
-        # self.populate_cols(xcol=xcol,ycol=ycol,table=table)
-
-    def on_fit_changed(self):
-        """  Toggle labels and edit boxes on or off when fit type is changed."""
-
-        print('\n***** Running on_fit_changed\n')
-        if self.time_ui.comboBoxFitTypes.currentText()=="Spline":
-            self.time_ui.LblSplKnots.setVisible(True)
-            self.time_ui.EdtSplKnots.setVisible(True)
-            self.time_ui.EdtEndDate.setVisible(False)
-            self.time_ui.EdtStartDate.setVisible(False)
-            self.time_ui.LblEndDate.setVisible(False)
-            self.time_ui.LblStartDate.setVisible(False)
-        else:
-            self.time_ui.LblSplKnots.setVisible(False)
-            self.time_ui.EdtSplKnots.setVisible(False)
-            self.time_ui.EdtEndDate.setVisible(True)
-            self.time_ui.EdtEndDate.setEnabled(True)
-            self.time_ui.EdtStartDate.setVisible(True)
-            self.time_ui.EdtStartDate.setEnabled(True)
-            self.time_ui.LblEndDate.setVisible(True)
-            self.time_ui.LblStartDate.setVisible(True)
-
-    def open_file_name_dialog(self, ext):
-        """Opens a file dialog to select a file with the specified extension.
-
-        Args:
-            ext: The file extension to filter for.
-
-        Returns:
-            The selected file path, or None if no file is selected.
-        """
-
-        print('\n***** Running open_file_name_dialog\n')
-        msg_wrapper("debug", self.log.debug, "Opening file name dialog")
-
-        file_name, _ = QtWidgets.QFileDialog.getOpenFileName(
-            self, "Open File", "", f"Fits Files (*{ext});;Fits Files (*{ext})")
-
-        return file_name
-    
-    def enable_time_buttons(self):
-        """Enable time buttons."""
-
-        print('\n***** Running enable_time_buttons\n')
-        for widget_name in [
-            "comboBoxTables",
-            "comboBoxColsX",
-            "comboBoxColsY",
-            "comboBoxColsYerr",
-            "EdtSplKnots",
-            "BtnPlot",
-            "comboBoxFilters",
-            "EdtFilter",
-            "BtnFilter",
-            "comboBoxFitTypes",
-            "comboBoxOrder",
-            "BtnFit",
-            "BtnDelPoint",
-            "BtnDelBoth",
-            "BtnResetPoint",
-            "BtnReset",
-            # "BtnRefreshDB",
-            "BtnUpdateDB",
-            "BtnSaveDB",
-            # "BtnQuit",
-        ]:
-            getattr(self.time_ui, widget_name).setEnabled(True)
-
-    def connect_ui_events(self):
-        """Connect UI elements to their corresponding functions."""
-
-        print('\n***** Running connect_ui_events\n')
-        msg_wrapper("debug", self.log.debug, "Connecting buttons to main canvas")
-
-        # Plot and Data Manipulation
-        self.time_ui.BtnPlot.clicked.connect(self.plot_cols)
-        self.time_ui.BtnFilter.clicked.connect(self.filter_timeseries_data)
-        self.time_ui.BtnFit.clicked.connect(self.fit_timeseries)
-        self.time_ui.BtnDelPoint.clicked.connect(self.update_point)
-        self.time_ui.BtnDelBoth.clicked.connect(self.update_all_points)
-        self.time_ui.BtnReset.clicked.connect(self.reset_timeseries)
-
-        # Database Operations
-        # self.time_ui.BtnRefreshDB.clicked.connect(self.refresh_db)
-        self.time_ui.BtnSaveDB.clicked.connect(self.save_time_db)
-
-        # Application Control
-        # self.time_ui.BtnQuit.clicked.connect(self.update_db)  # Consider renaming or providing a clear comment
-    
-    def make_positive(self, val):
-        """Returns the absolute value of the input value.
-
-        Args:
-            val: The input value.
-
-        Returns:
-            The absolute value of the input, or 0.0 if the input is not a number.
-        """
-
-        # print('\n***** Running make_positive\n')
-        try:
-            return abs(val)
-        except TypeError as e:
-            msg_wrapper('debug',self.log.debug,f"Error: Cannot calculate absolute value of {val} due to type mismatch. {e}\n")
-            return 0.0
-        except ValueError as e:
-            msg_wrapper('debug',self.log.debug,f"Error: Invalid input value {val}. {e}\n")
-            return 0.0
-        except Exception as e:
-            msg_wrapper('debug',self.log.debug,f"An unexpected error occurred: {e}\n")
-            return 0.0
-    
     def plot_cols(self, xcol="", ycol="", yerr=""):
-        """Plot database columns."""
-
+        """Plot selected columns from the database with optional error bars.
+        
+        Args:
+            xcol (str): Column name for x-axis data. If empty, uses current UI selection.
+            ycol (str): Column name for y-axis data. If empty, uses current UI selection.
+            yerr (str): Column name for error data. If empty or "None", no error bars are shown.
+        """
         print('\n***** Running plot_cols\n')
-
-        # Get selected table
+        
+        # Get selected table from UI
         self.table = self.time_ui.comboBoxTables.currentText()
 
+         # Handle case where no table is selected
         if not self.table:
-
             print("Please select a table")
-            self.time_ui.comboBoxTables.clear()
-            self.time_ui.comboBoxTables.clear()
-            self.time_ui.comboBoxTables.addItems(self.tables)
-
-        # tableCols = self.df.columns.tolist()
+            self._update_ui_components()
 
         # Get column names from UI or default values
-        # print('ycol :',ycol)
         xcol = xcol if xcol else self.time_ui.comboBoxColsX.currentText()
         ycol = ycol if ycol else self.time_ui.comboBoxColsY.currentText()
         yerr = yerr if yerr else self.time_ui.comboBoxColsYerr.currentText()
-        # print('ycol :',ycol)
+
 
         print(f"\nPlotting {xcol} vs {ycol} in table {self.table}")
 
@@ -618,6 +275,447 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
         else:
             self.canvas.plot_fig(xvalues, yvalues, xcol, ycol, data=self.df)
             # print('what')
+
+
+    def on_fit_changed(self):
+        """  Toggle labels and edit boxes on or off when fit type is changed."""
+
+        print('\n***** Running on_fit_changed\n')
+        if self.time_ui.comboBoxFitTypes.currentText()=="Spline":
+            self.time_ui.LblSplKnots.setVisible(True)
+            self.time_ui.EdtSplKnots.setVisible(True)
+            self.time_ui.EdtEndDate.setVisible(False)
+            self.time_ui.EdtStartDate.setVisible(False)
+            self.time_ui.LblEndDate.setVisible(False)
+            self.time_ui.LblStartDate.setVisible(False)
+        else:
+            self.time_ui.LblSplKnots.setVisible(False)
+            self.time_ui.EdtSplKnots.setVisible(False)
+            self.time_ui.EdtEndDate.setVisible(True)
+            self.time_ui.EdtEndDate.setEnabled(True)
+            self.time_ui.EdtStartDate.setVisible(True)
+            self.time_ui.EdtStartDate.setEnabled(True)
+            self.time_ui.LblEndDate.setVisible(True)
+            self.time_ui.LblStartDate.setVisible(True)
+
+
+    def _process_error_columns(self):
+        """Identify and process error columns from the dataframe."""
+        errcols = [name for name in self.colNames if 'ERR' in name]
+        self.yErr = ['None'] + errcols
+
+    def _get_x_columns(self):
+        """Get columns suitable for X-axis plotting."""
+        base_x_cols = ['OBSDATE', 'MJD', 'HA', 'ELEVATION']
+        additional_x_cols = [c for c in self.colNames if 'RMS' in c or 'SLOPE' in c]
+        return base_x_cols + additional_x_cols
+
+    def _get_plot_columns(self):
+        """Get columns suitable for Y-axis plotting by excluding unwanted columns."""
+        exclude_patterns = [
+            'id', 'LOGFREQ', 'CURDATETIME', 'FILE', 'OBSD', 'MJD', 'OBS', 'OBJ',
+            'RAD', 'TYPE', 'PRO', 'TELE', 'UPGR', 'INST', 'SCANDIR', 'SRC',
+            'COORDSYS', 'LONGITUD', 'LATITUDE', 'POINTING', 'DICHROIC', 'PHASECAL',
+            'HPBW', 'FNBW', 'SNBW', 'FRONTEND', 'BASE'
+        ]
+        
+        return [
+            name for name in self.colNames
+            if not any(pattern in name for pattern in exclude_patterns)
+            and name != 'id'  # Special case for exact match
+        ]
+
+    def _update_column_comboboxes(self, xCols, plotCols):
+        """Update the X, Y, and error column comboboxes in the UI."""
+        # Clear and populate X-axis combobox
+        self.time_ui.comboBoxColsX.clear()
+        self.time_ui.comboBoxColsX.addItems(xCols)
+        
+        # Clear and populate Y-axis combobox
+        self.time_ui.comboBoxColsY.clear()
+        self.time_ui.comboBoxColsY.addItems(plotCols)
+        
+        # Clear and populate error combobox
+        self.time_ui.comboBoxColsYerr.clear()
+        self.time_ui.comboBoxColsYerr.addItems(self.yErr)
+        
+    def open_file_name_dialog(self, ext):
+        """Opens a file dialog to select a file with the specified extension.
+
+        Args:
+            ext: The file extension to filter for.
+
+        Returns:
+            The selected file path, or None if no file is selected.
+        """
+
+        print('\n***** Running open_file_name_dialog\n')
+        msg_wrapper("debug", self.log.debug, "Opening file name dialog")
+
+        file_name, _ = QtWidgets.QFileDialog.getOpenFileName(
+            self, "Open File", "", f"Fits Files (*{ext});;Fits Files (*{ext})")
+
+        return file_name
+    
+    def open_db(self):
+        """Open and process a SQLite database file, initializing UI components and data structures."""
+
+
+        print('\n***** Running open_db\n')
+
+        # Get the database file path
+        # self.dbFile='/Users/pfesesanivanzyl/dran/HART26DATA.db'#resultsFromAnalysis/JUPITER/JUPITER.db'
+        self.dbFile = self.open_file_name_dialog("*.db")
+        # self.dbFile='/Users/pfesesanivanzyl/dran-analysis/resultsFromAnalysis/3C48/3C48.db'#resultsFromAnalysis/JUPITER/JUPITER.db'
+        
+        # Validate file selection
+        if not self.dbFile:
+            print("No file selected")
+            return
+
+        # Verify file exists
+        if os.path.isfile(self.dbFile):
+            pass
+        else:
+            print(f'File: "{self.dbFile}" does not exists\n')
+            return 
+
+        # Update UI with database path
+        self.time_ui.EdtDB.setText(self.dbFile)
+        self.time_ui.EdtDB.setEnabled(True)
+        
+        # Log database opening
+        msg_wrapper("debug", self.log.debug, f"\nOpening database: {self.dbFile}")
+        
+        # Connect to database and process data
+        cnx = sqlite3.connect(self.dbFile)
+        # try:
+            # Create your connection and read data from database.
+        self._load_database_tables(cnx)
+        self._process_dataframe()
+
+            # # Correct all errors, ensure errors are positive, i.e. err > 0
+            # # ---------------------------------------------------------------
+            # errCols=[col for col in (self.df.columns) if 'ERR' in col]
+            # for col in errCols:
+            #     self.df[col] = self.df.apply(lambda row: self.make_positive(row[col]), axis=1)
+
+        cnx.close()
+
+            # Update UI components
+        self._update_ui_components()
+            
+            # Process numeric columns and errors
+        self._process_numeric_columns()
+        self._ensure_positive_errors()
+            
+            # Final setup
+        self._finalize_setup()
+        
+            
+        # except Exception as e:
+        #     # Handle exceptions gracefully
+        #     # print(f"Error opening database: {e}")
+        #     self.log.error(f"Error opening database: {e}")
+
+        #     # Consider disabling UI elements or providing feedback to the user
+        #     self.time_ui.EdtDB.setEnabled(False)
+        #     sys.exit()
+
+    def _update_ui_components(self):
+        """Update UI components with loaded data."""
+        print(f"Working with Tables: {self.tables}")
+        self.time_ui.comboBoxTables.clear()
+        self.time_ui.comboBoxTables.addItems(self.tables)
+
+    def make_positive(self, val):
+        """Returns the absolute value of the input value.
+
+        Args:
+            val: The input value.
+
+        Returns:
+            The absolute value of the input, or 0.0 if the input is not a number.
+        """
+
+        # print('\n***** Running make_positive\n')
+        try:
+            return abs(val)
+        except TypeError as e:
+            msg_wrapper('debug',self.log.debug,f"Error: Cannot calculate absolute value of {val} due to type mismatch. {e}\n")
+            return 0.0
+        except ValueError as e:
+            msg_wrapper('debug',self.log.debug,f"Error: Invalid input value {val}. {e}\n")
+            return 0.0
+        except Exception as e:
+            msg_wrapper('debug',self.log.debug,f"An unexpected error occurred: {e}\n")
+            return 0.0
+        
+
+    def create_df_from_db(self,table=''):
+        """
+        Creates a pandas DataFrame from a specified table in the database.
+
+        Args:
+            table (str): Name of the table to read data from.
+
+        Returns:
+            pd.DataFrame: The created DataFrame containing table data.
+        """
+
+        print('\n***** Running create_df_from_db\n')
+
+
+        cnx = sqlite3.connect(self.dbFile)
+        # print(self.tables)
+        # sys.exit()
+
+        if table:
+            self.df = pd.read_sql_query(f"SELECT * FROM '{table}'", cnx)
+        else:
+            self.df = pd.read_sql_query(f"SELECT * FROM '{self.tables[0]}'", cnx)
+            
+        self.df.sort_values('FILENAME',inplace=True)
+        self.df['OBSDATE'] = self.df.apply(lambda row: self.parse_time(row['OBSDATE']), axis=1)
+        self.df["OBSDATE"] = pd.to_datetime(self.df["OBSDATE"]).dt.date
+        self.df["OBSDATE"] = pd.to_datetime(self.df["OBSDATE"], format="%Y-%m-%d")    
+
+        # Correct all errors, ensure errors are positive, i.e. err > 0
+        # ---------------------------------------------------------------
+        errCols=[col for col in (self.df.columns) if 'ERR' in col]
+        for col in errCols:
+            self.df[col] = self.df.apply(lambda row: self.make_positive(row[col]), axis=1)
+
+        cnx.close()
+
+    def enable_time_buttons(self):
+        """Enable time buttons."""
+        print('\n***** Running enable_time_buttons\n')
+        for widget_name in [
+            "comboBoxTables",
+            "comboBoxColsX",
+            "comboBoxColsY",
+            "comboBoxColsYerr",
+            "EdtSplKnots",
+            "BtnPlot",
+            "comboBoxFilters",
+            "EdtFilter",
+            "BtnFilter",
+            "comboBoxFitTypes",
+            "comboBoxOrder",
+            "BtnFit",
+            "BtnDelPoint",
+            "BtnDelBoth",
+            "BtnResetPoint",
+            "BtnReset",
+            # "BtnRefreshDB",
+            "BtnUpdateDB",
+            "BtnSaveDB",
+            "BtnDeleteZoomedPoints",
+            "BtnViewZoomedArea",
+            # "BtnQuit",
+        ]:
+            getattr(self.time_ui, widget_name).setEnabled(True)
+
+    def view_zoomed_area(self):
+
+        xlim,ylim=self.canvas.onzoom()
+
+        xCol=self.time_ui.comboBoxColsX.currentText()
+        yCol=self.time_ui.comboBoxColsY.currentText()
+
+        print('\n',xCol,yCol)
+
+        if xCol=='OBSDATE':
+            xmin = str(mdates.num2date(xlim[0]).date())
+            xmax = str(mdates.num2date(xlim[1]).date())
+            xmin=datetime.strptime(xmin, '%Y-%m-%d')
+            xmax=datetime.strptime(xmax, '%Y-%m-%d')
+        else:
+            xmin = xlim[0]
+            xmax = xlim[1]
+        
+        ymin = ylim[0]
+        ymax = ylim[1]
+
+        print(xmin,xmax)
+        print(f"Zoomed: ymin={ymin}, ymax={ymax}")
+        print(f"Zoomed: xmin={xmin}, xmax={xmax}")
+
+        # conditions
+        cond1=(self.df[xCol]>=xmin) & (self.df[xCol]<=xmax)
+        cond2=(self.df[yCol]>=ymin) & (self.df[yCol]<=ymax)
+
+        # get data based on zoomed area
+        df=self.df[cond1&cond2]
+        # df=df[cond2]
+
+        print(df['OBSDATE'])#[[xCol,yCol]])
+
+        # show plots of zoomed area
+
+        # sys.exit()
+
+        # # src info
+        srcname=df['OBJECT'].iloc[0]
+
+        if srcname.startswith('P'):
+            l=srcname[1:]
+            if 'M' in l:
+                l='P'+l.replace('M','-')
+            elif 'P' in l:
+                l='P'+l.replace('P','+')
+            srcname=l
+
+        elif srcname.startswith('J'):
+            l=srcname[1:]
+            if 'M' in l:
+                l='J'+l.replace('M','-')
+            elif 'P' in l:
+                l='J'+l.replace('P','+')
+            srcname=l
+        else:
+            pass
+
+        
+
+        freq = int(df['CENTFREQ'].iloc[0])
+
+        print(f'\nPlotting data for {srcname} at freq: {freq} MHz')
+
+        # # Get plot paths
+        # image_dir = f"plots/{srcname}/{freq}"
+        image_dir=os.path.join(os.path.abspath('.'),'plots')
+        image_paths = []
+
+        image_names=os.listdir(f'{image_dir}/{srcname}/{freq}/')
+
+        print(f'\nSEARCHING THROUGH: {len(image_names)} IMAGES\n')
+
+        # print(image_names)
+        df['FILES'] = df['FILENAME'].str[:18]
+        files=sorted(df['FILES'].tolist())
+        # filepaths=sorted(df['FILENAME'].tolist())
+
+        # print(df['FILES'].tolist())
+        # sys.exit()
+
+        for fl in files:
+        #     for pos in ['N','S','O']:
+        #         for pol in ['L','R']:
+            for flimg in image_names:
+                if fl in flimg:
+                    image_paths.append(f'{image_dir}/{srcname}/{freq}/{flimg}')
+        
+        image_paths=sorted(image_paths)
+        # print(image_paths)
+        
+        self.print_basic_stats(df, yCol)
+
+        script = ''' const images='''+f'{image_paths}'+''';
+            const imagesPerPage = 20;
+      let currentPage = 1;
+
+      function displayImages(page) {
+        const gallery = document.getElementById("image-gallery");
+        gallery.innerHTML = "";
+
+        const startIndex = (page - 1) * imagesPerPage;
+        const endIndex = startIndex + imagesPerPage;
+
+        for (let i = startIndex; i < endIndex && i < images.length; i++) {
+          const img = document.createElement("img");
+          img.src = images[i];
+          gallery.appendChild(img);
+        }
+      }
+
+      function buildPagination() {
+        const pagination = document.getElementById("pagination");
+        pagination.innerHTML = "";
+
+        const totalPages = Math.ceil(images.length / imagesPerPage);
+
+        for (let i = 1; i <= totalPages; i++) {
+          const li = document.createElement("li");
+          li.classList.add("page-item");
+          const a = document.createElement("a");
+          a.classList.add("page-link");
+          a.href = "#";
+          a.textContent = i;
+          a.addEventListener("click", () => {
+            currentPage = i;
+            displayImages(currentPage);
+            updateActivePage();
+          });
+          li.appendChild(a);
+          pagination.appendChild(li);
+        }
+      }
+
+      function updateActivePage() {
+        const pagination = document.getElementById("pagination");
+        const pageItems = pagination.querySelectorAll(".page-item");
+        pageItems.forEach((item, index) => {
+          if (index + 1 === currentPage) {
+            item.classList.add("active");
+          } else {
+            item.classList.remove("active");
+          }
+        });
+      }
+
+      displayImages(currentPage);
+      buildPagination();
+      updateActivePage();
+
+            '''
+
+        file_path = sys.path[0]
+        print(file_path)
+        
+
+        with open(f'{file_path}/gui/assets/script2.js','w+') as f:
+            f.write(script)
+
+        htmlstart = '<html> <head>\
+                            <meta charset = "utf-8" >\
+                            <meta http-equiv="X-UA-Compatible" content="IE=edge">\
+                            <meta name = "viewport" content = "width=device-width, initial-scale=1" > \
+                            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>\
+                               <link rel="stylesheet" href="src/dran2/gui/assets/style2.css">\
+                                <title>Driftscan plots</title>\
+                                </head>\
+                                <body>\
+                                        <h1> Plotting folder '+srcname.upper() + ' @ '+ str(int(freq)) +' MHz </h1> \
+                                        <div class="gallery-container">\
+                                            <div class="gallery" id="gallery"></div>\
+                                            <div class="pagination" id="pagination">\
+                                                <button id="prev-btn" disabled>Previous</button>\
+                                                <div id="page-numbers"></div>\
+                                                <button id="next-btn">Next</button>\
+                                            </div>\
+                                        </div>\
+                                <script src="src/dran2/gui/assets/script3.js"></script>\
+                                </body></html>'        
+                                                                     
+        htmlmid=''
+      
+        html=htmlstart
+
+                # create the html file
+        path = os.path.abspath('temp.html')
+        print(path)
+        url = 'file://' + path
+
+        print(url)
+        # sys.exit()
+        with open(path, 'w') as f:
+            f.write(html)
+        webbrowser.open(url)
+
+    def delete_zoomed_area(self):
+        pass
 
     def filter_timeseries_data(self):
         """Filter the timeseries data based on user selection."""
@@ -688,1012 +786,464 @@ class Main(QtWidgets.QMainWindow, Ui_MainWindow):
             elif filter_text == "binning":
                 print("Binning not implemented yet")
 
-    def fit_timeseries(self):
-        """Fits the timeseries data based on the selected fit type and order."""
 
-        print('\n***** Running fit_timeseries\n')
-        fit_type = self.time_ui.comboBoxFitTypes.currentText()
-        fit_order = self.time_ui.comboBoxOrder.currentText()
-
-        if fit_order == "Order" or fit_type == "Type":
-            print("Please select a fit type and order")
-            return
-
-        x_col = self.canvas.x_label
-        y_col = self.canvas.y_label
-
-        if x_col != "MJD":
-            print("X-axis must be MJD")
-            return
-
-        x = np.array(self.canvas.x).astype(float)
-        y = np.array(self.canvas.y).astype(float)
-
-        # Get start and end dates from UI inputs
-        try:
-            start_date = int(self.time_ui.EdtStartDate.text())
-        except ValueError:
-            start_date = None
-        try:
-            end_date = int(self.time_ui.EdtEndDate.text())
-        except ValueError:
-            end_date = None
-
-        # Apply date range filtering
-        if start_date is not None or end_date is not None:
-            if start_date is not None and end_date is not None:
-                mask = (x >= start_date) & (x <= end_date)
-            elif start_date is not None:
-                mask = x >= start_date
-            else:
-                mask = x <= end_date
-            x, y = x[mask], y[mask]
-
-        if fit_type == "Polynomial":
-            # Perform polynomial fit
-            
-            xm, model, res, rma, coeffs = fit.calc_residual_and_rms_fit(x, y, int(fit_order))
-            # ... (rest of the polynomial fit logic)
-
-        elif fit_type == "Spline":
-            knots = int(self.time_ui.EdtSplKnots.text())
-            if knots < 9:
-                knots = 9
-            xm, model = fit.spline_fit(x, y, knots, int(fit_order))
-            # ... (rest of the spline fit logic)
-
-        # Plot the fitted model
-        self.canvas.plot_dual_fig(x, y, xm, model, 'data', 'model', 'Plot of data vs fitted model')
-
-    def update_point(self):
-        """
-        Updates the selected point in the database and plot.
-
-        Raises:
-            ValueError: If setting a column value to NaN fails.
-        """
-
-        print('\n***** Running update_point\n')
-
-        # Get selected point and data
-        fit_points = self.canvas.fit_points
-        click_index = self.canvas.click_index
-
-        if not fit_points or not click_index:
-            print("No point selected.")
-            return
-
-        pos = int(click_index[0])  # Point index to delete
-        df_row = self.df.iloc[pos]
-
-        # Print confirmation message
-        print(f'\nDeleting points from row: {pos}')
-        print(f'Object: {df_row["OBJECT"]}')
-        print(f'Date: {df_row["OBSDATE"].date()}')
-        print(f'Frequency: {df_row["CENTFREQ"]}\n')
-        print(f"- (x: {fit_points[0][0]})\n"
-            f"- (y: {fit_points[0][1]})\n"
-            )
+    def _process_numeric_columns(self):
+        """Convert appropriate columns to numeric values."""
+        # List of column patterns to exclude from numeric conversion
+        exclude_patterns = [
+            'FILE', 'FRONT', 'OBJ', 'SRC', 'OBS', 'PRO', 'TELE', 'HDU',
+            'id', 'DATE', 'UPGR', 'TYPE', 'COOR', 'EQU', 'RADEC', 'SCAND',
+            'BMO', 'DICH', 'PHAS', 'POINTI', 'TIME', 'INSTRU', 'INSTFL',
+            'time', 'HABM'
+        ]
         
-        # Update value in DataFrame
-        ycol=self.canvas.ylab
-        self.df.at[pos, ycol] = np.nan  # Example update, change as needed
-
-        # print(self.df['MJD'].to_list())
-        # print(self.df[self.df['MJD']<=2])
-
-        # Clear the plot and re-plot the updated data
-        self.canvas.clear_figure()
-        self.plot_cols(self.canvas.xlab, self.canvas.ylab)
-
-        # update db
-        print(f'\nUpdating table "{self.table}" in database "{self.dbFile}"\n')
-        # print()
-        cnx = sqlite3.connect(self.dbFile)
-        self.df.to_sql(self.table,cnx,if_exists='replace',index=False)
-        cnx.close()
-
-
-    def set_to_zero(self,on,val):
-        """set value to zero based on value from another column. 
-        e.g. set OLPSS=0 if OLTA==0"""
-        try:
-            on=float(on)
-        except:
-            pass
-        if str(on) == 'nan' or str(on) == 'np.nan' or str(on)== '0' or on==None or str(on)=='None': #on==0 or on == np.nan or on == 
-            return np.nan
-        else:
-            return val
+        # Get columns to convert to numeric
+        float_cols = [
+            col for col in self.df.columns 
+            if not any(pattern in col for pattern in exclude_patterns)
+        ]
         
-    def update_all_points(self):
-        """
-        Updates the database and plot after deleting a point from the DataFrame.
+        # Convert to numeric, coercing errors to NaN
+        self.df[float_cols] = self.df[float_cols].apply(
+            pd.to_numeric, 
+            errors='coerce'
+        )
 
-        This function retrieves the selected point, updates the DataFrame and database,
-        and then redraws the plot.
-
-        Raises:
-            Exception: If an error occurs while connecting to or updating the database.
-        """
-
-        print('\n***** Running update_all_points\n')
-        # Get selected point and index
-        fit_points = self.canvas.fit_points
-        click_index = self.canvas.click_index
-
-        if not fit_points or not click_index:
-            print("No point selected.")
-            return
-
-        # Extract data from DataFrame
-        pos = int(click_index[0])  # Point index to delete
-        df_row = self.df.iloc[pos]
-
-        # Print confirmation message
-        print(f'\nDeleting points from row: {pos}')
-        print(f'Object: {df_row["OBJECT"]}')
-        print(f'Date: {df_row["OBSDATE"].date()}')
-        print(f'Frequency: {df_row["CENTFREQ"]}\n')
-        print(f"- (x: {fit_points[0][0]})\n"
-            f"- (y: {fit_points[0][1]})\n"
+    def _ensure_positive_errors(self):
+        """Ensure all error columns contain positive values."""
+        err_cols = [c for c in self.df.columns if 'ERR' in c]
+        for col in err_cols:
+            self.df[col] = self.df.apply(
+                lambda row: self.make_positive(row[col]), 
+                axis=1
             )
 
-        #Deleting points from row: 4
-        # Object: 3C48
-        # Date: 2025-02-16
-        # Frequency: 2270.0
-
-        # - (x: 2025-02-16T00:00:00.000000000)
-        # - (y: 5.0)
-
-        # 2270 3C48
-
-        freq=int(df_row['CENTFREQ'])
-        srcname=df_row['OBJECT']
-        beam=df_row['FRONTEND']
-
-        print(freq,srcname,beam)
-        print([c for c in self.df.columns])
-        # sys.exit()
-
-        POLS=['L','R'] # POLARIZATION
-
-        if beam == '13.0S':
-            #['id', 'FILENAME', 'FILEPATH', 'CURDATETIME', 'MJD', 'OBSDATE',
-    #    'OBSTIME', 'OBSDATETIME', 'FRONTEND', 'HDULENGTH', 'OBJECT', 'SRC',
-    #    'OBSERVER', 'OBSLOCAL', 'OBSNAME', 'PROJNAME', 'PROPOSAL', 'TELESCOP',
-    #    'UPGRADE', 'CENTFREQ', 'BANDWDTH', 'LOGFREQ', 'BEAMTYPE', 'HPBW',
-    #    'FNBW', 'SNBW', 'FEEDTYPE', 'LONGITUD', 'LATITUDE', 'COORDSYS',
-    #    'EQUINOX', 'RADECSYS', 'FOCUS', 'TILT', 'TAMBIENT', 'PRESSURE',
-    #    'HUMIDITY', 'WINDSPD', 'SCANDIR', 'POINTING', 'BMOFFHA', 'BMOFFDEC',
-    #    'DICHROIC', 'PHASECAL', 'NOMTSYS', 'SCANDIST', 'SCANTIME', 'INSTRUME',
-    #    'INSTFLAG', 'HZPERK1', 'HZKERR1', 'HZPERK2', 'HZKERR2', 'TCAL1',
-    #    'TCAL2', 'TSYS1', 'TSYSERR1', 'TSYS2', 'TSYSERR2', 'ELEVATION', 'ZA',
-    #    'HA', 'ATMOSABS', 'PWV', 'SVP', 'AVP', 'DPT', 'WVD', 'OLTA', 'OLTAERR',
-    #    'OLMIDOFFSET', 'OLS2N', 'OLFLAG', 'OLBRMS', 'OLSLOPE', 'OLBASELEFT',
-    #    'OLBASERIGHT', 'OLRMSB', 'OLRMSA', 'ORTA', 'ORTAERR', 'ORMIDOFFSET',
-    #    'ORS2N', 'ORFLAG', 'ORBRMS', 'ORSLOPE', 'ORBASELEFT', 'ORBASERIGHT',
-    #    'ORRMSB', 'ORRMSA', 'time', 'FLUX', 'OLPSS', 'OLPSSERR', 'OLAPPEFF',
-    #    'ORPSS', 'ORPSSERR', 'ORAPPEFF']
-            ta=[]
-            del_ta=[]
-
-            POSITION=['O']
-            
-            for l in POLS:
-                for p in POSITION:
-                    print(f'{p}{l}')
-                    ta.append(f'{p}{l}TA')
-                    ta.append(f'{p}{l}TAERR')
-
-                    del_ta.append(f'{p}{l}TA')
-                    del_ta.append(f'{p}{l}TAERR')
-                    del_ta.append(f'{p}{l}S2N')
-                    del_ta.append(f'{p}{l}FLAG')
-                    del_ta.append(f'{p}{l}BRMS')
-                    del_ta.append(f'{p}{l}SLOPE')
-                    del_ta.append(f'{p}{l}BASELEFT')
-                    del_ta.append(f'{p}{l}BASERIGHT')
-                    del_ta.append(f'{p}{l}MIDOFFSET')
-                    del_ta.append(f'{p}{l}RMSB')
-                    del_ta.append(f'{p}{l}RMSA')    
-
-                    if p=='O':
-                        del_ta.append(f'{p}{l}PSS')
-                        del_ta.append(f'{p}{l}PSSERR')
-                        del_ta.append(f'{p}{l}APPEFF')
-
-                for c in del_ta:
-                    try:
-                        self.df.at[pos, c] = np.nan
-                    except ValueError:
-                        self.df.at[pos, c] = 0.0
-                        print(f"Warning: Setting df[{c}] to 0.0 instead of NaN")
-
-            # for c in del_ta:
-            #     if 'PSS' in c:
-
-            # print(ta,'\n') 
-                print(del_ta,'\n') 
-                del_ta=[]
-                ta=[]
-
-            # sys.exit()
-            print(f'\nUpdating table "{self.table}" in database "{self.dbFile}"\n')
-
-            cnx = sqlite3.connect(self.dbFile)
-            self.df.to_sql(self.table,cnx,if_exists='replace',index=False)
-            cnx.close()
-            pass
-
-        elif beam == '01.3S' or beam == '02.5S':
-            #['id', 'FILENAME', 'FILEPATH', 'CURDATETIME', 'MJD', 'OBSDATE', 'OBSTIME', 
-            # 'OBSDATETIME', 'FRONTEND', 'HDULENGTH', 'OBJECT', 'SRC', 'OBSERVER', 
-            # 'OBSLOCAL', 'OBSNAME', 'PROJNAME', 'PROPOSAL', 'TELESCOP', 'UPGRADE', 
-            # 'CENTFREQ', 'BANDWDTH', 'LOGFREQ', 'BEAMTYPE', 'HPBW', 'FNBW', 'SNBW', 
-            # 'FEEDTYPE', 'LONGITUD', 'LATITUDE', 'COORDSYS', 'EQUINOX', 'RADECSYS', 
-            # 'FOCUS', 'TILT', 'TAMBIENT', 'PRESSURE', 'HUMIDITY', 'WINDSPD', 'SCANDIR', 
-            # 'POINTING', 'BMOFFHA', 'BMOFFDEC', 'HABMSEP', 'DICHROIC', 'PHASECAL', 'NOMTSYS', 
-            # 'SCANDIST', 'SCANTIME', 'INSTRUME', 'INSTFLAG', 'HZPERK1', 'HZKERR1', 'HZPERK2', 
-            # 'HZKERR2', 'TCAL1', 'TCAL2', 'TSYS1', 'TSYSERR1', 'TSYS2', 'TSYSERR2', 'ELEVATION', 
-            # 'ZA', 'HA', 'PWV', 'SVP', 'AVP', 'DPT', 'WVD', 'HPBW_ARCSEC', 'ADOPTED_PLANET_TB', 
-            # 'PLANET_ANG_DIAM', 'JUPITER_DIST_AU', 'SYNCH_FLUX_DENSITY', 'PLANET_ANG_EQ_RAD', 
-            # 'PLANET_SOLID_ANG', 'THERMAL_PLANET_FLUX_D', 'TOTAL_PLANET_FLUX_D', 'TOTAL_PLANET_FLUX_D_WMAP', 
-            # 'SIZE_FACTOR_IN_BEAM', 'SIZE_CORRECTION_FACTOR', 'MEASURED_TCAL1', 'MEASURED_TCAL2', 
-            # 'MEAS_TCAL1_CORR_FACTOR', 'MEAS_TCAL2_CORR_FACTOR', 'ATMOS_ABSORPTION_CORR', 'ZA_RAD', 
-            # 'TAU221', 'TAU2223', 'TBATMOS221', 'TBATMOS2223', 'NLTA', 'NLTAERR', 'NLMIDOFFSET', 'NLS2N', 
-            # 'NLFLAG', 'NLBRMS', 'NLSLOPE', 'NLBASELEFT', 'NLBASERIGHT', 'NLRMSB', 'NLRMSA', 'SLTA', 
-            # 'SLTAERR', 'SLMIDOFFSET', 'SLS2N', 'SLFLAG', 'SLBRMS', 'SLSLOPE', 'SLBASELEFT', 'SLBASERIGHT', 
-            # 'SLRMSB', 'SLRMSA', 'OLTA', 'OLTAERR', 'OLMIDOFFSET', 'OLS2N', 'OLFLAG', 'OLBRMS', 'OLSLOPE', 
-            # 'OLBASELEFT', 'OLBASERIGHT', 'OLRMSB', 'OLRMSA', 'OLPC', 'COLTA', 'COLTAERR', 'NRTA', 'NRTAERR', 
-            # 'NRMIDOFFSET', 'NRS2N', 'NRFLAG', 'NRBRMS', 'NRSLOPE', 'NRBASELEFT', 'NRBASERIGHT', 'NRRMSB', 
-            # 'NRRMSA', 'SRTA', 'SRTAERR', 'SRMIDOFFSET', 'SRS2N', 'SRFLAG', 'SRBRMS', 'SRSLOPE', 'SRBASELEFT', 
-            # 'SRBASERIGHT', 'SRRMSB', 'SRRMSA', 'ORTA', 'ORTAERR', 'ORMIDOFFSET', 'ORS2N', 'ORFLAG', 'ORBRMS', 
-            # 'ORSLOPE', 'ORBASELEFT', 'ORBASERIGHT', 'ORRMSB', 'ORRMSA', 'ORPC', 'CORTA', 'CORTAERR', 'SLTAFERR', 
-            # 'NLTAFERR', 'OLTAFERR', 'OLPSS', 'OLPSSERR', 'OLAPPEFF', 'SRTAFERR', 'NRTAFERR', 'ORTAFERR', 'ORPSS',
-            #  'ORPSSERR', 'ORAPPEFF', 'time', 'OLPSSFERR', 'ORPSSFERR', 'TSYS1FERR', 'TSYS2FERR', 'OLPCs', 
-            # 'COLTAs', 'COLTAERRs', 'OLPCn', 'COLTAn', 'COLTAERRn', 'ORPCs', 'CORTAs', 'CORTAERRs', 'ORPCn', 
-            # 'CORTAn', 'CORTAERRn', 'SLCP', 'SLCPERR', 'SRCP', 'SRCPERR', 'STOT', 'STOTERR']
-            ta=[]
-            del_ta=[]
-
-            POSITION=['S','N','O']
-            
-            for l in POLS:
-                for p in POSITION:
-                    # print(f'{p}{l}')
-                    # ta.append(f'{p}{l}TA')
-                    # ta.append(f'{p}{l}TAERR')
-
-                    del_ta.append(f'{p}{l}TA')
-                    del_ta.append(f'{p}{l}TAERR')
-                    del_ta.append(f'{p}{l}S2N')
-                    del_ta.append(f'{p}{l}FLAG')
-                    del_ta.append(f'{p}{l}BRMS')
-                    del_ta.append(f'{p}{l}SLOPE')
-                    del_ta.append(f'{p}{l}BASELEFT')
-                    del_ta.append(f'{p}{l}BASERIGHT')
-                    del_ta.append(f'{p}{l}MIDOFFSET')
-                    del_ta.append(f'{p}{l}RMSB')
-                    del_ta.append(f'{p}{l}RMSA')    
-
-                    if p=='O':
-                        del_ta.append(f'{p}{l}PC')
-                        del_ta.append(f'C{p}{l}TA')
-                        del_ta.append(f'C{p}{l}TAERR')
-                        del_ta.append(f'{p}{l}PSS')
-                        del_ta.append(f'{p}{l}PSSERR')
-                        del_ta.append(f'{p}{l}APPEFF')
-
-                for c in del_ta:
-                    try:
-                        self.df.at[pos, c] = np.nan
-                    except ValueError:
-                        self.df.at[pos, c] = 0.0
-                        print(f"Warning: Setting df[{c}] to 0.0 instead of NaN")
-                                
-                # print(ta,'\n') 
-                print('\n',del_ta,'\n') 
-                del_ta=[]
-                ta=[]
-
-            sys.exit()
-            print(f'\nUpdating table "{self.table}" in database "{self.dbFile}"\n')
-
-            cnx = sqlite3.connect(self.dbFile)
-            self.df.to_sql(self.table,cnx,if_exists='replace',index=False)
-            cnx.close()
-            pass
-
-        elif beam == "06.0D" or beam=="03.5D":
-            #['id', 'FILENAME', 'FILEPATH', 'CURDATETIME', 'MJD', 'OBSDATE', 
-            # 'OBSTIME', 'OBSDATETIME', 'FRONTEND', 'HDULENGTH', 'OBJECT', 'SRC', 
-            # 'OBSERVER', 'OBSLOCAL', 'OBSNAME', 'PROJNAME', 'PROPOSAL', 
-            # 'TELESCOP', 'UPGRADE', 'CENTFREQ', 'BANDWDTH', 'LOGFREQ', 
-            # 'BEAMTYPE', 'HPBW', 'FNBW', 'SNBW', 'FEEDTYPE', 'LONGITUD', 
-            # 'LATITUDE', 'COORDSYS', 'EQUINOX', 'RADECSYS', 'FOCUS', 'TILT', 
-            # 'TAMBIENT', 'PRESSURE', 'HUMIDITY', 'WINDSPD', 'SCANDIR', 'POINTING',
-            #  'BMOFFHA', 'BMOFFDEC', 'HABMSEP', 'DICHROIC', 'PHASECAL', 'NOMTSYS',
-            #  'SCANDIST', 'SCANTIME', 'INSTRUME', 'INSTFLAG', 'HZPERK1', 
-            # 'HZKERR1', 'HZPERK2', 'HZKERR2', 'TCAL1', 'TCAL2', 'TSYS1', 
-            # 'TSYSERR1', 'TSYS2', 'TSYSERR2', 'ELEVATION', 'ZA', 'HA', 'PWV', 
-            # 'SVP', 'AVP', 'DPT', 'WVD', 'SEC_Z', 'X_Z', 'DRY_ATMOS_TRANSMISSION',
-            #  'ZENITH_TAU_AT_1400M', 'ABSORPTION_AT_ZENITH', 'ANLTA', 'ANLTAERR', 
-            # 'ANLMIDOFFSET', 'ANLS2N', 'BNLTA', 'BNLTAERR', 'BNLMIDOFFSET', 
-            # 'BNLS2N', 'NLFLAG', 'NLBRMS', 'NLSLOPE', 'ANLBASELOCS', 
-            # 'BNLBASELOCS', 'NLRMSB', 'NLRMSA', 'ASLTA', 'ASLTAERR', 
-            # 'ASLMIDOFFSET', 'ASLS2N', 'BSLTA', 'BSLTAERR', 'BSLMIDOFFSET', 'BSLS2N', 'SLFLAG', 'SLBRMS', 'SLSLOPE', 'ASLBASELOCS', 'BSLBASELOCS', 'SLRMSB', 'SLRMSA', 'AOLTA', 'AOLTAERR', 'AOLMIDOFFSET', 'AOLS2N', 'BOLTA', 'BOLTAERR', 'BOLMIDOFFSET', 'BOLS2N', 'OLFLAG', 'OLBRMS', 'OLSLOPE', 'AOLBASELOCS', 'BOLBASELOCS', 'OLRMSB', 'OLRMSA', 'AOLPC', 'ACOLTA', 'ACOLTAERR', 'BOLPC', 'BCOLTA', 'BCOLTAERR', 'ANRTA', 'ANRTAERR', 'ANRMIDOFFSET', 'ANRS2N', 'BNRTA', 'BNRTAERR', 'BNRMIDOFFSET', 'BNRS2N', 'NRFLAG', 'NRBRMS', 'NRSLOPE', 'ANRBASELOCS', 'BNRBASELOCS', 'NRRMSB', 'NRRMSA', 'ASRTA', 'ASRTAERR', 'ASRMIDOFFSET', 'ASRS2N', 'BSRTA', 'BSRTAERR', 'BSRMIDOFFSET', 'BSRS2N', 'SRFLAG', 'SRBRMS', 'SRSLOPE', 'ASRBASELOCS', 'BSRBASELOCS', 'SRRMSB', 'SRRMSA', 'AORTA', 'AORTAERR', 'AORMIDOFFSET', 'AORS2N', 'BORTA', 'BORTAERR', 'BORMIDOFFSET', 'BORS2N', 'ORFLAG', 'ORBRMS', 'ORSLOPE', 'AORBASELOCS', 'BORBASELOCS', 'ORRMSB', 'ORRMSA', 'AORPC', 'ACORTA', 'ACORTAERR', 'BORPC', 'BCORTA', 'BCORTAERR', 'time', 'FLUX', 'AOLPSS', 'AOLPSSERR', 'CAOLTA', 'CAOLTAERR', 'AOLAPPEFF', 'ASLTAFERR', 'ANLTAFERR', 'AOLTAFERR', 'AOLPSSFERR', 'AORPSS', 'AORPSSERR', 'CAORTA', 'CAORTAERR', 'AORAPPEFF', 'ASRTAFERR', 'ANRTAFERR', 'AORTAFERR', 'AORPSSFERR', 'TSYS1FERR', 'TSYS2FERR', 'BOLPSS', 'BOLPSSERR', 'CBOLTA', 'CBOLTAERR', 'BOLAPPEFF', 'BSLTAFERR', 'BNLTAFERR', 'BOLTAFERR', 'BOLPSSFERR', 'BORPSS', 'BORPSSERR', 'CBORTA', 'CBORTAERR', 'BORAPPEFF', 'BSRTAFERR', 'BNRTAFERR', 'BORTAFERR', 'BORPSSFERR', 'AOLPCs', 'CACOLTAs', 'CACOLTAERRs', 'AOLPCn', 'CACOLTAn', 'ACOLTAERRn', 'AORPCs', 'CACORTAs', 'CACORTAERRs', 'AORPCn', 'CACORTAn', 'ACORTAERRn', 'BOLPCs', 'CBCOLTAs', 'CBCOLTAERRs', 'BOLPCn', 'CBCOLTAn', 'BCOLTAERRn', 'BORPCs', 'CBCORTAs', 'CBCORTAERRs', 'BORPCn', 'CBCORTAn', 'BCORTAERRn']
+    def _finalize_setup(self):
+        """Finalize UI and event connections."""
+        self.enable_time_buttons()
+        self.connect_ui_events()
+        # self.populate_cols()
         
-            ta=[]
-            del_ta=[]
-
-            POSITION=['S','N','O']
-            BEAMS=['A','B']
-            
-            for l in POLS:
-                if l=='L':
-                    del_ta.append(f'TSYS1')
-                    del_ta.append(f'TSYSERR1')
-                else:
-                    del_ta.append(f'TSYS2')
-                    del_ta.append(f'TSYSERR2')
-                for b in BEAMS:
-                    for p in POSITION:
-                        # print(f'{p}{l}')
-                        # ta.append(f'{p}{l}TA')
-                        # ta.append(f'{p}{l}TAERR')
-
-                        del_ta.append(f'{b}{p}{l}TA')
-                        del_ta.append(f'{b}{p}{l}TAERR')
-                        del_ta.append(f'{b}{p}{l}S2N')
-                        del_ta.append(f'{b}{p}{l}FLAG')
-                        del_ta.append(f'{b}{p}{l}BRMS')
-                        del_ta.append(f'{b}{p}{l}SLOPE')
-                        del_ta.append(f'{b}{p}{l}BASELEFT')
-                        del_ta.append(f'{b}{p}{l}BASERIGHT')
-                        del_ta.append(f'{b}{p}{l}MIDOFFSET')
-                        del_ta.append(f'{b}{p}{l}RMSB')
-                        del_ta.append(f'{b}{p}{l}RMSA')    
-
-                        if p=='O':
-                            del_ta.append(f'{b}{p}{l}PC')
-                            del_ta.append(f'{b}C{p}{l}TA')
-                            del_ta.append(f'{b}C{p}{l}TAERR')
-                            del_ta.append(f'{b}{p}{l}PSS')
-                            del_ta.append(f'{b}{p}{l}PSSERR')
-                            del_ta.append(f'{b}{p}{l}APPEFF')
-
-                    for c in del_ta:
-                        try:
-                            self.df.at[pos, c] = np.nan
-                        except ValueError:
-                            self.df.at[pos, c] = 0.0
-                            print(f"Warning: Setting df[{c}] to 0.0 instead of NaN")
-                                    
-                    # print(ta,'\n') 
-                    print('\n',del_ta,'\n') 
-                    del_ta=[]
-                    ta=[]
-
-            # sys.exit()
-            print(f'\nUpdating table "{self.table}" in database "{self.dbFile}"\n')
-
-            cnx = sqlite3.connect(self.dbFile)
-            self.df.to_sql(self.table,cnx,if_exists='replace',index=False)
-            cnx.close()
-            pass
-
-        else:
-            print(f'Invalid beam: {beam}')
-            sys.exit()
-        # Clear the plot and re-plot the updated data
-        self.canvas.clear_figure()
-        self.plot_cols(self.canvas.xlab, self.canvas.ylab)
-
-        # sys.exit()
-
-
-        # # beam=self.df['BEAMTYPE'].iloc[-1]
-        # if freq>22000:
-        #     POS=['S','N','O']
-        #     BEAMS=['']
-        #     POLS=['L','R']
-
-        #     ta=[]
-        #     del_ta=[]
-        #     for b in BEAMS:
-        #         for l in POLS:
-        #             for s in POS:
-        #                 ta.append(f'{b}{s}{l}TA')
-        #                 ta.append(f'{b}{s}{l}TAERR')
-
-        #                 del_ta.append(f'{b}{s}{l}TA')
-        #                 del_ta.append(f'{b}{s}{l}TAERR')
-
-        #                 del_ta.append(f'{b}{s}{l}S2N')
-        #                 del_ta.append(f'{b}{s}{l}FLAG')
-        #                 del_ta.append(f'{b}{s}{l}BRMS')
-        #                 del_ta.append(f'{b}{s}{l}SLOPE')
-        #                 del_ta.append(f'{b}{s}{l}BASELEFT')
-        #                 del_ta.append(f'{b}{s}{l}BASERIGHT')
-        #                 del_ta.append(f'{b}{s}{l}RMSB')
-        #                 del_ta.append(f'{b}{s}{l}RMSA')
-
-        #                 if s=='O':
-        #                     del_ta.append(f'{b}{s}{l}PSS')
-        #                     del_ta.append(f'{b}{s}{l}PSSERR')
-        #                     del_ta.append(f'{b}{s}{l}PC')
-        #                     del_ta.append(f'C{b}{s}{l}TA')
-        #                     del_ta.append(f'C{b}{s}{l}TAERR')
-        #                     del_ta.append(f'{b}{s}{l}APPEFF')
-                        
-        #                 print(f'{b}{s}{l}FERR')
-        #                 self.df[f'{b}{s}{l}TAFERR'] = self.df[f'{b}{s}{l}TAERR'].astype(float)/self.df[f'{b}{s}{l}TA'].astype(float) 
-
-        #             print()
-
-        #             for c in del_ta:
-        #                 try:
-        #                     self.df.at[i, c] = np.nan
-        #                 except ValueError:
-        #                     self.df.at[i, c] = 0.0
-        #                     print(f"Warning: Setting {c} to 0.0 instead of NaN")
-                            
-        #             print(ta,'\n')
-
-        #             if 'JUPITER' in srcname.upper():
-        #                 self.df[f'CORR_{b}{s}{l}DATA'] = self.df.apply(lambda row: calc_pc_pss(row[ta[0]], row[ta[1]],row[ta[2]], row[ta[3]],row[ta[4]], row[ta[5]], row['TOTAL_PLANET_FLUX_D'], df), axis=1)
-        #                 print(f'{b}{s}{l}PSS', f'{b}{s}{l}PSSERR',f'{b}{s}{l}PC',f'C{b}{s}{l}TA',f'C{b}{s}{l}TAERR',f'{b}{s}{l}PPEFF')
-        #                 self.df[[f'{b}{s}{l}PSS', f'{b}{s}{l}PSSERR',f'{b}{s}{l}PC',f'C{b}{s}{l}TA',f'C{b}{s}{l}TAERR',f'{b}{s}{l}APPEFF']] = pd.DataFrame(self.df[f'CORR_{b}{s}{l}DATA'].tolist(), index=self.df.index)
-        #                 self.df[f'{b}{s}{l}PSS'] = self.df[f'{b}{s}{l}PSS'].replace(0, np.nan)
-        #                 self.df.drop(f'CORR_{b}{s}{l}DATA', axis=1, inplace=True)
-                    
-        #             else:
-        #                 self.df[f'CORR_{b}{s}{l}DATA'] = self.df.apply(lambda row: calibrate(row[ta[0]], row[ta[1]],row[ta[2]], row[ta[3]],row[ta[4]], row[ta[5]], df), axis=1)
-        #                 print(f'{b}{s}{l}PC',f'C{b}{s}{l}TA',f'C{b}{s}{l}TAERR')
-        #                 self.df[[f'{b}{s}{l}PC',f'C{b}{s}{l}TA',f'C{b}{s}{l}TAERR']] = pd.DataFrame(self.df[f'CORR_{b}{s}{l}DATA'].tolist(), index=self.df.index)
-        #                 self.df.drop(f'CORR_{b}{s}{l}DATA', axis=1, inplace=True)
-                    
-        #             cnx = sqlite3.connect(self.dbFile)
-        #             self.df.to_sql(self.table,cnx,if_exists='replace',index=False)
-        #             cnx.close()
-
-        #             ta=[]
-        #             del_ta=[]
-
-            # self.plot_cols(x_col,y_col)
-
-        # if beam=='03.5D' or beam=='06.0D':
-        #     print()
-            
-        #     sys.exit()
-        #     POS=['S','N','O']
-        #     BEAMS=['A','B']
-        #     POLS=['L','R']
-
-
-
-    def reset_timeseries(self):
-        """
-        Resets the timeseries data to its original state and updates the plot.
-
-        This function restores the original DataFrame (`orig_df`) to the `df`
-        attribute and clears the current plot. It then calls the `plot_cols`
-        function to redraw the plot with the original data.
-        """
-
-        print('\n***** Running reset_timeseries\n')
-        self.df = self.orig_df.copy()  # Create a copy to avoid modifying the original
-        self.canvas.clear_figure()
-        self.plot_cols()
+    def _load_database_tables(self, cnx):
+        """Load tables from database and initialize main dataframe."""
+        dbTableList = pd.read_sql_query(
+            "SELECT name FROM sqlite_schema WHERE type='table'", 
+            cnx
+        )
+        self.tables = sorted(dbTableList['name'].tolist())
         
-    def save_time_db(self, filename=""):
+        # Filter out sqlite system tables
+        self.tables = [c for c in self.tables if 'sqlite' not in c]
+        
+        if not self.tables:
+            raise ValueError("No valid tables found in database")
+        
+        self.table = self.tables[0]
+        self.df = pd.read_sql_query(f"SELECT * FROM '{self.table}'", cnx)
+        self.orig_df = self.df.copy()
+
+    def parse_time(self,timeCol):
         """
-        Saves the analysis results of the timeseries to a CSV file.
+        Parses the time column and returns only the date part.
 
         Args:
-            filename (str, optional): The desired filename for the CSV file.
-                If not provided, a default filename will be used.
+            timeCol (str): The time column to parse"""
+        
+        # print('\n***** Running parse_time\n')
+        if 'T' in timeCol:
+            return timeCol.split('T')[0]
+        else:
+            return timeCol.split(' ')[0]
+        
+    def _process_dataframe(self):
+        """Process and clean the main dataframe."""
 
-        Saves the current DataFrame (`self.df`) to a CSV file with the specified
-        filename. If no filename is provided, the default filename "Analysis_results.csv"
-        will be used.
+        # Sort and process dates
+        self.df.sort_values('FILENAME', inplace=True)
+        self.df['OBSDATE'] = self.df.apply(
+            lambda row: self.parse_time(row['OBSDATE']), 
+            axis=1
+        )
+        self.df["OBSDATE"] = pd.to_datetime(self.df["OBSDATE"]).dt.date
+        self.df["OBSDATE"] = pd.to_datetime(self.df["OBSDATE"], format="%Y-%m-%d")
+        
+        # Remove duplicates
+        # ids = self.df['MJD']
+        # self.df = self.df[ids.isin(ids[ids.duplicated()])].sort_values("MJD")
+        # self.df = self.df.drop_duplicates(
+        #     subset=['time'],
+        #     keep="first"
+        # ).sort_values(by='time', ascending=True)
+ 
+    # def open_db_path(self):
+    #     """Open a SQLite database file, load its contents, and initialize UI components."""
+    
+
+    #     self.write("Opening DB",'info')
+    #     print('\n***** Running open_db\n')
+
+    #     # Get the database file path
+    #     # self.dbFile='/Users/pfesesanivanzyl/dran/resultsFromAnalysis/JUPITER/JUPITER.db'
+    #     self.dbFilePath = self.open_file_name_dialog("*.db")
+
+    #     if self.dbFilePath == None:
+    #         self.write("You need to select a file to open",'info')
+    #         self.write("Please select a file",'info')
+    #         pass
+    #     else:
+
+    #         # free all else
+    #         # Enable UI components
+    #         self._enable_plot_ui_components(True)
+
+    #         # open db and get tables
+    #         cnx = sqlite3.connect(self.dbFilePath)
+    #         dbTableList=pd.read_sql_query("SELECT name FROM sqlite_schema WHERE type='table'", cnx)
+    #         self.plot_tables = sorted(dbTableList['name'].tolist())
+    #         self.plot_table=self.plot_tables[0]
+
+    #         self.plot_df = pd.read_sql_query(f"SELECT * FROM '{self.plot_table}'", cnx)
+    #         self.plot_df.sort_values('FILENAME',inplace=True)
+    #         self.plot_df['OBSDATE'] = self.plot_df.apply(lambda row: self.parse_time(row['OBSDATE']), axis=1)
+    #         self.plot_df["OBSDATE"] = pd.to_datetime(self.plot_df["OBSDATE"], format="%Y-%m-%d")   
+
+    #         self.orig_df=self.plot_df.copy()
+    #         cnx.close()
+
+    #         # remove duplicates
+    #         ids=self.plot_df['MJD']
+    #         self.plot_df=self.plot_df[ids.isin(ids[ids.duplicated()])].sort_values("MJD")
+    #         # self.plot_df=self.plot_df.drop_duplicates(subset=['time'],keep="first").sort_values(by='time',ascending=True)
+            
+
+    #         print('Plot Tables:',self.plot_tables)
+
+    #         self._update_plot_ui_combobox()
+
+    def _update_plot_ui_combobox(self):
+        """Update the combo box with available tables."""
+        self.plot_ui.comboBox.clear()
+        self.plot_ui.comboBox.addItems(self.plot_tables)
+
+    def _enable_plot_ui_components(self, enable: bool):
+        """Enable or disable plot UI components."""
+        components = [
+            self.plot_ui.btnDelete,
+            self.plot_ui.btnRefreshPlotList,
+            self.plot_ui.btnShow,
+            self.plot_ui.comboBox,
+            self.plot_ui.comboBoxFilter,
+            self.plot_ui.comboBoxOptions,
+            self.plot_ui.txtBoxEnd,
+            self.plot_ui.txtBoxStart
+        ]
+        for component in components:
+            component.setEnabled(enable)
+    
+    def _setup_with_file_state(self):
+        """Configure UI for state when a file is loaded."""
+        self.open_drift_window()
+        self.log.debug("Auto-opened drift window for loaded file")
+
+    def _configure_button(self, button, background_color, text_color):
+        """Helper method to standardize button styling.
+        
+        Args:
+            button: QPushButton to configure
+            background_color: str color name or hex value
+            text_color: str color name or hex value
+        """
+        button.setStyleSheet(
+            f"QPushButton {{ background-color: {background_color}; color: {text_color}; }}"
+        )
+        button.setEnabled(True)
+
+    def open_drift_window(self):
+        """Initializes and displays the drift scan editing window with all components.
+        
+        Creates the window, sets up canvases, configures layouts, connects signals,
+        and displays the window with initial messages.
         """
 
-        print('\n***** Running save_time_db\n') 
-
-        if not filename:
-            filename = "Analysis_results.csv"
-
-        self.df.to_csv(filename, index=False)  # Save without row indices
-        print(f"Saved results to {filename}")
-
-    def populate_cols(self,xcol='',ycol='',yerrcol='',table=''):
-        """Fetches data from the database and populates UI elements."""
+        self.log.debug("Initializing drift scan window")
         
-        print('\n***** Running populate_cols\n')
-        # create dataframe from current database table -> self.df
-        self.create_df_from_db(table)
-
-        # Handle empty table selection
-        self.table = self.time_ui.comboBoxTables.currentText()
-        # print(self.tables)
-        # sys.exit()
-
-        if not self.table:
-            self.time_ui.comboBoxTables.clear()
-            self.time_ui.comboBoxTables.addItems(self.tables)
-            self.table = self.time_ui.comboBoxTables.currentText()
-
-        self.colNames = self.df.columns.tolist()
-
-        # exclude the following columns from plotting
-        plotCols=[]
-        for name in self.colNames:
-            if 'id' in name  or 'LOGFREQ' in name or 'CURDATETIME' in name or \
-                'FILE' in name or 'OBSD' in name \
-                    or 'MJD' in name or 'OBS' in name or 'OBJ' in name or 'id' == name \
-                        or 'RAD' in name or 'TYPE' in name or 'PRO' in name or 'TELE' in\
-                              name or 'UPGR' in name  or 'INST' in name or \
-                                'SCANDIR' in name or 'SRC' in name or 'COORDSYS' in name or 'LONGITUD' in name \
-                                    or 'LATITUDE' in name  or 'POINTING' in name \
-                                       or 'DICHROIC' in name \
-                                            or 'PHASECAL' in name or 'HPBW' in name or 'FNBW' in name or 'SNBW' in name\
-                                                or 'FRONTEND' in name or 'BASE' in name:
-                pass
-            else:
-                plotCols.append(name)
-        
-        # setup error columns
-        errcols=[]
-        for name in self.colNames:
-            if   'ERR' in name:
-                errcols.append(name)
-            else:
-                pass
-
-        # setup X and Y columns
-        xCols=['OBSDATE','MJD','HA','ELEVATION']
-        xCols=xCols+[c for c in self.colNames if 'RMS' in c or 'SLOPE' in c]
-
-        yerr=['None']
-        self.yErr=list(yerr)+list(errcols)
-
-        # prep columns
-        print('cols: ',xcol,ycol,yerrcol)
-        self.time_ui.comboBoxColsX.clear()
-        self.time_ui.comboBoxColsX.clear()
-        if xcol!='':
-            self.time_ui.comboBoxColsX.setCurrentText(xcol)
-        else:
-            self.time_ui.comboBoxColsX.addItems(xCols)
-        self.time_ui.comboBoxColsY.clear()
-        self.time_ui.comboBoxColsY.clear()
-        if ycol!='':
-            self.time_ui.comboBoxColsY.setCurrentText(ycol)
-        else:
-            self.time_ui.comboBoxColsY.addItems(plotCols)
-       
-        self.time_ui.comboBoxColsYerr.clear()
-        self.time_ui.comboBoxColsYerr.clear()
-        if yerrcol!='':
-            self.time_ui.comboBoxColsYerr.setCurrentText(yerrcol)
-        else:
-            self.time_ui.comboBoxColsYerr.addItems(self.yErr)
-
-        # print('cols: ',xcol,ycol,yerrcol)
-        # self.time_ui.comboBoxColsX.addItems(xCols)
-        # self.time_ui.comboBoxColsY.addItems(plotCols)
-        # self.time_ui.comboBoxColsYerr.addItems(self.yErr)
-
-    def open_db_path(self):
-        # Open a database
-
-        self.write("Opening DB",'info')
-
-        print('\n***** Running open_db\n')
-        # Get the database file path
-        # self.dbFile='/Users/pfesesanivanzyl/dran/resultsFromAnalysis/JUPITER/JUPITER.db'
-        self.dbFilePath = self.open_file_name_dialog("*.db")
-
-        if self.dbFile == None:
-            self.write("You need to select a file to open",'info')
-            self.write("Please select a file",'info')
-            pass
-        else:
-
-            # free all else
-            free=True
-            self.plot_ui.btnDelete.setEnabled(free)
-            self.plot_ui.btnRefreshPlotList.setEnabled(free)
-            self.plot_ui.btnShow.setEnabled(free)
-            self.plot_ui.comboBox.setEnabled(free)
-            self.plot_ui.comboBoxFilter.setEnabled(free)
-            self.plot_ui.comboBoxOptions.setEnabled(free)
-            self.plot_ui.txtBoxEnd.setEnabled(free)
-            self.plot_ui.txtBoxStart.setEnabled(free)
-
-            # open db and get tables
-            cnx = sqlite3.connect(self.dbFile)
-            dbTableList=pd.read_sql_query("SELECT name FROM sqlite_schema WHERE type='table'", cnx)
-            self.plot_tables = sorted(dbTableList['name'].tolist())
-            self.plot_table=self.plot_tables[0]
-            self.plot_df = pd.read_sql_query(f"SELECT * FROM {self.plot_table}", cnx)
-            self.plot_df.sort_values('FILENAME',inplace=True)
-            self.plot_df['OBSDATE'] = self.plot_df.apply(lambda row: self.parse_time(row['OBSDATE']), axis=1)
-            self.plot_df["OBSDATE"] = pd.to_datetime(self.plot_df["OBSDATE"], format="%Y-%m-%d")   
-
-            self.orig_df=self.plot_df.copy()
-            cnx.close()
-
-            print('WTables:',self.plot_tables)
-
-            self.plot_ui.comboBox.clear()     
-            self.plot_ui.comboBox.clear()      
-            self.plot_ui.comboBox.addItems(self.plot_tables)
-
-    def on_combo_changed(self):
-
-        print("\nChanged obs. to: ", self.plot_ui.comboBox.currentText())
-
-        # get data from db
-        # check folder name against table name
-        folderName=self.plot_ui.comboBox.currentText()
-
-        # get column names from db and put them in combobox
-        colNames=self.plot_df.columns.tolist()
-
-        plotCols=[]
-        for name in colNames:
-            if 'id' in name  or 'LOGFREQ' in name or 'CURDATETIME' in name or \
-                'FILE' in name or 'OBSD' in name \
-                    or 'MJD' in name or 'OBS' in name or 'OBJ' in name or 'id' == name \
-                        or 'RAD' in name or 'TYPE' in name or 'PRO' in name or 'TELE' in\
-                              name or 'UPGR' in name  or 'INST' in name or \
-                                'SCANDIR' in name or 'SRC' in name or 'COORDSYS' in name or 'LONGITUD' in name \
-                                    or 'LATITUDE' in name  or 'POINTING' in name \
-                                       or 'DICHROIC' in name \
-                                            or 'PHASECAL' in name or 'HPBW' in name or 'FNBW' in name or 'SNBW' in name\
-                                                or 'FRONTEND' in name or 'BASE' in name: 
-                pass
-            else:
-                plotCols.append(name)
-
-        self.plot_ui.comboBoxOptions.clear()
-        self.plot_ui.comboBoxOptions.clear()
-        self.plot_ui.comboBoxOptions.addItems(plotCols)
-
-        self.plot_ui.comboBoxFilter.clear()
-        self.plot_ui.comboBoxFilter.clear()
-        self.plot_ui.comboBoxFilter.addItems(['','>','>=','<','<='])#,'between']'=',)
-
-    def toggle_range_filter(self,toggle):
-
-        self.plot_ui.LblRangeFilter.setVisible(toggle)
-        self.plot_ui.LblStart.setVisible(toggle)
-        self.plot_ui.LblStop.setVisible(toggle)
-        self.plot_ui.LblFormat.setVisible(toggle)
-        # self.plot_ui.txtBoxEnd.setVisible(toggle)
-        # self.plot_ui.txtBoxStart.setVisible(toggle)
-
-    def add_items_to_combobox(self):
-        """Refreshes the list of folders containing plots to be displayed."""
-
-        # Clear all combo boxes
-        for combo_box in (
-            self.plot_ui.comboBox,
-            self.plot_ui.comboBoxOptions,
-            self.plot_ui.comboBoxFilter,
-        ):
-            combo_box.clear()
-
-        # Add table names to the main combo box
-        self.plot_ui.comboBox.addItems(sorted(self.plot_tables))
-
-    def write(self,msg,logType=""):
-        """ Write to screen and gui """
-
-        if logType=="info":
-            msg_wrapper("info", self.log.info, msg)
-        else:
-            msg_wrapper("debug", self.log.debug, msg)
-
-    def show_plot_browser(self):
-        """Opens a web browser containing the plots to be displayed."""
-
-        # Get filter options from the UI
-        option = self.plot_ui.comboBoxOptions.currentText()
-        filter_type = self.plot_ui.comboBoxFilter.currentText()
-        filter_value = self.plot_ui.txtBoxFilter.text()
-
-        # Validate input
-        if not option:
-            print("Please select an option.")
-            return
-        
-        if not filter_type:
-            print("Please select a filter type.")
-            return
-        
-        if not filter_value:
-            print("Please enter a filter value.")
-            return
-        
-        start=self.plot_ui.txtBoxStart.text()
-        end=self.plot_ui.txtBoxEnd.text()
-
-        
-        if start=='':
-            print("Please select a start date. 'YYYY-MM-DD'")
-            return
-
-        if end=='' :
-            print("Please select an end date. 'YYYY-MM-DD'")
-            return
-        
-        
-        # Get data from the database
-        # folder_name = self.plot_ui.comboBox.currentText()
-        df=self.plot_df.copy()
-
-        print('\n','='*50,'\n')
-        if start.upper()=='START':
-            start=df['OBSDATE'].iloc[0].date()
-            print(f"Start date. '{start}'")
-            return
-        
-        if end.upper()=='END':
-            start=df['OBSDATE'].iloc[-1].date()
-            print(f"End date. '{end}'")
-            return
-        
-        # Filter data based on the selected criteria
-      
         try:
-            filter_value = float(filter_value)
-            # print(self.plot_df)
-        except ValueError:
-            print("Invalid filter value.")
-            return
-        
-        df[option]=df[option].astype(float)
-        print(f"*** Performing operation: self.plot_df['{option}'] {filter_type} {filter_value}")
-
-        # first filter by date
-        df=df[(df['OBSDATE']>=datetime.strptime(start, '%Y-%m-%d')) & (df['OBSDATE']<=datetime.strptime(end, '%Y-%m-%d'))]
-
-        # then filter by condition
-        if filter_type == '>':
-            df = df[df[option] > filter_value].sort_values('FILENAME')
-        elif filter_type == '>=':
-            df = df[df[option] >= filter_value].sort_values('FILENAME')
-        elif filter_type == '<':
-            df = df[df[option] < filter_value].sort_values('FILENAME')
-        elif filter_type == '<=':
-            df = df[df[option] <= filter_value].sort_values('FILENAME')
-        # elif filter_type == 'between':
-        #     df = df[(df[f'{option}'] >= filter_value[0]) & (df[f'{option}'] <= filter_value[1])].sort_values('FILENAME')
-        # df =df[df['OBSDATE']>=start and df['OBSDATE']<=end]
-        
-        # print(df.iloc[0])
+            self._initialize_drift_window()
+            self._setup_canvases()
+            self._setup_layouts()
+            self._show_initial_messages()
+            # self._initialize_status()
             
-        print(f'\nFound: {len(df)} rows")\n')
-        # sys.exit()
+            self.drift_window.show()
+            self.log.debug("Drift scan window displayed successfully")
 
-        # Print basic statistics
-        if len(df)>0:
+            # Welcome messages
+            self.write("** DRAN GUI loaded successfully.", "info")
+            self.write("** Open a file to get started.", "info")
 
-            print(df[option])
-            self.print_basic_stats(df, option)
+            # Set initial status (consider using a dedicated class to manage status)
+            self.status = self.initial_status  # Maybe use a status class with meaningful names for flags
 
-            # sys.exit()
-            
-            # src info
-            srcname=df['OBJECT'].iloc[0]
-            freq = int(df['CENTFREQ'].iloc[0])
+            # Show the window
+            self.drift_window.show()
 
-            print(f'Source name: {srcname}, freq: {freq} MHz')
+        except Exception as e:
+            self.log.error(f"Failed to initialize drift window: {str(e)}")
+            self.write(f"Error opening drift window: {str(e)}", "error")
+            raise
 
-            # Get plot paths
-            image_dir = f"plots/{srcname}/{freq}"
-            image_paths = []
+    def _initialize_drift_window(self):
+        """Create and configure the main drift window instance."""
+        self.drift_window = QtWidgets.QMainWindow()
+        self.drift_ui = Ui_DriftscanWindow()
+        self.drift_ui.setupUi(self.drift_window)
+        self.drift_window.setWindowTitle("Drift Scan Editor")
 
-            # print(df.columns.tolist())
+    def _setup_canvases(self):
+        """Initialize and configure all canvas components."""
+        self.canvas = CanvasManager(log=self.log)
+        self.secondary_canvas = SecondaryCanvasManager(log=self.log)
+        self.nav_toolbar = NavigationToolbar(self.canvas, self)
 
-            image_names=os.listdir(image_dir)
-
-            print(f'\nSEARCHING THROUGH: {len(image_names)} IMAGES\n')
-
-                # print(image_names)
-                # sys.exit()
-
-            file_path = sys.path[0]
-            from pathlib import Path
-            path=Path(file_path).parent
-            # print()
-            # sys.exit()
-
-            for _, row in df.iterrows():
-                    plot_tag = row['FILENAME'][:18]
-                    # print(plot_tag)
-                    # sys.exit()
-                    for image_name in image_names:
-                        if plot_tag in image_name:
-                            for pos in ['N','S','O']:
-                                for pol in ['L','R']:
-                                    # print(option, f'{pos}{pol}'  ,image_name, f'HP{pos}_{pol}CP')
-                                    # if f'{pos}{pol}' in option:
-                                    if (f'HP{pos}_{pol}CP' in image_name) and (f'{pos}{pol}' in option):
-                                            print( f'HP{pos}_{pol}CP' ,image_name, f'{pos}{pol}',option )
-                                            image_paths.append(f'{path}/{os.path.join(image_dir, image_name)}')
-                                            break
-                                    elif (f'O{pos}_{pol}CP' in image_name) and (f'O{pol}' in option):
-                                            print( f'O{pos}_{pol}CP' ,image_name, f'O{pos}{pol}',option )
-                                            image_paths.append(f'{path}/{os.path.join(image_dir, image_name)}')
-                                            break
-            print(image_paths)
-            
-
-            if len(image_paths)==0:
-                for _, row in df.iterrows():
-                    plot_tag = row['FILENAME'][:18]
-                    for image_name in image_names:
-                            if plot_tag in image_name: 
-                                # print(plot_tag, image_name)
-                                image_paths.append(f'{path}/{os.path.join(image_dir, image_name)}')
-     
-            print(image_paths)
-            # sys.exit()
-            # htmlstart = '<html> <head>\
-            #                 <meta charset = "utf-8" >\
-            #                 <meta http-equiv="X-UA-Compatible" content="IE=edge">\
-            #                 <meta name = "viewport" content = "width=device-width, initial-scale=1" > <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous"> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script> \
-            #                         <style> \
-            #                             img {border: 3px solid  # ddd; /* Gray border */border-radius: 5px;  /* Rounded border */padding: 5px; /* Some padding */width: 400px; /* Set a small width */}/* Add a hover effect (blue shadow) */\
-            #                             img:hover {box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);}\
-            #                         </style> \
-            #                     <title>Driftscan plots</title>\
-            #                     </head>\
-            #                     <div class="container-fluid"> \
-            #                         <div class="row">\
-            #                             <hr>\
-            #                             <h1> Plotting folder '+srcname.upper() + ' @ '+ str(int(freq)) +' MHz </h1> \
-            #                             <p>'
-
-            script = ''' const images='''+f'{image_paths}'+''';
-            const imagesPerPage = 20;
-      let currentPage = 1;
-
-      function displayImages(page) {
-        const gallery = document.getElementById("image-gallery");
-        gallery.innerHTML = "";
-
-        const startIndex = (page - 1) * imagesPerPage;
-        const endIndex = startIndex + imagesPerPage;
-
-        for (let i = startIndex; i < endIndex && i < images.length; i++) {
-          const img = document.createElement("img");
-          img.src = images[i];
-          gallery.appendChild(img);
+    def _setup_layouts(self):
+        """Configure and populate all UI layouts."""
+        layout_mapping = {
+            self.drift_ui.PlotLayout: [self.nav_toolbar, self.canvas],
+            self.drift_ui.otherPlotsLayout: [self.secondary_canvas]
         }
-      }
+        
+        for layout, widgets in layout_mapping.items():
+            self._populate_layout(layout, widgets)
 
-      function buildPagination() {
-        const pagination = document.getElementById("pagination");
-        pagination.innerHTML = "";
+    def _populate_layout(self, layout, widgets):
+        """Add widgets to a layout with standardized spacing."""
+        # layout.setSpacing(10)
+        # layout.setContentsMargins(5, 5, 5, 5)
+        for widget in widgets:
+            layout.addWidget(widget)
 
-        const totalPages = Math.ceil(images.length / imagesPerPage);
+    def _show_initial_messages(self):
+        """Display initial informational messages to the user."""
+        welcome_messages = [
+            ("** DRAN GUI loaded successfully.", "info"),
+            ("** Open a file to get started.", "info")
+        ]
+        
+        for msg, msg_type in welcome_messages:
+            self.log.debug(msg, msg_type)
 
-        for (let i = 1; i <= totalPages; i++) {
-          const li = document.createElement("li");
-          li.classList.add("page-item");
-          const a = document.createElement("a");
-          a.classList.add("page-link");
-          a.href = "#";
-          a.textContent = i;
-          a.addEventListener("click", () => {
-            currentPage = i;
-            displayImages(currentPage);
-            updateActivePage();
-          });
-          li.appendChild(a);
-          pagination.appendChild(li);
+    def write(self, msg: str, log_type: str = "debug") -> None:
+        """Write a message to both the GUI and application logs.
+        
+        Args:
+            msg: The message text to display/log
+            log_type: The message type - "info", "debug", "warning", or "error"
+            
+        Examples:
+            >>> self.write("Operation completed", "info")
+            >>> self.write("Debug value: 42")
+        """
+
+        # Validate input types
+        if not isinstance(msg, str):
+            raise TypeError(f"Message must be string, got {type(msg).__name__}")
+        
+        # Normalize log type and validate
+        log_type = log_type.lower().strip()
+        valid_types = {"info", "debug", "warning", "error"}
+        if log_type not in valid_types:
+            raise ValueError(f"Invalid log type '{log_type}'. Must be one of {valid_types}")
+        
+        # Map log types to appropriate handlers
+        log_handlers = {
+            "info": self.log.info,
+            "debug": self.log.debug,
+            "warning": self.log.warning,
+            "error": self.log.error
         }
-      }
+        
+        # Get the appropriate logger function
+        logger_func = log_handlers.get(log_type, self.log.debug)
+        
+        try:
+            # Log the message
+            msg_wrapper(log_type, logger_func, msg)
+            
+            # Also update GUI display if needed
+            if hasattr(self, 'statusBar'):
+                self.statusBar().showMessage(msg, 5000)  # Show for 5 seconds
+                
+        except Exception as e:
+            # Fallback to basic logging if fancy wrapper fails
+            self.log.error(f"Failed to write message: {str(e)}")
+            print(f"[{log_type.upper()}] {msg}")  # Absolute fallback
+            
+    def connect_ui_events(self):
+        """Connects all UI signals to their corresponding event handlers.
+        
+        Organizes connections by functional categories and provides clear debugging.
+        """
+        self.log.debug("Connecting UI signals to event handlers")
+        
+        try:
+            self._connect_plot_operations()
+            self._connect_data_operations()
+            self._connect_database_operations()
+        except Exception as e:
+            self.log.error(f"Failed to connect UI events: {str(e)}")
+            raise
 
-      function updateActivePage() {
-        const pagination = document.getElementById("pagination");
-        const pageItems = pagination.querySelectorAll(".page-item");
-        pageItems.forEach((item, index) => {
-          if (index + 1 === currentPage) {
-            item.classList.add("active");
-          } else {
-            item.classList.remove("active");
-          }
-        });
-      }
+    def _connect_plot_operations(self):
+        """Connect signals for plot-related operations."""
+        self.time_ui.BtnPlot.clicked.connect(self.plot_cols)
+        self.time_ui.BtnViewZoomedArea.clicked.connect(self.view_zoomed_area)
+        self.time_ui.BtnDeleteZoomedPoints.clicked.connect(self.delete_zoomed_area)
 
-      displayImages(currentPage);
-      buildPagination();
-      updateActivePage();
+    def _connect_data_operations(self):
+        """Connect signals for data manipulation operations."""
+        self.time_ui.BtnFilter.clicked.connect(self.filter_timeseries_data)
+        self.time_ui.BtnFit.clicked.connect(self.fit_timeseries)
+        # self.time_ui.BtnReset.clicked.connect(self.reset_timeseries)
 
-            '''
+    def _connect_database_operations(self):
+        """Connect signals for database-related operations."""
+        # self.time_ui.BtnRefreshDB.clicked.connect(self.refresh_db)  # Disabled for now
+        # self.time_ui.BtnSaveDB.clicked.connect(self.save_time_db)
+        pass
 
-            file_path = sys.path[0]
-            # print(file_path)
-            with open(f'{file_path}/gui/assets/script2.js','w+') as f:
-                f.write(script)
+    def _connect_point_editing(self):
+        """Connect signals for point editing operations."""
+        self.time_ui.BtnDelPoint.clicked.connect(self.update_point)
+        self.time_ui.BtnDelBoth.clicked.connect(self.update_all_points)
 
-            htmlstart = '<html> <head>\
-                            <meta charset = "utf-8" >\
-                            <meta http-equiv="X-UA-Compatible" content="IE=edge">\
-                            <meta name = "viewport" content = "width=device-width, initial-scale=1" > \
-                            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>\
-                               <link rel="stylesheet" href="src/gui/assets/style.css">\
-                                <title>Driftscan plots</title>\
-                                </head>\
-                                <body>\
-                                        <h1> Plotting folder '+srcname.upper() + ' @ '+ str(int(freq)) +' MHz </h1> \
-                                        <div class="gallery" id="image-gallery">\
-                                            </div>\
-                                        <ul class="pagination justify-content-center mt-4" id="pagination"></ul>\
-                                <script src="src/gui/assets/script2.js"></script>\
-                                </body></html>'        
-                                                                     
-            htmlmid=''
-      
-            # for img in image_paths:
-                    # print(f'Showing: {img}')
-
-            # for i in range(len(image_paths)):
-                    #print(images.split("/")[1],images.split("/")[2])
-                    # pathtoimg = images[i]
-                    # img = '<small class="card-title">'+img.split("/")[3]+'</small><br/>\
-                    #         <a target="_blank" href="'+img + \
-                    #         '"><img src="'+img + \
-                    #         '" class="card-img-top" alt="image goes here"></a>'
-                    # imglink ='<div class = "card" style = "width: 13rem;" >\
-                    #             '+img+'\
-                    #                 </div>'
-                    # htmlmid=htmlmid+imglink
-
-            # htmlmid=htmlmid+'</p></div>'
-            # htmlend = '</div></html>'
-            # html = htmlstart+htmlmid+htmlend
-            html=htmlstart
-
-                # create the html file
-            path = os.path.abspath('temp.html')
-            url = 'file://' + path
-
-            with open(path, 'w') as f:
-                    f.write(html)
-            webbrowser.open(url)
     
-    def print_basic_stats(self, df, option):
-        """Prints basic statistics for the given DataFrame and option."""
+    def fit_timeseries(self):
+        """Fit the timeseries data using the selected fit method and parameters.
+    
+        Handles polynomial and spline fits with optional date range filtering.
+        """
 
-        print("\n--- Basic stats ---\n")
+        print('\n***** Running fit_timeseries\n')
+        
+        # Validate fit parameters
+        if not self._validate_fit_parameters():
+            return
+        
+        # Get current plot data
+        if not self._validate_plot_data():
+            return
+
+     
+
+
+        # if fit_type == "Polynomial":
+        #     # Perform polynomial fit
+            
+        #     xm, model, res, rma, coeffs = fit.calc_residual_and_rms_fit(x, y, int(fit_order))
+        #     # ... (rest of the polynomial fit logic)
+
+        # elif fit_type == "Spline":
+        #     knots = int(self.time_ui.EdtSplKnots.text())
+        #     if knots < 9:
+        #         knots = 9
+        #     xm, model = fit.spline_fit(x, y, knots, int(fit_order))
+        #     # ... (rest of the spline fit logic)
+
+        # # Plot the fitted model
+        # self.canvas.plot_dual_fig(x, y, xm, model, 'data', 'model', 'Plot of data vs fitted model')
+
+    def _validate_fit_parameters(self):
+        """Check that valid fit type and order are selected."""
+        fit_type = self.time_ui.comboBoxFitTypes.currentText()
+        fit_order = self.time_ui.comboBoxOrder.currentText()
+        
+        if fit_order == "Order" or fit_type == "Type":
+            print("Please select both a fit type and order")
+            return False
+        return True
+
+    def _validate_plot_data(self):
+        """Verify we have valid plot data with MJD x-axis."""
+        if not self.canvas.has_data():
+            print("No data available for fitting")
+            return False
+            
+        if self.canvas.x_label != "MJD":
+            print("X-axis must be MJD for fitting")
+            return False
+            
+        return True
+
+    def _prepare_fit_data(self):
+        """Prepare and filter the data for fitting."""
+        try:
+            x = np.array(self.canvas.x).astype(float)
+            y = np.array(self.canvas.y).astype(float)
+            
+            # Apply date range filtering if specified
+            start_date, end_date = self._get_date_range()
+            if start_date is not None or end_date is not None:
+                mask = self._create_date_mask(x, start_date, end_date)
+                x, y = x[mask], y[mask]
+                
+            return x, y
+            
+        except Exception as e:
+            print(f"Error preparing fit data: {e}")
+            return None, None
+        
+    def _get_date_range(self):
+        """Get start and end dates from UI inputs."""
+        try:
+            start_date = int(self.time_ui.EdtStartDate.text()) if self.time_ui.EdtStartDate.text() else None
+            end_date = int(self.time_ui.EdtEndDate.text()) if self.time_ui.EdtEndDate.text() else None
+            return start_date, end_date
+        except ValueError:
+            print("Invalid date range - using full dataset")
+            return None, None
+
+    def _create_date_mask(self, x, start_date, end_date):
+        """Create mask for date range filtering."""
+        if start_date is not None and end_date is not None:
+            return (x >= start_date) & (x <= end_date)
+        elif start_date is not None:
+            return x >= start_date
+        elif end_date is not None:
+            return x <= end_date
+        return slice(None)  # No filtering
+
+
+
+    def print_stats(self, df, column):
+        """Prints basic statistics for the given DataFrame and specified column.
+        
+        Args:
+            df (pd.DataFrame): Input dataframe containing the data
+            option (str): Column name for which to calculate statistics
+        """
+        print("\n=== Statistics ===\n")
         
         try:
-            print(f'DATE start: {df["OBSDATE"].iloc[0]}')
-            print(f'DATE end: {df["OBSDATE"].iloc[-1]}')
-            print(f'MJD start: {df["MJD"].iloc[0]:.1f}')
-            print(f'MJD end: {df["MJD"].iloc[-1]:.1f}')
-            print(f'3sigma upper limit: {df[option].mean() + (df[option].mean()*df[option].std()):.3f}')
-            print(f'3sigma lower limit: {df[option].mean() - (df[option].mean()*df[option].std()):.3f}')
-        except:
-            print(f'DATE start: {df["OBSDATE"].iloc[0]}')
-            print(f'DATE end: {df["OBSDATE"].iloc[-1]}')
-            print(f'MJD start: {df["MJD"].iloc[0]:.1f}')
-            print(f'MJD end: {df["MJD"].iloc[-1]:.1f}')
+            # Date info
+            print("Date Range:")
+            print(f'Start: {df["OBSDATE"].iloc[0]} (MJD: {df["MJD"].iloc[0]:.1f})')
+            print(f'End:   {df["OBSDATE"].iloc[-1]} (MJD: {df["MJD"].iloc[-1]:.1f})\n')
+            
+            # Column stats
+            values = df[column]
+            mean = values.mean()
+            std = values.std()
+            
+            print(f"Column: {column}")
+            print(f"3sigma range: ({mean - 3*std:.3f}, {mean + 3*std:.3f})")
+            print(f"Min/Max: {values.min():.3f} / {values.max():.3f}")
+            print(f"Mean: {mean:.3f}")
+            print(f"Median: {values.median():.3f}")
+            print(f"Count: {len(values)}")
+            
+        except KeyError as e:
+            print(f"Error: Column {str(e)} not found")
+        except Exception as e:
+            print(f"Error calculating stats: {str(e)}")
         
-        print("Min:", df[option].min())
-        print("Max:", df[option].max())
-        print("Mean:", df[option].mean())
-        print("Median:", df[option].median())
-        print(f'Len:" {len(df)}')
-
-        print("-" * 20, "\n")
-        
+        print("\n" + "-"*20)

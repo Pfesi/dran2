@@ -46,3 +46,4 @@ dist*
 src/dran.egg-info
 build_dran_package.py
 setup0.py
+src/dran2/gui/

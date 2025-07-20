@@ -217,9 +217,11 @@ class TimeCanvas(FigureCanvas):
             # TODO: Button to toggle step change locations on/off
             self.ax.grid(True,alpha=0.2)
 
+            # print ('on start, ylim: ',self.ax.get_ylim())
             connection_id_0=self.mpl_connect('pick_event', self.onpick)
             connection_id = self.mpl_connect('button_press_event', self.onclick)
-            #self.mpl_connect('pick_event', self.onpick)
+            connection_id2 = self.ax.callbacks.connect('xlim_changed', self.onzoom)
+            # connection_id3 = self.ax.callbacks.connect('ylim_changed', self.onzoom)
 
             # rotate ticks
             self.fig.autofmt_xdate()
@@ -287,7 +289,15 @@ class TimeCanvas(FigureCanvas):
     def onclick(self,event):
 
         #print(event, "\n")
+        # self.cid_zoom = self.ax.callbacks.connect('xlim_changed', self.onzoom)
         
+        # print ('on zoom, xlim: ',self.ax.get_xlim()) 
+        # print ('on zoom, ylim: ',self.ax.get_ylim()) 
+        # print(event.get_xlim(),event.get_xlim())
+        # if zooming in 
+
+
+        # if just clicking
         if event.xdata==None:
             print('\nNothing selected, aim for the tiny blue dots ;)\n')
         else:
@@ -382,17 +392,50 @@ class TimeCanvas(FigureCanvas):
             self.click_index.append(ind[0])
             self.draw()
 
+    def onzoom(self,event=''):
+
+        # Implement your zoom handling logic here
+        xlim = self.ax.get_xlim()
+        ylim = self.ax.get_ylim()
+
+        # try:
+        #     x_min = mdates.num2date(xlim[0]).date()
+        #     x_max = mdates.num2date(xlim[1]).date()
+        # except:
+        #     x_min = mdates.num2date(xlim[0])
+        #     x_max = mdates.num2date(xlim[1])
+
+        # y_min = ylim[0]
+        # y_max = ylim[1]
+        
+        
+        print("\nZoom event occurred:")
+        # print_zoom_limits(event.canvas.figure.axes[0]) #get the axes object from the event.canvas.figure object
+
+        # print(f"Zoomed: xlim={xlim}, ylim={ylim}")
+        # print(f"Zoomed: date_min={date_min}, date_max={date_max}")
+        # print('event: ',event,'\n')
+        self.draw()
+        return xlim,ylim
+
     def show_plots(self, index):
         """ Show plots on click event in a web browser. """
 
         self.data['CENTFREQ'] = self.data['CENTFREQ'].astype(float)
         data = self.data.iloc[index]
-        source_name = data["OBJECT"].replace(" ", "")
+        # source_name = data["OBJECT"].replace(" ", "")
+        source_name = data["SRC"].replace(" ", "")
         central_frequency = int(data["CENTFREQ"])
         file_name = data["FILENAME"]
         observation_date = str(data["OBSDATE"])[:10]
 
         # Check for image directory
+        # if source_name.startswith('P'):
+        #     sys.exit()
+        # else:
+        #     source_name=source_name.replace('M','-')
+        #     source_name=source_name.replace('P','+')
+
         img_dir = f"plots/{source_name}/{central_frequency}"
         if not os.path.exists(img_dir):
             print(f"Missing images for {source_name}. Try processing data first.")

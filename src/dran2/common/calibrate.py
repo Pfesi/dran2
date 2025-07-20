@@ -13,6 +13,8 @@ from .miscellaneousFunctions import catch_zeroDivError
 
 import numpy as np 
 import sys
+import pandas as pd
+
 
 # =========================================================================== #
 
@@ -379,7 +381,142 @@ def calc_totFlux(lcp,dlcp,rcp,drcp):
         dfluxtot=(2/n)*np.sqrt(dlcp**2+drcp**2)
 
         return fluxtot,dfluxtot
+
+def get_fluxes_df(df,caldf):
     
+    beams=['A','B']
+    pos=['O']
+    pols=['L','R']
+
+    for b in beams:
+        for p in pos:
+            for l in pols:
+    #             print(f'{b}{p}{l}PSS',f'{b}{p}{l}PSSERR')
+                df[f'{b}{p}{l}PSS']=np.nan
+                df[f'{b}{p}{l}PSSERR']=np.nan
+                df[f'{b}S{l}CP']=np.nan
+                df[f'{b}S{l}CPERR']=np.nan
+#             print()
+
+    indl=''
+    indr=''
+    indl2=''
+    indr2=''
+
+    for r,row in df.iterrows():
+    #     print(r,row)
+        idx=row['id']
+        fn=row['FILENAME']
+        obsdate=str(row['OBSDATE']).split(' ')[0]
+        time=row['time']
+
+    #     print(idx,fn)
+        n={}
+        n['idx']=idx
+        updates={}
+    #     n['fn']=fn
+
+        for b in beams:
+            for p in pos:
+                for l in pols:
+
+    #                 print(f'{b}{p}{l}TA')
+                    ta=abs(row[f'{b}{p}{l}TA'])
+                    taerr=row[f'{b}{p}{l}TAERR']
+                    pss=row[f'{b}{p}{l}PSS']
+                    psse=row[f'{b}{p}{l}PSSERR']
+
+                    if str(ta)!='nan':
+    #                     print(idx,fn,obsdate,ta,pss,psse)
+
+                        d=caldf[caldf['start']<=obsdate]
+                        # print('\nlen d: ',len(d))
+
+                        if len(d)==0:
+                            n[f'{b}{p}{l}TA']=np.nan
+                            updates[f'{b}PSS_{l}CP']=np.nan
+                            updates[f'{b}PSS_{l}CP_SE']=np.nan
+                            updates[f'{b}S{l}CP']=np.nan
+                            updates[f'{b}S{l}CPERR']=np.nan
+                        else:
+                            start=d['start'].iloc[-1]
+                            end=d['end'].iloc[-1]
+
+                            if obsdate >= start and obsdate <= end:
+                                pss=d[f'{b}PSS_{l}CP'].iloc[-1]
+                                psse=d[f'{b}PSS_{l}CP_SE'].iloc[-1]
+
+                                n['start']=start
+                                n['obs']=obsdate
+                                n['end']=end
+        #                         n['obs']=obsdate
+        #                         print(f'start: {start}, obs: {obsdate}, end: {end}, ta: {ta:.3f}, {b}PSS_{l}CP: {pss:.3f} +- {psse:.3f}')
+                                n[f'{b}{p}{l}TA']=f'{ta:.3f}'
+        #                         updates[f'{b}{p}{l}TA']=f'{ta:.3f}'
+
+                                f,fe=calc_flux(ta,taerr,pss,psse)
+                                updates[f'{b}PSS_{l}CP']=float(f'{pss:f}')
+                                updates[f'{b}PSS_{l}CP_SE']=float(f'{psse:f}')
+                                updates[f'{b}S{l}CP']=float(f'{f:f}')
+                                updates[f'{b}S{l}CPERR']=float(f'{fe:f}')
+
+        #                         df = df.apply(lambda rw: update_vals(rw,fn,lpss,lpsse,'AOLPSS','AOLPSSERR'),axis=1)
+
+                            else:
+                                # use the preious PSS value, when reaching end of DF
+                                pss=d[f'{b}PSS_{l}CP'].iloc[-1]
+                                psse=d[f'{b}PSS_{l}CP_SE'].iloc[-1]
+                                print(idx,fn,obsdate,ta,pss,psse, start,end)
+
+                                n['start']=start
+                                n['obs']=obsdate
+                                n['end']=end
+
+                                n[f'{b}{p}{l}TA']=f'{ta:.3f}'
+                                f,fe=calc_flux(ta,taerr,pss,psse)
+                                updates[f'{b}PSS_{l}CP']=float(f'{pss:f}')
+                                updates[f'{b}PSS_{l}CP_SE']=float(f'{psse:f}')
+                                updates[f'{b}S{l}CP']=float(f'{f:f}')
+                                updates[f'{b}S{l}CPERR']=float(f'{fe:f}')
+
+                                print('issue1')
+                                # sys.exit()
+                        
+                    else:
+                        n[f'{b}{p}{l}TA']=np.nan
+                        updates[f'{b}PSS_{l}CP']=np.nan
+                        updates[f'{b}PSS_{l}CP_SE']=np.nan
+                        updates[f'{b}S{l}CP']=np.nan
+                        updates[f'{b}S{l}CPERR']=np.nan
+
+        stot,stoterr,n,s=calc_dualtotFlux2(updates['ASLCP'],updates['ASLCPERR'],
+                                      updates['ASRCP'],updates['ASRCPERR'],
+                                      updates['BSLCP'],updates['BSLCPERR'],
+                                      updates['BSRCP'],updates['BSRCPERR'])
+        updates['STOT']=float(stot)
+        updates['STOTERR']=float(stoterr)
+
+        for k,v in updates.items():
+            df.loc[r,k] = v
+        
+    return df
+  
+def calc_dualtotFlux2(slcp,dslcp, srcp,dsrcp, bslcp,bdslcp, bsrcp,bdsrcp):
+        ''' Calculate the total flux density of the source'''
+        
+        slcp,dslcp=abs(slcp),abs(dslcp)
+        srcp,dsrcp=abs(srcp),abs(dsrcp)
+        bslcp,bdslcp=abs(bslcp),abs(bdslcp)
+        bsrcp,bdsrcp=abs(bsrcp),abs(bdsrcp)
+
+        sumflux=np.nansum([slcp,srcp,bslcp,bsrcp])
+        sumfluxerr=np.sqrt(np.nansum([dslcp**2,dsrcp**2,bdslcp**2,bdsrcp**2]))
+        n=(np.array([slcp,srcp,bslcp,bsrcp])>0).sum() 
+        fluxtot=(sumflux/n)*2
+        dfluxtot=(2/n)*sumfluxerr#np.sqrt(dslcp**2+dsrcp**2+bdslcp**2+bdsrcp**2)
+
+        return fluxtot,dfluxtot,n,sumflux
+
 def calc_dualtotFlux(slcp,dslcp,srcp,dsrcp,bslcp,bdslcp,bsrcp,bdsrcp):
         ''' Calculate the total flux density of the source'''
         sumflux=np.nansum([slcp,srcp,bslcp,bsrcp])
@@ -599,7 +736,9 @@ def calc_ta_and_ferrs(df,pol,pos):
     df['TSYS1FERR']=(df['TSYSERR1']/df['TSYS1']).astype(float)
     df['TSYS2FERR']=(df['TSYSERR1']/df['TSYS2']).astype(float) 
 
+
 def calc_pss_and_ferrs(df,pol,pos):
+
     print('\n> Calculating PSS and FERRS')
 
     for s in pol:
@@ -628,6 +767,7 @@ def calc_pss_and_ferrs(df,pol,pos):
     df['TSYS2FERR']=(df['TSYSERR1']/df['TSYS2']).astype(float) 
 
 def calc_ta_and_ferrs_db(df,pol,pos,beams):
+
     print('\n> Calculating TA and FERRS')
     c=[]
 
@@ -704,3 +844,102 @@ def calc_pss_and_ferrs_db(df,pol,pos,beams):
 
         df['TSYS1FERR']=(df['TSYSERR1']/df['TSYS1']).astype(float)
         df['TSYS2FERR']=(df['TSYSERR1']/df['TSYS2']).astype(float) 
+
+
+def add_pss(df, caldf):
+    """
+        Calculates and updates PSS (Polarized Source Strength) and related values in the input DataFrame.
+
+        Args:
+            df (pd.DataFrame): Input DataFrame containing observation data.  Must have columns:
+                            'FILENAME', 'OBSDATE', 'time', 'OLTA', 'ORTA', 'id'.
+            caldf (pd.DataFrame): Calibration DataFrame containing PSS values. Must have columns:
+                                'start', 'end', 'PSS_LCP', 'PSS_LCP_STD', 'PSS_LCP_SE',
+                                'PSS_RCP', 'PSS_RCP_STD', 'PSS_RCP_SE'.
+
+        Returns:
+            pd.DataFrame: Updated DataFrame with calculated PSS values.
+    """
+
+    BEAMS=['A','B']
+    POSITIONS=['S','N','O'] # hps,hpn,on
+    POLARIZATIONS = ['L', 'R'] 
+
+    # Initialize new columns more efficiently
+    for b in BEAMS:
+        for p in POLARIZATIONS:
+            for s in POSITIONS:
+                if s=='O':
+                    df[[f'{b}{s}{p}PSS',f'{b}{s}{p}PSSERR',f'{b}{s}{p}CP',f'{b}{s}{p}CPERR']]=np.nan
+                else:
+                    df[[f'{b}{s}{p}CP',f'{b}{s}{p}CPERR']]=np.nan
+
+#     df[['OLPSS', 'OLPSSERR', 'ORPSS', 'ORPSSERR', 'SLCP', 'SLCPERR', 'SRCP', 'SRCPERR', 'STOT', 'STOTERR']] = np.nan
+
+    for index, row in df.iterrows():  # Use iterrows for efficient row access
+        for b in BEAMS:
+            for p in POLARIZATIONS:
+                fn = row['FILENAME']
+                obsdate = str(row['OBSDATE']).split(' ')[0]
+                ta = row[f'{b}CO{p}TA']
+                tae = row[f'{b}CO{p}TAERR']
+#                 orta = row[f'{b}CORTA']
+#                 ortae = row[f'{b}CORTAERR']
+                idx = row['id']
+
+                # Process OLTA (Left Circular Polarization)
+        #         print(obsdate)
+                if pd.notna(ta):  # Use pd.notna for NaN check
+                    pss, psse,g = _get_pss_values(caldf, obsdate, f'{b}PSS_{p}CP', f'{b}PSS_{p}CP_SE',f'{p}cp')
+                    if pd.notna(pss):
+                        df.loc[index, [f'{b}O{p}PSS', f'{b}O{p}PSSERR']] = pss, psse  # More efficient update
+
+#                         df.loc[index, [f'{b}S{p}CP', f'{b}S{p}CPERR']] = calc_flux(ta,tae,pss, psse)#Calculate SLCP directly
+#                 print(f'{b}O{p}PSS', f'{b}O{p}PSSERR',f'{b}S{p}CP', f'{b}S{p}CPERR')
+ 
+    return df
+
+
+def _get_pss_values(caldf, obsdate, pss_col, pss_err_col, pol):
+
+    """Helper function to find and return PSS values from calibration DataFrame."""
+    for _, c2 in caldf.iterrows():
+        # print(c2)
+        
+        start = c2['start']
+        end = c2['end']
+
+#       print(start,end)
+        if obsdate >= start and obsdate < end:
+            lpss = c2[pss_col]
+            lpsse = c2[pss_err_col]
+
+#           print(start,obsdate,end,lpss,lpsse,pol)
+            if pd.notna(lpss):
+                return abs(lpss), abs(lpsse), np.nan  # Return values directly
+            
+            else:
+                # Handle missing PSS, try previous value (if needed)
+                lpss, lpsse,ind= _get_previous_pss(caldf, start, pss_col, pss_err_col) # removed unused index
+                return lpss, lpsse, ind
+            
+    return np.nan, np.nan, np.nan # Return None if no suitable PSS is found
+
+def _get_previous_pss(mydf,latest_date,col,colerr):
+    x=mydf[mydf[col]>0]
+#     print(f'>> Cant find pss at {latest_date}, looking at next best pss')
+#     sys.exit()
+    y=x[x['start']<=latest_date]
+#     print(y)
+#     sys.exit()
+
+    if len(y)==0:
+#         print('No previous pss found\n')
+        return np.nan, np.nan, np.nan
+    else:
+#         print(f'found next best at {y.iloc[-1]} FOR DATE {latest_date}, {col}')
+#         sys.exit()
+        pss=y.iloc[-1][col]
+        psserr=y.iloc[-1][colerr]
+        ind=1#int(y.iloc[-1]['ind'])
+        return abs(pss),abs(psserr),ind

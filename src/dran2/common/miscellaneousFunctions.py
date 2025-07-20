@@ -201,7 +201,7 @@ def create_table_cols(freq,log,src=''):
     # NASA limits: https://www.nasa.gov/general/what-are-the-spectrum-band-designators-and-bandwidths/
 
     # 18, 13,6,4.5,3.5,2.5,1.3 cm
-    cols=[]
+    # cols=[]
     colTypes=[]
 
     freq=int(freq)
@@ -590,6 +590,7 @@ def fast_scandir(dirname,log,Observation,outfile):
             tableName, myCols, tableFiles, tableNames=get_previously_processed_files(src, freq,log,DBNAME)
 
             # print(tableFiles)
+            # sys.exit()
             # get all files that havent processed yet
             unprocessedObs=[]
             for fl in files:  

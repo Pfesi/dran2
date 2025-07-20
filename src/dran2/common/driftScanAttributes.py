@@ -25,7 +25,6 @@ class DriftScanAttributes:
 
     def print_keys(self):
         """ Print the keys of the dictionary. """
-
         print(self.__dict__.keys())
 
     def print_dict(self):

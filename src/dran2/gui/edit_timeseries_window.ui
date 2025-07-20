@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1170</width>
-    <height>822</height>
+    <width>1448</width>
+    <height>886</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,9 +18,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>20</y>
-      <width>1151</width>
-      <height>591</height>
+      <y>10</y>
+      <width>1431</width>
+      <height>581</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="PlotLayout"/>
@@ -29,9 +29,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>620</y>
-      <width>1151</width>
-      <height>191</height>
+      <y>590</y>
+      <width>1431</width>
+      <height>291</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="controlLayout">
@@ -41,7 +41,7 @@
         <widget class="QLabel" name="LblDB">
          <property name="maximumSize">
           <size>
-           <width>80</width>
+           <width>100</width>
            <height>16777215</height>
           </size>
          </property>
@@ -143,6 +143,12 @@
        </item>
        <item>
         <widget class="QLabel" name="LblColsYerr">
+         <property name="maximumSize">
+          <size>
+           <width>80</width>
+           <height>16777215</height>
+          </size>
+         </property>
          <property name="text">
           <string>Y-err</string>
          </property>
@@ -378,6 +384,38 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="BtnViewZoomedArea">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>150</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>View Zoomed Area</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="BtnDeleteZoomedPoints">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>150</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Delete Zoomed Points</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QLabel" name="LblTables_4">
          <property name="text">
           <string/>
@@ -548,7 +586,7 @@
           <widget class="QLabel" name="LblStartDate">
            <property name="maximumSize">
             <size>
-             <width>100</width>
+             <width>30</width>
              <height>16777215</height>
             </size>
            </property>
@@ -577,7 +615,7 @@
           <widget class="QLabel" name="LblEndDate">
            <property name="maximumSize">
             <size>
-             <width>100</width>
+             <width>30</width>
              <height>16777215</height>
             </size>
            </property>
@@ -719,6 +757,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="BtnSaveDB">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="maximumSize">
           <size>
            <width>150</width>
