@@ -712,7 +712,7 @@ def calc_ta_and_ferrs(df,pol,pos):
     for p in pol:
         ta=[]
         for s in pos:
-#             print(f'{p}{pol}TA',f'{p}{pol}TAERR')
+            print(f'{s}{p}TA',f'{s}{p}TAERR')
             ta.append(f'{s}{p}TA')
             ta.append(f'{s}{p}TAERR')
 
@@ -736,7 +736,6 @@ def calc_ta_and_ferrs(df,pol,pos):
     df['TSYS1FERR']=(df['TSYSERR1']/df['TSYS1']).astype(float)
     df['TSYS2FERR']=(df['TSYSERR1']/df['TSYS2']).astype(float) 
 
-
 def calc_pss_and_ferrs(df,pol,pos):
 
     print('\n> Calculating PSS and FERRS')
@@ -744,7 +743,7 @@ def calc_pss_and_ferrs(df,pol,pos):
     for s in pol:
         ta=[]
         for p in pos:
-            # print(f'{p}{s}TA',f'{p}{s}TAERR')
+            print(f'{p}{s}TA',f'{p}{s}TAERR')
             ta.append(f'{p}{s}TA')
             ta.append(f'{p}{s}TAERR')
 
