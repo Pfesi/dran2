@@ -14,7 +14,8 @@ from .miscellaneousFunctions import catch_zeroDivError
 import numpy as np 
 import sys
 import pandas as pd
-
+from datetime import datetime
+from typing import List
 
 # =========================================================================== #
 
@@ -35,6 +36,7 @@ def calc_pss(flux:float, Ta:float, errTa:float):
             appEff: the apperture effeciency
     """
 
+    # print(flux,Ta,errTa)
     flux=float(flux)
     Ta=float(Ta)
     errTa=float(errTa)
@@ -50,6 +52,147 @@ def calc_pss(flux:float, Ta:float, errTa:float):
         appEff = .0
 
     return pss, errPSS, appEff
+
+# Date parsing
+# -------------------------------------------------------------------
+def parse_time(timeCol: str) -> str:
+    """
+    """
+    
+    if 'T' in timeCol:
+        return timeCol.split('T')[0]
+    else:
+        return timeCol.split(' ')[0]
+    
+def parse_observation_dates(df: pd.DataFrame,form='m') -> pd.DataFrame:
+    """
+    Parse the observation date column into a datetime format.
+
+    Args:
+        df (pd.DataFrame): The input DataFrame.
+
+    Returns:
+        pd.DataFrame: The DataFrame with parsed dates.
+    """
+    
+    df['time'] = df['OBSDATE'].astype(str)
+    df['OBSDATE'] = df['time'].apply(parse_time)
+    df['OBSDATE'] = pd.to_datetime(df['OBSDATE']).dt.date
+    df['OBSDATE'] = pd.to_datetime(df['OBSDATE'], format=f"%Y-%{form}-%d")
+    return df
+
+# Data prepping
+# -------------------------------------------------------------------
+def prep_data(dataframe: pd.DataFrame, source_name: str) -> pd.DataFrame:
+    """
+    Preprocess the data in the DataFrame for analysis.
+
+    Args:
+        dataframe (pd.DataFrame): The input DataFrame containing observational data.
+        source_name (str): The name of the source being processed.
+
+    Returns:
+        pd.DataFrame: The processed DataFrame.
+    """
+
+    # --- Remove all data from Marisa's gain observations
+    dataframe=dataframe.loc[~dataframe.FILENAME.str.contains('marisa')]
+
+    # --- Sort the DataFrame by filename
+    dataframe.sort_values(by='FILENAME', inplace=True)
+
+    # --- Parse observation dates
+    dataframe = parse_observation_dates(dataframe)
+
+    # --- Identify columns to convert to numeric (excluding metadata columns)
+    exclude_keywords = [
+            'FILE', 'FRONT', 'OBJ', 'SRC', 'OBS', 'PRO', 'TELE', 'HDU', 'id', 'DATE',
+            'UPGR', 'TYPE', 'COOR', 'EQU', 'RADEC', 'SCAND', 'BMO', 'DICH', 'PHAS',
+            'POINTI', 'TIME', 'INSTRU', 'INSTFL', 'time', 'HABM'
+        ]
+    dataframe = convert_to_numeric(dataframe, exclude_keywords)
+
+    # Add source name to the DataFrame
+    dataframe['FILES'] = dataframe['FILENAME'].str[:18]
+    dataframe['OBJECT'] = source_name
+
+    # Ensure all error columns have positive values
+    dataframe = ensure_positive_errors(dataframe)
+    return dataframe
+
+def ensure_positive_errors(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Ensure all error columns have positive values.
+
+    Args:
+        dataframe (pd.DataFrame): The input DataFrame.
+
+    Returns:
+        pd.DataFrame: The DataFrame with positive error values.
+    """
+    err_cols = df.filter(like='ERR').columns
+    df[err_cols] = df[err_cols].map(make_positive)
+
+    return df
+
+def make_positive(value):
+    """
+    Ensure the input value is positive and convert it to a float. If the value is invalid or negative, return NaN.
+
+    Args:
+        value (Any): The input value to process.
+
+    Returns:
+        float: The positive float value or NaN if the value is invalid or negative.
+    """
+    # Check if the value is None or an empty string
+    if value is None or value == '':
+        return np.nan
+
+    try:
+        # Convert the value to a float
+        numeric_value = float(value)
+        # Return the value if it is non-negative, otherwise return NaN
+        return numeric_value if numeric_value >= 0 else np.nan
+    except (ValueError, TypeError):
+        # Handle invalid values (e.g., non-numeric strings)
+        return np.nan
+
+def ensure_positive_errors_db(df):
+    
+    # Ensure all errors are +ve
+    # ---------------------------
+    err_cols = df.filter(like='ERR').columns
+    df[err_cols] = df[err_cols].map(make_positive_db)
+
+
+def make_positive_db(value):
+#     """Ensures a value is positive."""
+    if value=='None' or value==None:
+        return np.nan
+    else:
+        return abs(value)
+    
+# Column conversions
+# -------------------------------------------------------------------
+def convert_to_numeric(dataframe: pd.DataFrame, exclude_keywords: List[str]) -> pd.DataFrame:
+    """
+    Convert columns to numeric, excluding those containing specific keywords.
+
+    Args:
+        dataframe (pd.DataFrame): The input DataFrame.
+        exclude_keywords (List[str]): Keywords to exclude from numeric conversion.
+
+    Returns:
+        pd.DataFrame: The DataFrame with numeric columns.
+    """
+
+    colList=list(dataframe.columns)
+    floatList = [col for col in colList if not any(excl in col for excl in exclude_keywords)]
+    # --- Rather than fail, we might want 'pandas' to be considered a missing/bad numeric value. We can coerce invalid values to NaN as follows using the errors keyword argument:
+    dataframe[floatList] = dataframe[floatList].apply(pd.to_numeric, errors='coerce')
+
+    return dataframe
 
 def calc_tcorr(Ta, pc, data):
     """
@@ -382,6 +525,77 @@ def calc_totFlux(lcp,dlcp,rcp,drcp):
 
         return fluxtot,dfluxtot
 
+def calc_ta_and_ferrs_fast(df, pol, pos,beams=[]):
+    """
+    Faster TA + fractional error computation.
+    - Drops prints and redundant loops
+    - Replaces apply(axis=1) with list-comprehensions over NumPy arrays
+    - Avoids temp DATA columns; assigns results directly
+
+    Assumes:
+      * len(pos) >= 3; uses the first three as (p0, p1, p2)
+      * calibrate(...) -> (PC, CTA, CTAERR)
+    """
+    if len(pos) < 3:
+        raise ValueError("pos must have at least 3 entries (e.g., ['N','S','R']).")
+
+    p0, p1, p2 = pos[:3]
+
+    # Materialize rows once as plain dicts (faster indexing inside calibrate than Series)
+    rows = df.to_dict("records")
+
+    for pol_code in pol:
+
+        for b in beams:
+            # Preload needed columns once per pol as NumPy arrays
+            a_ta   = df[f'{b}{p0}{pol_code}TA'   ].to_numpy()
+            a_err  = df[f'{b}{p0}{pol_code}TAERR'].to_numpy()
+            b_ta   = df[f'{b}{p1}{pol_code}TA'   ].to_numpy()
+            b_err  = df[f'{b}{p1}{pol_code}TAERR'].to_numpy()
+            c_ta   = df[f'{b}{p2}{pol_code}TA'   ].to_numpy()
+            c_err  = df[f'{b}{p2}{pol_code}TAERR'].to_numpy()
+
+            print(f'{b}{p0}{pol_code}TA')
+
+            # --- full/combined: use (a,aerr,b,berr,c,cerr)
+            out_all = np.array([
+                calibrate(at, ae, bt, be, ct, ce, r)
+                for at, ae, bt, be, ct, ce, r in zip(a_ta, a_err, b_ta, b_err, c_ta, c_err, rows)
+            ])
+            # NOTE: original code used the last 's' from the loop for naming; that maps to p2 here.
+            df[[f'{b}{p2}{pol_code}PC', f'{b}C{p2}{pol_code}TA', f'{b}C{p2}{pol_code}TAERR']] = out_all
+
+            # --- fractional errors (vectorized), one pass per (TA,TAERR) pair
+            # for name_ta, name_err in (
+            #     (f'{p0}{pol_code}TA', f'{p0}{pol_code}TAERR'),
+            #     (f'{p1}{pol_code}TA', f'{p1}{pol_code}TAERR'),
+            #     (f'{p2}{pol_code}TA', f'{p2}{pol_code}TAERR'),
+            # ):
+            #     with np.errstate(divide='ignore', invalid='ignore'):
+            #         ferr = np.abs(df[name_err].to_numpy() / df[name_ta].to_numpy())
+            #     df[f'{name_ta}FERR'] = ferr.astype(float)
+
+        # These follow your original logic (kept as-is)
+        # df['TSYS1FERR'] = (df['TSYSERR1'] / df['TSYS1']).astype(float)
+        # df['TSYS2FERR'] = (df['TSYSERR1'] / df['TSYS2']).astype(float)
+
+    return df
+
+# GET FLUX
+def get_fluxes_db(df,beams=['A','B']):
+    # beams=
+    pols=['L','R']
+    for b in beams:
+        for p in pols:
+#             print(f'{b}{p}')
+            df[f'{b}S{p}OUT']=df.apply(lambda rf: calc_flux(rf[f'{b}CO{p}TA'],rf[f'{b}CO{p}TAERR'],rf[f'{b}O{p}PSS'],rf[f'{b}O{p}PSSERR']),axis=1)
+            df[[f'{b}S{p}CP', f'{b}S{p}CPERR']] = pd.DataFrame(df[f'{b}S{p}OUT'].tolist(), index=df.index)
+            
+    for r,c in df.iterrows():
+        df['STOUT']=df.apply(lambda rf: calc_dualtotFlux2(rf['ASLCP'],rf['ASLCPERR'],rf['ASRCP'],rf['ASRCPERR'],rf['BSLCP'],rf['BSLCPERR'],rf['BSRCP'],rf['BSRCPERR']),axis=1)
+        df[['STOT', 'STOTERR','n','s']] = pd.DataFrame(df[f'STOUT'].tolist(), index=df.index)
+    return df
+
 def get_fluxes_df(df,caldf):
     
     beams=['A','B']
@@ -501,6 +715,232 @@ def get_fluxes_df(df,caldf):
         
     return df
   
+def get_fluxes_db2(df, beams=('A','B')):
+    """
+    Vectorized flux computation.
+    - Computes (CP, CPERR) for each beam/pol in one pass per pair.
+    - Avoids temporary *OUT columns.
+    - Computes STOT and STOTERR exactly once (the original loop recomputed them N times).
+    - Leaves rows as NaN where required inputs are missing.
+    """
+    out = df.copy()
+    pols = ('L','R')
+
+    # Vectorize your scalar functions without rewriting them
+    v_calc_flux = np.frompyfunc(calc_flux, 4, 2)          # returns (cp, cpe)
+    v_tot_flux  = np.frompyfunc(calc_dualtotFlux2, 8, 4)  # returns (STOT, STOTERR, n, s)
+
+    # --- Per beam/pol CP & CPERR ---
+    for b in beams:
+        for p in pols:
+            ta   = out[f'{b}CO{p}TA'     ].to_numpy()
+            tae  = out[f'{b}CO{p}TAERR'  ].to_numpy()
+            pss  = out[f'{b}O{p}PSS'     ].to_numpy()
+            psse = out[f'{b}O{p}PSSERR'  ].to_numpy()
+
+            cp, cpe = v_calc_flux(ta, tae, pss, psse)  # elementwise calls to calc_flux
+            # cp, cpe = calc_flux(ta, tae, pss, psse)  # returns float arrays
+            # frompyfunc outputs dtype=object; cast to float
+            out[f'{b}S{p}CP']    = np.asarray(cp, dtype='float64')
+            out[f'{b}S{p}CPERR'] = np.asarray(cpe, dtype='float64')
+
+    # --- Totals (computed ONCE) ---
+    ASL, ASLe = out['ASLCP'   ].to_numpy(), out['ASLCPERR' ].to_numpy()
+    ASR, ASRe = out['ASRCP'   ].to_numpy(), out['ASRCPERR' ].to_numpy()
+    BSL, BSLe = out['BSLCP'   ].to_numpy(), out['BSLCPERR' ].to_numpy()
+    BSR, BSRe = out['BSRCP'   ].to_numpy(), out['BSRCPERR' ].to_numpy()
+
+    stot, stot_e, n, s = v_tot_flux(ASL, ASLe, ASR, ASRe, BSL, BSLe, BSR, BSRe)
+    # stot, stot_e, n, s = calc_dualtotFlux2(ASL, ASLe, ASR, ASRe, BSL, BSLe, BSR, BSRe)
+
+    out['STOT']     = np.asarray(stot,   dtype='float64')
+    out['STOTERR']  = np.asarray(stot_e, dtype='float64')
+    out['n']        = np.asarray(n,      dtype='float64')  # or int, depending on your function
+    out['s']        = np.asarray(s,      dtype='float64')  # or int
+
+    return out
+
+def calc_dualtotFlux2(slcp, dslcp, srcp, dsrcp, bslcp, bdslcp, bsrcp, bdsrcp):
+    """
+    Vectorized total flux over 4 inputs (A-L, A-R, B-L, B-R):
+      sumflux    = sum of |flux_i| over valid (finite & >0) channels
+      sumfluxerr = sqrt( sum of err_i^2 )    (NaN errors treated as 0)
+      n          = count of valid channels
+      fluxtot    = (sumflux / n) * 2         (NaN if n == 0)
+      dfluxtot   = (2 / n) * sumfluxerr      (NaN if n == 0)
+    Returns: (fluxtot, dfluxtot, n, sumflux)
+    """
+
+    # Stack and absolute-value fluxes & errors
+    f = np.abs(np.stack([slcp,  srcp,  bslcp,  bsrcp ], axis=0)).astype(float)
+    e = np.abs(np.stack([dslcp, dsrcp, bdslcp, bdsrcp], axis=0)).astype(float)
+
+    # Valid channel = finite and strictly > 0 (matches your (>0) test after abs)
+    valid = np.isfinite(f) & (f > 0)
+
+    # Sum of flux across valid channels (treat invalid as 0)
+    sumflux = np.where(valid, f, 0.0).sum(axis=0)
+
+    # Quadrature error: treat NaN errors as 0; (optionally mask by 'valid' if desired)
+    var_sum = np.where(np.isfinite(e), e**2, 0.0).sum(axis=0)
+    sumfluxerr = np.sqrt(var_sum)
+
+    # Count of contributing channels
+    n = valid.sum(axis=0)
+
+    # Totals with safe division
+    with np.errstate(divide='ignore', invalid='ignore'):
+        fluxtot  = (sumflux / n) * 2.0
+        dfluxtot = (2.0 / n) * sumfluxerr
+
+    # If no valid channels, set NaN
+    zero = (n == 0)
+    if np.any(zero):
+        fluxtot  = np.where(zero, np.nan, fluxtot)
+        dfluxtot = np.where(zero, np.nan, dfluxtot)
+
+    return fluxtot, dfluxtot, n, sumflux
+
+def calc_flux(ta, dta, pss, dpss):
+    """
+    Vectorized flux and uncertainty:
+      flux  = TA * PSS
+      dflux = |flux| * sqrt( (dTA/TA)^2 + (dPSS/PSS)^2 ), with safe division.
+    Accepts scalars or arrays; returns NumPy arrays (flux, dflux).
+    """
+
+    ta   = abs(np.asarray(ta,   dtype=float))
+    dta  = abs(np.asarray(dta,  dtype=float))
+    pss  = abs(np.asarray(pss,  dtype=float))
+    dpss = abs(np.asarray(dpss, dtype=float))
+
+    # Base flux
+    flux = ta * pss
+
+    # Safe relative errors (0 when denominator is 0)
+    rel_ta  = np.where(ta  != 0.0, dta  / ta,  0.0)
+    rel_pss = np.where(pss != 0.0, dpss / pss, 0.0)
+
+    dflux = np.abs(flux) * np.sqrt(rel_ta**2 + rel_pss**2)
+
+    # If TA or PSS is NaN, invalidate both outputs
+    invalid = np.isnan(ta) | np.isnan(pss)
+    if invalid.any():
+        flux  = np.where(invalid, np.nan, flux)
+        dflux = np.where(invalid, np.nan, dflux)
+
+    return flux, dflux
+
+def add_pss_db_fast2(df, caldf, pol, pos, beams):
+    """
+    Vectorized: map each OBSDATE to its calibration interval and assign PSS/PSSERR.
+    - Uses merge_asof(start) + OBSDATE < end to choose the active calibration row.
+    - Falls back to the most recent *positive* PSS before the interval if current is missing/nonpositive.
+    - Only fills rows where the corresponding TA exists (matches your original behavior).
+
+    Expects:
+      df columns include: 'FILENAME', 'OBSDATE', 'id', and per-beam/pol TA columns like f'{b}CO{p}TA'.
+      caldf columns include: 'start','end' and per-beam/pol PSS columns like f'{b}PSS_{p}CP' and f'{b}PSS_{p}CP_SE'.
+    """
+
+    # --- Normalize date types ---
+    df = df.copy()
+    df['OBSDATE'] = pd.to_datetime(df['OBSDATE']).dt.floor('D')
+
+    cal = caldf.copy()
+    cal['start'] = pd.to_datetime(cal['start']).dt.floor('D')
+    cal['end']   = pd.to_datetime(cal['end']).dt.floor('D')
+    cal = cal.sort_values('start', kind='mergesort').reset_index(drop=True)
+
+    # --- Precompute per-beam/pol "previous valid (>0)" fallback in cal table ---
+    # This lets us grab the most recent positive PSS when current interval's value is NaN or <= 0.
+    prev_cols = []
+    for b in beams:
+        for p in pol:
+            pss_col    = f'{b}PSS_{p}CP'
+            pss_se_col = f'{b}PSS_{p}CP_SE'
+            if pss_col in cal.columns:
+                cal[f'__prev_{b}{p}_pss']    = cal[pss_col   ].where(cal[pss_col   ] > 0).ffill()
+                prev_cols.append(f'__prev_{b}{p}_pss')
+            if pss_se_col in cal.columns:
+                cal[f'__prev_{b}{p}_psse']   = cal[pss_se_col].where(cal[pss_se_col] > 0).ffill()
+                prev_cols.append(f'__prev_{b}{p}_psse')
+
+    # --- Merge each observation onto the most recent calibration row by start ---
+    order = df.index
+    tmp = df[['OBSDATE']].sort_values('OBSDATE', kind='mergesort').copy()
+    tmp['__row'] = tmp.index
+
+    # Bring only columns we need from cal into the merge to keep it lean
+    needed_cols = ['start', 'end']
+    for b in beams:
+        for p in pol:
+            needed_cols += [c for c in (f'{b}PSS_{p}CP', f'{b}PSS_{p}CP_SE') if c in cal.columns]
+    needed_cols = list(dict.fromkeys(needed_cols + prev_cols))  # de-dup while preserving order
+
+    merged = pd.merge_asof(
+        tmp, cal[needed_cols].sort_values('start', kind='mergesort'),
+        left_on='OBSDATE', right_on='start', direction='backward'
+    )
+
+    # Keep rows whose OBSDATE falls before the interval end (i.e., start <= OBSDATE < end)
+    valid_mask = merged['OBSDATE'].lt(merged['end'])
+    merged = merged.set_index('__row').reindex(order)  # back to original order
+    valid_mask = valid_mask.reindex(order).fillna(False)
+
+    # --- Initialize output columns (once) ---
+    init_cols = {}
+    for b in beams:
+        for p in pol:
+            for s in pos:
+                if s == 'O':
+                    init_cols[f'{b}{s}{p}PSS']    = np.nan
+                    init_cols[f'{b}{s}{p}PSSERR'] = np.nan
+                else:
+                    init_cols[f'{b}{s}{p}CP']     = np.nan
+                    init_cols[f'{b}{s}{p}CPERR']  = np.nan
+    for k, v in init_cols.items():
+        if k not in df.columns:
+            df[k] = v
+
+    # --- Fill PSS for on-source positions where TA is present ---
+    for b in beams:
+        for p in pol:
+            ta_col = f'{b}CO{p}TA'
+            if ta_col not in df.columns:
+                # If the TA column isn't present, skip quietly.
+                continue
+
+            # Only compute where we have TA and a valid calibration match
+            fill_mask = df[ta_col].notna() & valid_mask
+
+            pss_col    = f'{b}PSS_{p}CP'
+            pss_se_col = f'{b}PSS_{p}CP_SE'
+
+            # Pull current interval values
+            cur_pss  = merged[pss_col]    if pss_col in merged.columns    else pd.Series(index=df.index, dtype='float64')
+            cur_psse = merged[pss_se_col] if pss_se_col in merged.columns else pd.Series(index=df.index, dtype='float64')
+
+            # Fallback to most recent *positive* value prior to this interval
+            prev_pss  = merged.get(f'__prev_{b}{p}_pss',  pd.Series(index=df.index, dtype='float64'))
+            prev_psse = merged.get(f'__prev_{b}{p}_psse', pd.Series(index=df.index, dtype='float64'))
+
+            eff_pss  = np.where((cur_pss  > 0), cur_pss,  prev_pss)
+            eff_psse = np.where((cur_psse > 0), cur_psse, prev_psse)
+
+            # Assign to on-source PSS columns (abs like your helper did)
+            df.loc[fill_mask, f'{b}O{p}PSS']    = np.abs(eff_pss[fill_mask])
+            df.loc[fill_mask, f'{b}O{p}PSSERR'] = np.abs(eff_psse[fill_mask])
+
+            # If/when you want CP computed directly from TA, uncomment and supply your calc:
+            # df.loc[fill_mask, f'{b}S{p}CP'], df.loc[fill_mask, f'{b}S{p}CPERR'] = calc_flux(
+            #     df.loc[fill_mask, ta_col], df.loc[fill_mask, f'{b}CO{p}TAERR'],
+            #     df.loc[fill_mask, f'{b}O{p}PSS'], df.loc[fill_mask, f'{b}O{p}PSSERR']
+            # )
+
+    return df
+
+
 def calc_dualtotFlux2(slcp,dslcp, srcp,dsrcp, bslcp,bdslcp, bsrcp,bdsrcp):
         ''' Calculate the total flux density of the source'''
         
@@ -688,12 +1128,20 @@ def get_calibrator_flux(data,calibrationPaper=''):
             # el
 
             # We are ignoring Perley for now, their calibration flux is 9 Jy,  Ott and Baars are ~27
+        
         if data['OBJECT'].upper() in ott.keys():
-                if ott[data['OBJECT']]["range_from"] < data['CENTFREQ'] < ott[data['OBJECT']]["range_to"]:
-                    data['FLUX'] = (10**(ott[data['OBJECT']]["a"] + 
+                # print(data['OBJECT'], ott[data['OBJECT']]["range_from"], data['CENTFREQ'] , ott[data['OBJECT']]["range_to"])
+                
+                if float(ott[data['OBJECT']]["range_from"]) < float(data['CENTFREQ']) < float(ott[data['OBJECT']]["range_to"]):
+                    # data['FLUX'] = (10**(ott[data['OBJECT']]["a"] + 
+                    #                           ott[data['OBJECT']]["b"]*data['LOGFREQ'] + 
+                    #                           ott[data['OBJECT']]["c"]*data['LOGFREQ']**2))
+                    return (10**(ott[data['OBJECT']]["a"] + 
                                               ott[data['OBJECT']]["b"]*data['LOGFREQ'] + 
                                               ott[data['OBJECT']]["c"]*data['LOGFREQ']**2))
                     
+                    # print(data['FLUX'])
+                    # sys.exit()
         # elif data['OBJECT'].upper() in baars.keys():
         #             if baars[data['OBJECT']]["range_from"] < data['CENTFREQ'] < baars[data['OBJECT']]["range_to"]:
         #                 data['FLUX'] = (10**(baars[data['OBJECT']]["a"] + 
@@ -702,7 +1150,8 @@ def get_calibrator_flux(data,calibrationPaper=''):
         else:
                 print(f'{data["OBJECT"]} - does not have calibration flux density spectral parameters in Ott 1994 or Barrs 1977.')
                 print('Contact author about this.')
-                data['FLUX']=0.0
+                # data['FLUX']=0.0
+                return 0.0
                 # sys.exit()
 
 def calc_ta_and_ferrs(df,pol,pos):
@@ -716,14 +1165,14 @@ def calc_ta_and_ferrs(df,pol,pos):
             ta.append(f'{s}{p}TA')
             ta.append(f'{s}{p}TAERR')
 
-#         if key=='s':
-        df[f'PC_{s}{p}DATAs'] = df.apply(lambda row: calibrate(0,0,row[ta[2]], row[ta[3]],row[ta[4]], row[ta[5]], row), axis=1)
-        df[[f'{s}{p}PCs',f'C{s}{p}TAs',f'C{s}{p}TAERRs']] = pd.DataFrame(df[f'PC_{s}{p}DATAs'].tolist(), index=df.index)  
+# #         if key=='s':
+#         df[f'PC_{s}{p}DATAs'] = df.apply(lambda row: calibrate(0,0,row[ta[2]], row[ta[3]],row[ta[4]], row[ta[5]], row), axis=1)
+#         df[[f'{s}{p}PCs',f'C{s}{p}TAs',f'C{s}{p}TAERRs']] = pd.DataFrame(df[f'PC_{s}{p}DATAs'].tolist(), index=df.index)  
             
-#         elif key=='n':
-        df[f'PC_{s}{p}DATAn'] = df.apply(lambda row: calibrate(row[ta[0]], row[ta[1]],0,0,row[ta[4]], row[ta[5]], row), axis=1)
-        df[[f'{s}{p}PCn',f'C{s}{p}TAn',f'C{s}{p}TAERRn']] = pd.DataFrame(df[f'PC_{s}{p}DATAn'].tolist(), index=df.index)  
-#         else:
+# #         elif key=='n':
+#         df[f'PC_{s}{p}DATAn'] = df.apply(lambda row: calibrate(row[ta[0]], row[ta[1]],0,0,row[ta[4]], row[ta[5]], row), axis=1)
+#         df[[f'{s}{p}PCn',f'C{s}{p}TAn',f'C{s}{p}TAERRn']] = pd.DataFrame(df[f'PC_{s}{p}DATAn'].tolist(), index=df.index)  
+# #         else:
         df[f'PC_{s}{p}DATA'] = df.apply(lambda row: calibrate(row[ta[0]], row[ta[1]],row[ta[2]], row[ta[3]],row[ta[4]], row[ta[5]], row), axis=1)
         df[[f'{s}{p}PC',f'C{s}{p}TA',f'C{s}{p}TAERR']] = pd.DataFrame(df[f'PC_{s}{p}DATA'].tolist(), index=df.index)  
 #     return dfx
@@ -736,34 +1185,82 @@ def calc_ta_and_ferrs(df,pol,pos):
     df['TSYS1FERR']=(df['TSYSERR1']/df['TSYS1']).astype(float)
     df['TSYS2FERR']=(df['TSYSERR1']/df['TSYS2']).astype(float) 
 
-def calc_pss_and_ferrs(df,pol,pos):
 
-    print('\n> Calculating PSS and FERRS')
-
-    for s in pol:
-        ta=[]
-        for p in pos:
-            print(f'{p}{s}TA',f'{p}{s}TAERR')
-            ta.append(f'{p}{s}TA')
-            ta.append(f'{p}{s}TAERR')
-
-#         pss, errPss, pc, corrTa, errCorrTa, appEff = calc_pc_pss(hpsTa, errHpsTa, hpnTa, errHpnTa, onTa, errOnTa, flux,data)
-#         print(row[ta[0]], row[ta[1]],row[ta[2]], row[ta[3]],row[ta[4]],row[ta[5]], row['SYNCH_FLUX_DENSITY'])
-        df[f'PC_{p}{s}DATA'] = df.apply(lambda row: calc_pc_pss(row[ta[0]], row[ta[1]],row[ta[2]], row[ta[3]],row[ta[4]], row[ta[5]], row['TOTAL_PLANET_FLUX_D'], row), axis=1)
-        df[[f'{p}{s}PSS', f'{p}{s}PSSERR',f'{p}{s}PC',f'C{p}{s}TA',f'C{p}{s}TAERR',f'{p}{s}APPEFF']] = pd.DataFrame(df[f'PC_{p}{s}DATA'].tolist(), index=df.index)
+def calc_pss_and_ferrs(df, pol, pos):
+    """
+    Calculate PSS (Primary Spectral Standard) values and fractional errors for given polarizations and positions.
     
-        df[f'{p}{s}PSS'] = df[f'{p}{s}PSS'].replace(0, np.nan)
-            
-        # estimate fractional errors
-        df[f'{ta[0]}FERR']=abs(df[ta[1]]/df[ta[0]]).astype(float)
-        df[f'{ta[2]}FERR']=abs(df[ta[3]]/df[ta[2]]).astype(float)
-        df[f'{ta[4]}FERR']=abs(df[ta[5]]/df[ta[4]]).astype(float)
+    Parameters:
+    -----------
+    df : pandas.DataFrame
+        Input DataFrame containing observational data.
+    pol : list
+        List of polarizations (e.g., ['L', 'R']).
+    pos : list
+        List of positions (e.g., ['HPS', 'HPN', 'ON']).
+    
+    Returns:
+    --------
+    None (modifies the input DataFrame in-place).
+    """
+    
+    for s in pol:
+        ta = []
+        for p in pos:
+            ta.extend([f'{p}{s}TA', f'{p}{s}TAERR'])  # Collect TA and TAERR columns
         
-        # print(f'{p}{s}PSSFERR')
-        df[f'{p}{s}PSSFERR']=abs(df[f'{p}{s}PSSERR']/df[f'{p}{s}PSS']).astype(float)
-            
-    df['TSYS1FERR']=(df['TSYSERR1']/df['TSYS1']).astype(float)
-    df['TSYS2FERR']=(df['TSYSERR1']/df['TSYS2']).astype(float) 
+        # Determine flux source (Jupiter or calibrator)
+        if 'TOTAL_PLANET_FLUX_D' in df.columns:
+            # Case: Jupiter (flux from 'TOTAL_PLANET_FLUX_D')
+            df[f'PC_{p}{s}DATA'] = df.apply(
+                lambda row: calc_pc_pss(
+                    row[ta[0]], row[ta[1]], 
+                    row[ta[2]], row[ta[3]], 
+                    row[ta[4]], row[ta[5]], 
+                    row['TOTAL_PLANET_FLUX_D'], row
+                ), axis=1
+            )
+        else:
+            # Case: Other calibrator (fetch flux dynamically)
+            # get_calibrator_flux=(df[['CENTFREQ','OBJECT','LOGFREQ']].iloc[-1])
+
+           
+            df['FLUX'] = df.apply(lambda row: get_calibrator_flux(row), axis=1)
+            # print(df['FLUX'])
+            # sys.exit()
+            df[f'PC_{p}{s}DATA'] = df.apply(
+                lambda row: calc_pc_pss(
+                    row[ta[0]], row[ta[1]], 
+                    row[ta[2]], row[ta[3]], 
+                    row[ta[4]], row[ta[5]], 
+                    row['FLUX'], row
+                ), axis=1
+            )
+        
+        # Unpack results into DataFrame columns
+        result_columns = [
+            f'{p}{s}PSS', f'{p}{s}PSSERR', f'{p}{s}PC',
+            f'C{p}{s}TA', f'C{p}{s}TAERR', f'{p}{s}APPEFF'
+        ]
+        df[result_columns] = pd.DataFrame(
+            df[f'PC_{p}{s}DATA'].tolist(), 
+            index=df.index
+        )
+        
+        # Replace zeros with NaN for PSS
+        df[f'{p}{s}PSS'] = df[f'{p}{s}PSS'].replace(0, np.nan)
+        
+        # Calculate fractional errors
+        for i in range(0, len(ta), 2):
+            ta_col, taerr_col = ta[i], ta[i+1]
+            df[f'{ta_col}FERR'] = (df[taerr_col] / df[ta_col]).abs()
+        
+        df[f'{p}{s}PSSFERR'] = (df[f'{p}{s}PSSERR'] / df[f'{p}{s}PSS']).abs()
+    
+    # Calculate TSYS fractional errors
+    df['TSYS1FERR'] = (df['TSYSERR1'] / df['TSYS1']).abs()
+    df['TSYS2FERR'] = (df['TSYSERR2'] / df['TSYS2']).abs()  
+
 
 def calc_ta_and_ferrs_db(df,pol,pos,beams):
 
@@ -782,24 +1279,24 @@ def calc_ta_and_ferrs_db(df,pol,pos,beams):
             print(ta,'\n')
 
     #         if key=='s':
-            df[f'PC_{key}DATAs'] = df.apply(lambda row: calibrate(0,0,row[ta[2]], row[ta[3]],row[ta[4]], row[ta[5]], row), axis=1)
-            df[[f'{key}PCs',f'C{key}TAs',f'C{key}TAERRs']] = pd.DataFrame(df[f'PC_{key}DATAs'].tolist(), index=df.index)  
+    #         df[f'PC_{key}DATAs'] = df.apply(lambda row: calibrate(0,0,row[ta[2]], row[ta[3]],row[ta[4]], row[ta[5]], row), axis=1)
+    #         df[[f'{key}PCs',f'C{key}TAs',f'C{key}TAERRs']] = pd.DataFrame(df[f'PC_{key}DATAs'].tolist(), index=df.index)  
 
-    #         elif key=='n':
-            df[f'PC_{key}DATAn'] = df.apply(lambda row: calibrate(row[ta[0]], row[ta[1]],0,0,row[ta[4]], row[ta[5]], row), axis=1)
-            df[[f'{key}PCn',f'C{key}TAn',f'C{key}TAERRn']] = pd.DataFrame(df[f'PC_{key}DATAn'].tolist(), index=df.index)  
+    # #         elif key=='n':
+    #         df[f'PC_{key}DATAn'] = df.apply(lambda row: calibrate(row[ta[0]], row[ta[1]],0,0,row[ta[4]], row[ta[5]], row), axis=1)
+    #         df[[f'{key}PCn',f'C{key}TAn',f'C{key}TAERRn']] = pd.DataFrame(df[f'PC_{key}DATAn'].tolist(), index=df.index)  
     #         else:
             df[f'PC_{key}DATA'] = df.apply(lambda row: calibrate(row[ta[0]], row[ta[1]],row[ta[2]], row[ta[3]],row[ta[4]], row[ta[5]], row), axis=1)
-            df[[f'{key}PC',f'C{key}TA',f'C{key}TAERR']] = pd.DataFrame(df[f'PC_{key}DATA'].tolist(), index=df.index)  
+            df[[f'{key}PC',f'{b}C{key}TA',f'{b}C{key}TAERR']] = pd.DataFrame(df[f'PC_{key}DATA'].tolist(), index=df.index)  
     #     return dfx
 
     # #         # estimate fractional errors
-            df[f'{ta[0]}FERR']=abs(df[ta[1]]/df[ta[0]]).astype(float)
-            df[f'{ta[2]}FERR']=abs(df[ta[3]]/df[ta[2]]).astype(float)
-            df[f'{ta[4]}FERR']=abs(df[ta[5]]/df[ta[4]]).astype(float)
+        #     df[f'{ta[0]}FERR']=abs(df[ta[1]]/df[ta[0]]).astype(float)
+        #     df[f'{ta[2]}FERR']=abs(df[ta[3]]/df[ta[2]]).astype(float)
+        #     df[f'{ta[4]}FERR']=abs(df[ta[5]]/df[ta[4]]).astype(float)
 
-        df['TSYS1FERR']=(df['TSYSERR1']/df['TSYS1']).astype(float)
-        df['TSYS2FERR']=(df['TSYSERR1']/df['TSYS2']).astype(float)
+        # df['TSYS1FERR']=(df['TSYSERR1']/df['TSYS1']).astype(float)
+        # df['TSYS2FERR']=(df['TSYSERR1']/df['TSYS2']).astype(float)
 
 def calc_pss_and_ferrs_db(df,pol,pos,beams):
     print('\n> Calculating PSS and FERRS')
@@ -824,7 +1321,7 @@ def calc_pss_and_ferrs_db(df,pol,pos,beams):
                 pssvals.append(f'{key}TAERR')
 
             # print()
-            print(ta)
+            # print(ta)
             df[f'PC_{key}DATA'] = df.apply(lambda row: calc_pc_pss(row[ta[0]], row[ta[1]],row[ta[2]], row[ta[3]],row[ta[4]], row[ta[5]], row['FLUX'], row), axis=1)
             df[[f'{key}PSS', f'{key}PSSERR',f'{key}PC',f'C{key}TA',f'C{key}TAERR',f'{key}APPEFF']] = pd.DataFrame(df[f'PC_{key}DATA'].tolist(), index=df.index)
 
@@ -897,6 +1394,55 @@ def add_pss(df, caldf):
 #                 print(f'{b}O{p}PSS', f'{b}O{p}PSSERR',f'{b}S{p}CP', f'{b}S{p}CPERR')
  
     return df
+
+def add_pss_db(df, caldf,pol,pos,beams):
+    """
+    Calculates and updates PSS (Polarized Source Strength) and related values in the input DataFrame.
+
+    Args:
+        df (pd.DataFrame): Input DataFrame containing observation data.  Must have columns:
+                           'FILENAME', 'OBSDATE', 'time', 'OLTA', 'ORTA', 'id'.
+        caldf (pd.DataFrame): Calibration DataFrame containing PSS values. Must have columns:
+                            'start', 'end', 'PSS_LCP', 'PSS_LCP_STD', 'PSS_LCP_SE',
+                            'PSS_RCP', 'PSS_RCP_STD', 'PSS_RCP_SE'.
+
+    Returns:
+        pd.DataFrame: Updated DataFrame with calculated PSS values.
+    """
+
+    # Initialize new columns more efficiently
+    for b in beams:
+        for p in pol:
+            for s in pos:
+                if s=='O':
+                    df[[f'{b}{s}{p}PSS',f'{b}{s}{p}PSSERR',f'{b}{s}{p}CP',f'{b}{s}{p}CPERR']]=np.nan
+                else:
+                    df[[f'{b}{s}{p}CP',f'{b}{s}{p}CPERR']]=np.nan
+#     df[['OLPSS', 'OLPSSERR', 'ORPSS', 'ORPSSERR', 'SLCP', 'SLCPERR', 'SRCP', 'SRCPERR', 'STOT', 'STOTERR']] = np.nan
+
+    
+    for index, row in df.iterrows():  # Use iterrows for efficient row access
+        for b in beams:
+            for p in pol:
+                fn = row['FILENAME']
+                obsdate = str(row['OBSDATE']).split(' ')[0]
+                ta = row[f'{b}CO{p}TA']
+                tae = row[f'{b}CO{p}TAERR']
+#                 orta = row[f'{b}CORTA']
+#                 ortae = row[f'{b}CORTAERR']
+                idx = row['id']
+
+                # Process OLTA (Left Circular Polarization)
+        #         print(obsdate)
+                if pd.notna(ta):  # Use pd.notna for NaN check
+                    pss, psse,g = _get_pss_values(caldf, obsdate, f'{b}PSS_{p}CP', f'{b}PSS_{p}CP_SE',f'{p}cp')
+                    if pd.notna(pss):
+                        df.loc[index, [f'{b}O{p}PSS', f'{b}O{p}PSSERR']] = pss, psse  # More efficient update
+#                         df.loc[index, [f'{b}S{p}CP', f'{b}S{p}CPERR']] = calc_flux(ta,tae,pss, psse)#Calculate SLCP directly
+#                 print(f'{b}O{p}PSS', f'{b}O{p}PSSERR',f'{b}S{p}CP', f'{b}S{p}CPERR')
+ 
+    return df
+
 
 
 def _get_pss_values(caldf, obsdate, pss_col, pss_err_col, pol):
